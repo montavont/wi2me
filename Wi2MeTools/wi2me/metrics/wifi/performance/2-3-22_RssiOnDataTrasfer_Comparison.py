@@ -160,9 +160,9 @@ def plot(config):
 
 	fig = plt.figure()
 
-	for kInd, k in enumerate(Dict):
-		if len(Dict[k]) > 0:
-                        color = cmap(float(kInd)/len(Dict))
+	for kInd, k in enumerate(SessionRssiTrajs):
+		if len(SessionRssiTrajs[k]) > 0:
+                        color = cmap(float(kInd)/len(SessionRssiTrajs))
 			plt.plot([x * 100.0 / config['BUCKET_COUNT']  for x in range(config['BUCKET_COUNT'])], SessionRssiTrajs[k], label=k, color=color)
 
 
