@@ -1,0 +1,4 @@
+*.pyc
+out_dir
+build_dir
+

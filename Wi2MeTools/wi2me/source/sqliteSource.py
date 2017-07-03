@@ -92,34 +92,34 @@ class sqliteSource:
 		retval = [0, 0, 0, 0]
 
 		c = self.conn.cursor()
-		
+
 		long_min = c.execute('select MIN(longitude) from Trace where longitude NOT IN (0)').fetchone()[0]
 		long_max = c.execute('select MAX(longitude) from Trace where longitude NOT IN (0)').fetchone()[0]
 		lat_min = c.execute('select MIN(latitude) from Trace where latitude NOT IN (0)').fetchone()[0]
 		lat_max = c.execute('select MAX(latitude) from Trace where latitude NOT IN (0)').fetchone()[0]
-		
+
 		if None not in [lat_min, lat_max, long_min, long_max]:
 			retval =  [lat_min, lat_max, long_min, long_max]
 
-		return retval 
+		return retval
 
 	#Get the total travelled distance in meters
 	def getTravelledDistance(self):
 		retval = 0
-		
+
 		c = self.conn.cursor()
 
 		#Trajectory with traffic calculation
 		GPSRows = c.execute('SELECT longitude, latitude from Trace').fetchall()
 		gpsPoints = [] #All positions
-	
+
 		for row in GPSRows:
 			if (row[0] * row[1] == 0):
 				continue
-	
+
 			longitude = row[0]
 			latitude = row[1]
-	
+
 			gpsPoints.append([longitude, latitude])
 
 		if len(gpsPoints) > 1:
@@ -158,7 +158,7 @@ class sqliteSource:
 			ScanRes = c.execute('SELECT id from Trace where type="WIFI_SCAN_RESULT" and longitude between ? and ? and latitude between ? and ?', (long_min, long_max, lat_min, lat_max)).fetchall()
 		else:
 			ScanRes = c.execute('SELECT id from Trace where type="WIFI_SCAN_RESULT"').fetchall()
-		
+
 		for scanInd, res in enumerate(ScanRes):
 			scanRes = []
 			for bssid, level, ssid, latitude, longitude, channel, capabilities, timestamp in c.execute('SELECT BSSID, level, ssid, latitude, longitude, channel, capabilities, timestamp from WifiScanResult s, WifiAP a, Trace t where s.TraceId=' + str(res[0]) + " and a.id = s.WifiAPId and t.id = s.TraceId").fetchall():
@@ -225,9 +225,19 @@ class sqliteSource:
 	def getTransferredData(self):
 		retval = []
 		c = self.conn.cursor()
-		
+
 		for timestamp, bssid, level, ssid, latitude, longitude, channel, capabilities, bytesTransferred, totalBytes, direction in c.execute('SELECT timestamp, BSSID, level, ssid, latitude, longitude, channel, capabilities, bytesTransferred, totalBytes, d.type from WifiConnectionData d, WifiAP a, Trace t where t.type="WIFI_CONNECTION_DATA" and d.TraceId=t.id and a.id=d.WifiAPId and t.id=d.TraceId').fetchall():
 			network = Network(bssid = bssid, ssid=ssid, channel = channel, detections=[Detection(source = "android", GPS = (latitude, longitude), timestamp = timestamp, rssi = level)], capabilities = capabilities)
 			retval.append(TransferredData(network, bytesTransferred, totalBytes, LINK_WIFI, direction))
 
 		return retval
+
+        def getTotalTransferredBytes(self, maxts = -1):
+            retval = 0
+
+	    c = self.conn.cursor()
+	    for timestamp, bssid, level, ssid, latitude, longitude, channel, capabilities, bytesTransferred, totalBytes, direction in c.execute('SELECT timestamp, BSSID, level, ssid, latitude, longitude, channel, capabilities, bytesTransferred, totalBytes, d.type from WifiConnectionData d, WifiAP a, Trace t where t.type="WIFI_CONNECTION_DATA" and d.TraceId=t.id and a.id=d.WifiAPId and t.id=d.TraceId').fetchall():
+                retval = totalBytes
+
+
+            return retval

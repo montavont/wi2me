@@ -49,8 +49,8 @@ L2EVENTS = {
 }
 
 SOURCES = {0:"beacon", 1:"presponse"}
-       
- 
+
+
 def intToBssid(val):
     retval = list("00:00:00:00:00:00")
     ind = len(retval) - 1
@@ -226,7 +226,7 @@ class ns3Source:
 
                     if ssid not in retval:
                         retval[ssid] = Network(bssid = intToBssid(ssids.index(ssid)), ssid=ssid, detections=[Detection(source = SourceHelper.ORIGIN_NS3, timestamp = timestamp, rssi = rssi, scanInd = scanInd)])
-                        
+
                     else:
                         retval[ssid].detections.append(Detection(source = SourceHelper.ORIGIN_NS3, timestamp = timestamp, rssi = rssi, scanInd = scanInd))
 
@@ -270,7 +270,7 @@ class ns3Source:
 	#Get a list of the data transfer events, with the associated AP
 	def getTransferredData(self):
 		retval = []
-        
+
                 totalbytes = 0
                 lastBytes = 0
                 rssi = -200
@@ -282,7 +282,7 @@ class ns3Source:
                         totalbytes = int(totalbytes)
 
                         byt = totalbytes - lastBytes
-                    
+
     	        	network = Network(detections=[Detection(source = "ns3", GPS = (0, 0), timestamp = timestamp, rssi = rssi)])
         		retval.append(TransferredData(network, byt, 0, LINK_WIFI, direction))
 
