@@ -41,8 +41,8 @@ TAB = "	"
 def plot(config):
 
 	allTags = set([tag for source in config['data'] for tag in source.tags])
-	
-	Rssis = {} 
+
+	Rssis = {}
         Sessions = {}
         SessionRssiTrajs = {}
         cmap = plt.get_cmap('jet_r')
@@ -59,7 +59,7 @@ def plot(config):
         #Get Rssis overall
 	for source in config['data']:
 		srcRssis = [data.network.detections[0].rssi for data in source.getTransferredData() if data.network.detections[0].rssi != -200]
-		
+
 		if len(source.tags) > 0:
 			for tag in source.tags:
 				Rssis[tag] += srcRssis
@@ -90,14 +90,14 @@ def plot(config):
                         for evt in Seq:
                             normTs = float(evt.timestamp - start) / duration
                             normalizedRssis.append((normTs, evt.network.detections[0].rssi))
-                    
+
         	if len(source.tags) > 0:
 	        	for tag in source.tags:
 		        	Sessions[tag] += normalizedRssis
         	else:
 	        	Sessions[source.name] += normalizedRssis
 
-        
+
         #Bucketize the rssis depending on their normalized position in the session, then average each bucket
         for k in Sessions:
             bucketized = []
@@ -111,14 +111,14 @@ def plot(config):
 
             SessionRssiTrajs[k] = [np.average(u) for u in bucketized]
 
-                        
+
 	for xAxis, Dict in [("RSSI (dBm)", Rssis)]:
 		fig = plt.figure()
 
 		for kInd, k in enumerate(Dict):
 			if len(Dict[k]) > 0:
                                 color = cmap(float(kInd)/len(Dict))
-    
+
 				ecdf = ECDF(Dict[k])
 				plt.step(ecdf.x, ecdf.y, label=k, color=color)
 
@@ -128,7 +128,7 @@ def plot(config):
 		plt.ylabel("CDF")
 		plt.xlabel(xAxis)
 		plt.xlim(xmin=-100)
-			
+
 		fig.tight_layout()
 
 		output_file = config['outdir'] + METRIC_CODE + "_" + OUT_BASE_NAME + xAxis + SVG_EXTEND
@@ -153,8 +153,8 @@ def plot(config):
 					textOut.write(str(func(Dict[k])))
 					textOut.write('\n')
 		textOut.write('\n')
-	
-	textOut.close()	
+
+	textOut.close()
 
 
 
@@ -170,7 +170,7 @@ def plot(config):
 
 	plt.ylabel("Rssi (dBm)")
 	plt.xlabel('Relative session time (%)')
-			
+
 	fig.tight_layout()
 
 	output_file = config['outdir'] + METRIC_CODE + "_" + OUT_BASE_NAME + "_RssiTrajectories" + SVG_EXTEND
@@ -178,5 +178,5 @@ def plot(config):
 
 	plt.close(fig)
 
-        
+
 

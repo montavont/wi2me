@@ -35,6 +35,7 @@ databaseEventValues = {
 	TYPE_CONNECTED : "CONNECTED",
 	TYPE_TIMEOUT : "TIMEOUT(15000ms)",
 	TYPE_DHCP : "OBTAINING_IPADDR",
+        TYPE_RSSI_CHANGE : "NOTIMPL",
 }
 
 databaseCNEventValues = {
