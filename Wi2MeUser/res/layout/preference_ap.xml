@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="fill_parent" 
+  android:layout_height="fill_parent"
+  android:orientation="vertical" > 
+
+          
+    <TextView 
+     	android:text="Network Rating" 
+     	android:id="@+id/listviewtitle" 
+     	android:layout_width="fill_parent" 
+     	android:layout_height="wrap_content"
+     	style="?android:attr/listSeparatorTextViewStyle"/>
+    
+    <TextView 
+     	android:text="Long press on an element to connect manually or remove the grade." 
+     	android:id="@+id/listviewsubtitle" 
+     	android:layout_below="@+id/listviewtitle"
+     	android:layout_width="fill_parent" 
+     	android:layout_height="wrap_content"/>
+       	
+    <ListView
+        android:id="@+id/listviewAP"
+        android:layout_below="@+id/listviewsubtitle"
+        android:layout_above="@+id/buttons"
+        android:gravity="center_horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"/>
+
+    
+     <LinearLayout
+                android:id="@+id/buttons"
+                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true">
+                <Button
+                        android:id="@+id/buttonSave"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:text="Save"/>
+                 <Button
+                        android:id="@+id/buttonCancel"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="50"
+                        android:text="Cancel"/>
+ 	</LinearLayout>
+
+</RelativeLayout>

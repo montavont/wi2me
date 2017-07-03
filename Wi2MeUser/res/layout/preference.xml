@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <PreferenceCategory android:title="Authorization">
+        <CheckBoxPreference
+            android:key="DataCollection"
+            android:title="Data collection"
+            android:summaryOn="Allow traffic data collection"
+            android:summaryOff="Don't allow traffic data collection">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="OpenNetwork"
+            android:title="Open network connection"
+            android:summaryOn="connect to open network"
+            android:summaryOff="Don't connect to open network">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="Notification"
+            android:title="Service Notification"
+            android:summaryOn="Show wi2me logo in the status bar"
+            android:summaryOff="Don't show wi2me logo in the status bar">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="GPSLocation"
+            android:title="Location"
+            android:summaryOn="Use GPS Location"
+            android:summaryOff="Use Network Location">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="NotifyConnection"
+            android:title="Connection Notification"
+            android:summaryOn="Notify when wifi connected"
+            android:summaryOff="Don't notify when wifi connected">
+        </CheckBoxPreference> 
+        
+        <CheckBoxPreference
+            android:key="ConnectivityCheck"
+            android:title="Connectivity Verification"
+            android:summaryOn="Check the connectivity with the defined frequency"
+            android:summaryOff="Don't check the connectivity">
+        </CheckBoxPreference>
+           
+    </PreferenceCategory> 
+  	
+    <PreferenceCategory android:title="Configuration">  
+        <Preference
+            android:key="BatteryLevel"
+            android:title="Battery level"
+            android:summary="Mininum battery level to run the application">
+        </Preference>      
+        <ListPreference
+            android:key="Threshold"
+            android:title="Threshold"
+            android:summary="Mininum threshold to connect to a Access Point">
+        </ListPreference>  
+        <EditTextPreference
+            android:key="ScanInterval"
+            android:title="Scanning Interval"
+            android:summary="The interval of scanning in second">
+        </EditTextPreference>
+        <Preference
+            android:key="ConnectivityFrequency"
+            android:title="Frequency of Connectivity Verification"
+            android:summary="The frequency of the connectivity verification, you should authorize the connectivity verification to set this frequency">
+        </Preference> 
+    </PreferenceCategory>           
+</PreferenceScreen>
+
+
+ 
+
+

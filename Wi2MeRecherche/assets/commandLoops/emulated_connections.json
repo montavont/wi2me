@@ -1,0 +1,24 @@
+{
+	"command":{
+		"name":"WifiCleanerCommand"
+	},
+	"command":{
+		"name":"WifiScanner"
+	},
+	"command":{
+		"module":"wi2meRecherche",
+		"name":"WifiBestRssiSelector",
+		"params":{
+			"bssid_file":""
+		}
+	},
+	"command":{
+		"module":"wi2meRecherche",
+		"name":"WifiCommandPoppingStayConnected",
+		"params":{
+				"iface":"wlan0",
+				"min_rssi":"-85",
+				"max_fail":"5"
+			}
+	}
+}       
