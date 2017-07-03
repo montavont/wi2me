@@ -39,10 +39,11 @@ def plot(config):
 		Timeline = {}
 
 		for res in source.getScanResults():
-                        ts = res[0].detections[0].timestamp
-			Timeline[ts] = len(res)
-		
-		Timelines.append(Timeline)	
+                        if len(res) > 0 and len(res[0].detections) > 0:
+                            ts = res[0].detections[0].timestamp
+             		    Timeline[ts] = len(res)
+
+		Timelines.append(Timeline)
 
 	fig, axes = plt.subplots(len(Timelines), sharex=True, sharey=True)
 
@@ -71,8 +72,8 @@ def plot(config):
 
 			axes[i].set_ylabel(yLabel)
 			axes[i].bar(*zip(*dataPoints), edgecolor = colors)
-		
+
 		axes[len(Timelines) -1].set_xlabel(xLabel)
-	
+
 	output_file = outdir + METRIC_CODE + "_" + OUT_NAME + ".svg"
 	fig.savefig(output_file)
