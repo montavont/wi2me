@@ -31,28 +31,23 @@ def getHMSMS(ts):
 def plot(config):
 	Sources = config['data']
 	totalLen = 0
-	
+
 	finalFile = open(config['outdir'] + METRIC_CODE + "_TotalDuration.txt", 'w')
 
 	for source in Sources:
-		if source is not None:
-			print source.name
+		srcLen = 0
+                start = stop = 0
+		hreadable = "%i:%i:%i.%i" % getHMSMS(0)
+		for i, (start, stop) in  enumerate(source.getSessions()):
+			sessLen = stop - start
+			hreadable = "%i:%i:%i.%i" % getHMSMS(sessLen)
 
-			srcLen = 0
-                        start = stop = 0
-			hreadable = "%i:%i:%i.%i" % getHMSMS(0)
-			for i, (start, stop) in  enumerate(source.getSessions()):
-				sessLen = stop - start
-				hreadable = "%i:%i:%i.%i" % getHMSMS(sessLen)
+			finalFile.write(source.name + config['CSV_SEQ'] + "Session_" + str(i) + config['CSV_SEQ']  + str(start) + config['CSV_SEQ'] + str(stop) + config['CSV_SEQ'] + str(sessLen) + config['CSV_SEQ'] + hreadable + "\n")
+			srcLen += sessLen
 
-				finalFile.write(source.name + config['CSV_SEQ'] + "Session_" + str(i) + config['CSV_SEQ']  + str(start) + config['CSV_SEQ'] + str(stop) + config['CSV_SEQ'] + str(sessLen) + config['CSV_SEQ'] + hreadable + "\n")
-				srcLen += sessLen
+		finalFile.write(source.name + config['CSV_SEQ'] + "Total"  + config['CSV_SEQ']  + str(start) + config['CSV_SEQ'] + str(stop) + config['CSV_SEQ'] + str(srcLen) + config['CSV_SEQ'] + hreadable + "\n")
+		totalLen += srcLen
 
-			finalFile.write(source.name + config['CSV_SEQ'] + "Total"  + config['CSV_SEQ']  + str(start) + config['CSV_SEQ'] + str(stop) + config['CSV_SEQ'] + str(srcLen) + config['CSV_SEQ'] + hreadable + "\n")
-			totalLen += srcLen
-		else:
-			print "None  !"
-		
 	hreadable = "%i:%i:%i.%i" % getHMSMS(totalLen)
 	finalFile.write("Total" + config['CSV_SEQ'] + str(totalLen) + config['CSV_SEQ'] + hreadable + "\n")
 	finalFile.close()

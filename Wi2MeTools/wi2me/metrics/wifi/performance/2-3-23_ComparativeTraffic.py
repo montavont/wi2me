@@ -59,6 +59,7 @@ def plot(config):
 
 	for source in config['data']:
                 l2Time = 0
+                startTime = source.getStartTime()
                 if config['TRUNCATE']:
                     duration = minDuration / 1000.0 
                 else:
@@ -83,7 +84,7 @@ def plot(config):
 
                 lastTraf = 0
 
-                buckets = 10 
+                buckets = 10
                 tsum = 0
 
                 lastTs = 0
@@ -94,7 +95,7 @@ def plot(config):
                 bucketInterv = {i:[] for i in range(buckets + 1)}
                 for dataPoint in source.getTransferredData():
                     ts = dataPoint.network.detections[0].timestamp
-                    buk = int(ts// step)
+                    buk = int((ts - startTime) // step)
                     bucketSpeeds[buk].append(dataPoint.progress - lastBytes)
                     bucketInterv[buk].append(ts - lastTs)
 
@@ -114,7 +115,9 @@ def plot(config):
 			L2AssociationTimes[source.name] += l2Time
 			Handovers[source.name] += handovers
 
-        print "|_.name|_.Average Throughput (kB/s) |_.Duration (s)|_.Average Throughput while associated (kBs)|_.Association time(s)|Association Ratio|_.Handovers|_.Handovers/s|"
+
+	output_txt = open(config['outdir'] + METRIC_CODE + "_" + OUT_BASE_NAME + "_stats_table.txt", 'w')
+        output_txt.write("|_.name|_.Average Throughput (kB/s) |_.Duration (s)|_.Average Throughput while associated (kBs)|_.Association time(s)|Association Ratio|_.Handovers|_.Handovers/s|\n")
         for k in sorted([u for u in Traffic if Duration[u] > 0] ,key = lambda x : Traffic[x] / float(Duration[x])):
             line = "|" + k + "|"
             if Duration[k] > 0:
@@ -127,7 +130,8 @@ def plot(config):
                 line += "|" + str(float(Traffic[k])/ L2AssociationTimes[k] // 1000) + "|" + str(L2AssociationTimes[k])[:8] + "|" + str(float(L2AssociationTimes[k])  / Duration[k])[:8] + '|' + str(Handovers[k]) + " |"  + str(Handovers[k]/float(Duration[k]))[:8] + "|"
             else:
                 line += "|N/A|" + str(L2AssociationTimes[k]) + "|N/A|" + str(Handovers[k]) + " |N/A|"
-            print line
+            output_txt.write( line + "\n")
+        output_txt.close()
 
 
         if len(AvgThroughputs) > 0:
@@ -154,7 +158,7 @@ def plot(config):
                     legT = ax1.bar(Average_Xs, Average_bars, width,  color = "grey", align = "center", label = "Average Throughput")
                 if len(AssociationRatio_bars) > 0:
                     legAR = ax2.bar(AssocRatio_Xs, AssociationRatio_bars, width, color="black", align = "center", label ="Association Ratio")
-                if len(AssociationAverage_bars) > 0:
+                if len(AssociationAverage_bars) == len(AssociationAverage_Xs):
                     legAA = ax1.bar(AssociationAverage_Xs, AssociationAverage_bars, width, color="darkgrey", align = "center", label = "Instantaneous Throughput")
                 plt.xticks(range(1, len(AvgThroughputs) + 1), sorted(AvgThroughputs.keys()), rotation = 90)
 
