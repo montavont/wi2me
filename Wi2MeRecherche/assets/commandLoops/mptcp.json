@@ -1,0 +1,59 @@
+{
+	"command":{
+		"name":"WifiCleanerCommand"
+	},
+	"command":{
+		"name":"WifiScanner"
+	},
+	"command":{
+		"module":"wi2meRecherche",
+		"name":"WifiConnector",
+		"params":{
+			"bssid_file":""
+		}
+	},
+	"command":{
+		"name":"CommunityNetworkConnector"
+	},
+	"command":{
+		"name":"ShellPoppingCommand",
+		"params":{
+				"command":"sysctl -w net.mptcp.mptcp_enabled=0"
+			}
+	},
+	"command":{
+		"name":"WifiWebPageDownloader",
+		"params":{
+			"page":"http://192.108.119.130/Huff.html",
+			"threads":"5",
+			"tag":"WEB"
+		}
+	},
+	"command":{
+		"name":"ShellPoppingCommand",
+		"params":{
+				"command":"sysctl -w net.mptcp.mptcp_enabled=1"
+			}
+	},
+	"command":{
+		"name":"WifiWebPageDownloader",
+		"params":{
+			"page":"http://192.108.119.130/Huff.html",
+			"threads":"5",
+			"tag":"NDIFFPORTS"
+		}
+	},
+	"command":{
+		"name":"ShellPoppingCommand",
+		"params":{
+				"command":"sysctl -w net.mptcp.mptcp_enabled=0"
+			}
+	},
+	"command":{
+		"name":"WifiSPDYDownloader",
+		"params":{
+			"page":"http://192.108.119.130/Huff.html",
+			"tag":"SPDY_VANILLA"
+		}
+	},
+}

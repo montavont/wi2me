@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    
+    <PreferenceCategory android:title="Connectivity">
+
+        <CheckBoxPreference
+            android:key="RUN_WIFI"
+            android:title="RUN_WIFI">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="RUN_CELLULAR"
+            android:title="RUN_CELLULAR">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="CONNECT_CELLULAR"
+            android:title="CONNECT_CELLULAR">
+        </CheckBoxPreference>
+        
+        <CheckBoxPreference
+            android:key="CONNECT_TO_OPEN_NETWORKS"
+            android:title="CONNECT_TO_OPEN_NETWORKS">
+        </CheckBoxPreference>
+      </PreferenceCategory> 
+      <PreferenceCategory android:title="Configuration">
+        <Preference
+            android:key="MIN_BATTERY_LEVEL"
+            android:title="MIN_BATTERY_LEVEL">
+        </Preference>      
+        <EditTextPreference
+            android:key="WIFI_THRESHOLD"
+            android:title="WIFI_THRESHOLD">
+        </EditTextPreference>  
+        <EditTextPreference
+            android:key="WIFI_SCAN_INTERVAL"
+            android:title="WIFI_SCAN_INTERVAL">
+        </EditTextPreference>  
+	<MultiSelectListPreference
+            android:key="MONITORED_INTERFACES"
+            android:title="MONITORED_INTERFACES">
+	</MultiSelectListPreference>
+        <CheckBoxPreference
+            android:key="LOCK_NETWORK"
+            android:title="LOCK_NETWORK (requiers root)">
+        </CheckBoxPreference>
+        <CheckBoxPreference
+            android:key="USE_GPS"
+            android:title="USE_GPS">
+        </CheckBoxPreference>
+        <ListPreference
+            android:key="STORAGE_TYPE"
+            android:title="STORAGE_TYPE">
+        </ListPreference> 
+	<Preference
+            android:key="COMMAND_FILE"
+            android:title="COMMAND_FILE">
+	</Preference>
+        <Preference
+            android:key="Advanced"
+            android:title="Advanced">
+        </Preference> 
+        <Preference
+            android:key="About"
+            android:title="About">
+        </Preference> 
+    </PreferenceCategory>           
+    <PreferenceCategory 
+	android:title="Commands"
+	android:key="COMMAND_LOOP_CATEGORY" >
+    </PreferenceCategory>           
+</PreferenceScreen>
+
+
+ 
+
+

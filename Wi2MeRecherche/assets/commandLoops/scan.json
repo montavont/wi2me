@@ -1,0 +1,8 @@
+{
+	"command":{
+		"name":"WifiCleanerCommand"
+	},
+	"command":{
+		"name":"WifiScanner"
+	},
+}

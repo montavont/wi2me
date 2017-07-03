@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Wi2MeUser</string>
+    <string name="operator_name">Operator Name:</string>
+     
+    <string-array name="thresholdDisplayWord">
+		 <item>-80 dBm</item>
+		 <item>-85 dBm</item>
+		 <item>-90 dBm</item>
+	</string-array>
+	<string-array name="thresholdReturnValue">
+		 <item>-80</item>
+		 <item>-85</item>
+		 <item>-90</item>
+	</string-array>
+        
+	<!-- Menu -->
+	 <string name="network_management">Network Management</string>
+	 <string name="ic_menu_preferences">Preferences</string>
+	 <string name="log">Upload</string>
+	 <string name="quit">Exit</string>
+</resources>
