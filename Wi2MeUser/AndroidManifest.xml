@@ -6,8 +6,7 @@
 
     
     <application
-        android:icon="@drawable/icon"
-        android:label="Wi2Me-User" 
+        android:label="Wi2Me-User"
         android:debuggable="false">
         <activity
             android:label="Wi2Me-User"

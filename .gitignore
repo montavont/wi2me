@@ -1,0 +1,8 @@
+.gradle/
+Wi2MeCore/.gradle/
+Wi2MeCore/build/
+Wi2MeRecherche/.gradle/
+Wi2MeRecherche/build/
+Wi2MeUser/build/
+build/
+local.properties

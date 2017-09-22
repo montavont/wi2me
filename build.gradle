@@ -1,0 +1,4 @@
+dependencies {
+    project(":Wi2MeRecherche")
+    project(":Wi2MeUser")
+}

@@ -3,7 +3,7 @@
       package="telecom.wi2meRecherche"
       android:versionCode="1"
       android:versionName="6.2">
-    <application android:icon="@drawable/icon" android:label="Wi2Me-Research">
+    <application android:label="Wi2Me-Research">
         <activity android:name=".Wi2MeRecherche"
                   android:label="Wi2Me-Research"
                   android:screenOrientation="portrait">

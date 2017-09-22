@@ -1,0 +1,33 @@
+buildscript {
+    repositories {
+		jcenter()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:2.3.3'
+    }
+}
+
+evaluationDependsOn(':Wi2MeCore')
+
+apply plugin: 'android'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion "26.0"
+
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            resources {
+                    srcDirs= ["res"]
+            }
+        }
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+}
