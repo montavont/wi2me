@@ -121,12 +121,12 @@ public class ApplicationService  extends Service {
 	@Override
 	public void onCreate() {
 
-		super.onCreate(); 
+		super.onCreate();
 
 		cellThreadContainer = new CellThreadContainer();
 		context = this;
 
-		Log.d(getClass().getSimpleName(), "++ " + "Running onCreate");    	
+		Log.d(getClass().getSimpleName(), "++ " + "Running onCreate");
 
 		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
@@ -159,12 +159,12 @@ public class ApplicationService  extends Service {
 			//If we have problems loading the parameters file, we should tell and finish
 			Toast.makeText(this, "ERROR LOADING CONFIGURATION FILE: "+e.getMessage()+". Please, check ensure USB storage is off. Otherwise, replace configuration file and try again.", Toast.LENGTH_LONG).show();
 			binder.loadingError = true;
-			return;	
+			return;
 		}
 
 
 		// We get if the 3G connection is available to enable it again when closing
-		int version = Build.VERSION.SDK_INT;			
+		int version = Build.VERSION.SDK_INT;
 		if (version <= 8){//8 is FROYO (2.2), higher versions change the Telephony API so we should not use the cellular methods
 			wasCellularConnected = ControllerServices.getInstance().getCell().isDataNetworkConnected();
 		}else{
@@ -172,9 +172,9 @@ public class ApplicationService  extends Service {
 		}
 
 		// Lost connection
-		lostConnectionReceiver.register();	
+		lostConnectionReceiver.register();
 	}
-	
+
 	private void startThreads() {
 		wifiThread = new Thread(){
 			public void run(){
@@ -251,7 +251,7 @@ public class ApplicationService  extends Service {
 			ControllerServices.getInstance().getCell().connectAsync();
 		}
 
-		ControllerServices.finalizeServices();    	
+		ControllerServices.finalizeServices();
 		/*
     	if (DatabaseHelper.isInitialized())
     		DatabaseHelper.getDatabaseHelper().closeDatabase();
@@ -262,15 +262,15 @@ public class ApplicationService  extends Service {
 	}
 
 	private void stopThreads() {
-		//Stop 
+		//Stop
 		//we also interrupt what is being done, as it may be sleeping to scan, or downloading something
 
 
 
 		if (cellWorkingFlag != null){
-			cellWorkingFlag.setActive(false);	
+			cellWorkingFlag.setActive(false);
 			cellCommandLooper.breakLoop();
-			cellThread.interrupt();		
+			cellThread.interrupt();
 			try {
 				cellThread.join(10000);
 			} catch (InterruptedException e) {
@@ -282,7 +282,7 @@ public class ApplicationService  extends Service {
 		if (wifiWorkingFlag != null){
 			wifiWorkingFlag.setActive(false);
 			wifiCommandLooper.breakLoop();
-			wifiThread.interrupt();  
+			wifiThread.interrupt();
 			try {
 				wifiThread.join(10000);
 			} catch (InterruptedException e) {
@@ -320,10 +320,6 @@ public class ApplicationService  extends Service {
 		// The PendingIntent to launch our activity if the user selects this notification
 		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
 				new Intent(this, Wi2MeUserActivity.class), 0);
-
-		// Set the info for the views that show in the notification panel.
-		notification.setLatestEventInfo(this, "Wi2Me User",
-				"Select to open application", contentIntent);
 
 		notification.flags = Notification.FLAG_NO_CLEAR;
 		notification_show = true;
@@ -385,7 +381,7 @@ public class ApplicationService  extends Service {
 			this.parameters = parameters;
 			isBatteryLow = false;
 			firstRun = true;
-			startedDate = new Date(Calendar.getInstance().getTimeInMillis());    		
+			startedDate = new Date(Calendar.getInstance().getTimeInMillis());
 			loadingError = false;
 			observable = null;
 			wifiData = null;
@@ -394,20 +390,22 @@ public class ApplicationService  extends Service {
 		public void start()
 		{
 
-			wifiCommandLooper = new WirelessNetworkCommandLooper(new WifiCleanerCommand());
+			wifiCommandLooper = new WirelessNetworkCommandLooper();
 			wifiCommandLooper.addCommand(new WifiScanner());
 			wifiCommandLooper.addCommand(new WifiConnector());
 			wifiCommandLooper.addCommand(new CommunityNetworkConnector());
 			wifiCommandLooper.addCommand(new WifiStayConnected());
+			wifiCommandLooper.addCommand(new WifiCleanerCommand());
 
 			if ((Boolean)parameters.getParameter(Parameter.SENSOR_ONLY))
 				wifiCommandLooper.addCommand(new WifiSensor());
 
 			wifiCommandLooper.initializeCommands(parameters);
 
-			cellCommandLooper = new WirelessNetworkCommandLooper(new CellCleanerCommand());
+			cellCommandLooper = new WirelessNetworkCommandLooper();
 			cellCommandLooper.addCommand(new CellScanner());
 			cellCommandLooper.addCommand(new CellConnector());
+			cellCommandLooper.addCommand(new CellCleanerCommand());
 
 			cellCommandLooper.initializeCommands(parameters);
 

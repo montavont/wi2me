@@ -81,19 +81,19 @@ public class LocationService implements ILocationService{
 				int index = locationListeners.indexOf(new ServiceLocationListener(receiver));
 				if (index != -1){ //listener found
 					LocationListener toUnregister = locationListeners.remove(index);
-					locationManager.removeUpdates(toUnregister);					
+					locationManager.removeUpdates(toUnregister);
 				}else{
 					Log.w(getClass().getSimpleName(), "++ "+"Location Listener to unregister, not registered.");
 				}
 
 	    	}catch(Exception e){
-	    		Log.e("Unregistering Location Receiver", e.getMessage(), e);
+	    		Log.e("Location", "Unregistering Location Receiver " + e.getMessage(), e);
 	    	}
 		}
-		
+
 	}
-	
-	
+
+
 	@Override
 	public void finalizeService() {
 		//if there is any listener that was forgotten to remove, this will do
@@ -101,7 +101,7 @@ public class LocationService implements ILocationService{
 			locationManager.removeUpdates(l);
 		}
 	}
-	
+
 
 	@Override
 	public boolean isGPSEnabled() {

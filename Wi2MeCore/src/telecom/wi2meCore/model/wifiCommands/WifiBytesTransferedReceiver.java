@@ -313,15 +313,15 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 					}
 					catch(InterruptedException e)
 					{
-						Log.e("WifiBytesTransferedReceiver", "++ Unable to obtain debugfs semaphore" + e.toString());
+						Log.e("Wifi", "++ Unable to obtain debugfs semaphore" + e.toString());
 					}
 				}
 				catch (IOException e)
 				{
-					Log.e("WifiBytesTransferedReceiver", "++ Error reading in debugfs" + e.toString());
+					Log.e("Wifi", "++ Error reading in debugfs" + e.toString());
 					ifaces.remove(iface);
 				}
-				if (logData)			
+				if (logData)
 				{
 					SnifferData snifferData = SnifferData.getNewSnifferData(txb, rxb, txp, rxp, retries, Utils.intToIp(info.getIpAddress()));
 					WifiSnifferData wifiSnifferData = WifiSnifferData.getNewWifiSnifferData(TraceManager.getTrace(), connectionToWifiAP, snifferData, i);
@@ -392,12 +392,12 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 					}
 					catch(InterruptedException e)
 					{
-						Log.e("WifiBytesTransferedReceiver", "++ Unable to obtain debugfs semaphore" + e.toString());
+						Log.e("Wifi", "++ Unable to obtain debugfs semaphore" + e.toString());
 					}
 				}
 				catch (IOException e)
 				{
-					Log.e("WifiBytesTransferedReceiver", "++ Error messing with debugfs" + e.toString());
+					Log.e("Wifi", "++ Error messing with debugfs" + e.toString());
 				}
 
 				byteCounter += bytes;
@@ -405,7 +405,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 				if (info != null && logData)
 				{
 					int ip = info.getIpAddress();
-				
+
 					WifiConnectionData connectionData = WifiConnectionData.getNewWifiConnectionData(
 								TraceManager.getTrace(),
 								WifiAP.getNewWifiAP(info.getBSSID(),
@@ -458,7 +458,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		}
 		catch (Exception e)
 		{
-			Log.w("WifiBytesTransferedReceiver", "++ Error reading file: "+e.toString());
+			Log.w("Wifi", "++ Error reading file: "+e.toString());
 		}
 		finally
 		{
@@ -470,7 +470,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 				}
 				catch (IOException e)
 				{
-					Log.w("WifiBytesTransferedReceiver", "++ Error closing file: "+e.toString());
+					Log.w("Wifi", "++ Error closing file: "+e.toString());
 				}
 			}
 		}

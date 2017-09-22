@@ -1,77 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <PreferenceCategory android:title="Connectivity">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+>
+
+    <PreferenceCategory android:title="Connectivity"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+	>
 
         <CheckBoxPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="RUN_WIFI"
             android:title="RUN_WIFI">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="RUN_CELLULAR"
             android:title="RUN_CELLULAR">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="CONNECT_CELLULAR"
             android:title="CONNECT_CELLULAR">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="CONNECT_TO_OPEN_NETWORKS"
             android:title="CONNECT_TO_OPEN_NETWORKS">
         </CheckBoxPreference>
-      </PreferenceCategory> 
-      <PreferenceCategory android:title="Configuration">
+      </PreferenceCategory>
+      <PreferenceCategory android:title="Configuration"
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
+	  >
         <Preference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="MIN_BATTERY_LEVEL"
             android:title="MIN_BATTERY_LEVEL">
-        </Preference>      
+        </Preference>
         <EditTextPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="WIFI_THRESHOLD"
             android:title="WIFI_THRESHOLD">
-        </EditTextPreference>  
+        </EditTextPreference>
         <EditTextPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="WIFI_SCAN_INTERVAL"
             android:title="WIFI_SCAN_INTERVAL">
-        </EditTextPreference>  
+        </EditTextPreference>
 	<MultiSelectListPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="MONITORED_INTERFACES"
             android:title="MONITORED_INTERFACES">
 	</MultiSelectListPreference>
         <CheckBoxPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="LOCK_NETWORK"
             android:title="LOCK_NETWORK (requiers root)">
         </CheckBoxPreference>
         <CheckBoxPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="USE_GPS"
             android:title="USE_GPS">
         </CheckBoxPreference>
         <ListPreference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="STORAGE_TYPE"
             android:title="STORAGE_TYPE">
-        </ListPreference> 
+        </ListPreference>
 	<Preference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="COMMAND_FILE"
             android:title="COMMAND_FILE">
 	</Preference>
         <Preference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="Advanced"
             android:title="Advanced">
-        </Preference> 
+        </Preference>
         <Preference
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
             android:key="About"
             android:title="About">
-        </Preference> 
-    </PreferenceCategory>           
-    <PreferenceCategory 
+        </Preference>
+    </PreferenceCategory>
+    <PreferenceCategory
+		    android:layout_width="fill_parent"
+		    android:layout_height="fill_parent"
 	android:title="Commands"
 	android:key="COMMAND_LOOP_CATEGORY" >
-    </PreferenceCategory>           
+    </PreferenceCategory>
 </PreferenceScreen>
 
 
- 
+
 
 

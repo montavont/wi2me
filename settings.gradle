@@ -1,0 +1,3 @@
+include ':Wi2MeCore'
+include ':Wi2MeRecherche'
+include ':Wi2MeUser'

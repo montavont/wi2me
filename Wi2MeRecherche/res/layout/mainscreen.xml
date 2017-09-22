@@ -10,21 +10,21 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content" >
 
-       
-	<RelativeLayout 
+
+	<RelativeLayout
 	    android:orientation="vertical"
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content">
 
 
-	
+
 	        <TextView
 	            android:id="@+id/localization"
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
 	            android:text="Localization"
 	            android:background="?android:attr/listDivider"/>
-	
+
 	        <ListView
 	            android:id="@+id/gridViewLocalization"
 	            android:layout_width="wrap_content"
@@ -32,31 +32,31 @@
 	            android:layout_below="@+id/localization"
 	            android:scrollbars="none"
 	            android:clickable="false">
-	
-	        </ListView>
-	
 
-	
+	        </ListView>
+
+
+
 	        <LinearLayout
 	            android:id="@+id/linearLayout6"
 	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content" 
+	            android:layout_height="wrap_content"
 	            android:background="?android:attr/listDivider"
 	            android:layout_below="@+id/gridViewLocalization">
-	
+
 	            <TextView
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
 	                android:text="Connection Status" />
-	
+
 	            <TextView
 	                android:id="@+id/connectionStatus"
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"/>
 	        </LinearLayout>
-	
+
 	        <ListView
 	            android:id="@+id/gridViewConnection"
 	            android:layout_width="wrap_content"
@@ -64,32 +64,32 @@
 	            android:layout_below="@+id/linearLayout6"
 	            android:scrollbars="none"
 	            android:clickable="false">
-	
-	        </ListView>
-	
 
-	        
+	        </ListView>
+
+
+
 	                <LinearLayout
 	            android:id="@+id/linearLayout7"
 	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content" 
+	            android:layout_height="wrap_content"
 	            android:background="?android:attr/listDivider"
 	            android:layout_below="@+id/gridViewConnection">
-	
+
 	            <TextView
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
 	                android:text="Wifi Status"/>
 
-	            	
+	            
 	            <TextView
 	                android:id="@+id/wifiStatus"
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"/>
 	        </LinearLayout>
-	
+
 	        <ListView
 	            android:id="@+id/gridViewWifi"
 	            android:layout_width="wrap_content"
@@ -97,30 +97,30 @@
 	            android:layout_below="@+id/linearLayout7"
 	            android:scrollbars="none"
 	            android:clickable="false">
-	
+
 	        </ListView>
 
-	        
+
 	            <LinearLayout
 	            android:id="@+id/linearLayout8"
 	            android:layout_width="match_parent"
-	            android:layout_height="wrap_content" 
+	            android:layout_height="wrap_content"
 	            android:background="?android:attr/listDivider"
 	            android:layout_below="@+id/gridViewWifi">
-	
+
 	            <TextView
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
 	                android:text="2G/3G Status" />
-	
+
 	            <TextView
 	                android:id="@+id/CellStatus"
 	                android:layout_width="0dp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1" />
 	        </LinearLayout>
-	        
+
 	        <ListView
 	            android:id="@+id/gridViewCell"
 	            android:layout_width="wrap_content"
@@ -130,7 +130,7 @@
 	            android:clickable="false">
 	        </ListView>
 
-	
+
 	        <TextView
 	            android:id="@+id/textView1"
 	            android:layout_width="match_parent"
@@ -145,9 +145,9 @@
 	            android:layout_below="@+id/textView1"
 	            android:textSize="13dp"/>
 
-	
+
 	</RelativeLayout>
-     
+
 </ScrollView>
 
 </LinearLayout>

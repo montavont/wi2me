@@ -41,7 +41,7 @@
         android:id="@+id/startstopLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"        
+        android:layout_gravity="center"
         android:orientation="vertical" >
 
         <Button
@@ -56,7 +56,7 @@
             android:textStyle="bold"
             android:textColor="#FFFFFF"
             android:background="#128629"/>
-                    
+
         <Button
             android:id="@+id/btnstop"
             android:layout_width="100dp"
@@ -70,23 +70,23 @@
             android:textColor="#FFFFFF"
             android:background="#B40404"/>
     </LinearLayout>
-        
+
     <LinearLayout
         android:id="@+id/statusLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"       
-        android:orientation="vertical" 
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="#99CC00">
-        
+
 		<LinearLayout
         	android:layout_width="match_parent"
-        	android:layout_height="wrap_content" 
+        	android:layout_height="wrap_content"
         	android:layout_marginLeft="5dp"
-        	android:layout_marginRight="5dp"  
+        	android:layout_marginRight="5dp"
         	android:layout_marginTop="5dp"
-        	android:orientation="vertical" 
+        	android:orientation="vertical"
         	android:background="#669900">
-        	
+
         	<TextView
             android:id="@+id/textView1"
             android:layout_width="wrap_content"
@@ -97,11 +97,11 @@
             android:textColor="#FFFFFF" />
 
      	</LinearLayout>
-     </LinearLayout>   
+     </LinearLayout>
      <LinearLayout
-        android:id="@+id/statusLayout"
+        android:id="@+id/statusLayout2"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"       
+        android:layout_height="wrap_content"
         android:orientation="vertical"
 		android:background="#99CC00">
 
@@ -114,7 +114,7 @@
             android:text="Ready"
             android:layout_gravity="center_horizontal"
             android:layout_weight="1"
-            android:textAppearance="?android:attr/textAppearanceMedium" 
+            android:textAppearance="?android:attr/textAppearanceMedium"
             android:textColor="#000000"
             android:textStyle="bold"
             android:textSize="20sp"
@@ -123,15 +123,15 @@
         	android:layout_marginLeft="10dp"
         	android:layout_marginRight="10dp" />
 
-         
+
 		</LinearLayout>
      	<LinearLayout
-        	android:id="@+id/statusLayout"
+        	android:id="@+id/statusLayout3"
         	android:layout_width="fill_parent"
-        	android:layout_height="fill_parent"       
+        	android:layout_height="fill_parent"
         	android:orientation="vertical"
 			android:background="#99CC00">
-            
+
     		<TableLayout
         		android:layout_width="match_parent"
         		android:layout_height="wrap_content"
@@ -139,12 +139,12 @@
         		android:layout_margin="5dp"
         		android:layout_gravity="center">
 
-        	<TableRow 
+        	<TableRow
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
             android:layout_marginTop="5dp"
-            android:layout_weight="1" 
+            android:layout_weight="1"
             android:layout_marginLeft="5dp"
         	android:layout_marginRight="5dp">
 
@@ -154,7 +154,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="Network:"
-                android:textColor="#000000" 
+                android:textColor="#000000"
                 android:layout_marginLeft="1dp"
                 android:background="#D8F6CE"
                 android:gravity="center_vertical"/>
@@ -170,12 +170,12 @@
                 android:textColor="#669900"/>
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/textView4"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:textColor="#000000"
-                android:text="Signal level:" 
+                android:text="Signal level:"
                 android:layout_marginLeft="1dp"
                 android:background="#CEF6D8"
                 android:gravity="center_vertical"/>
@@ -197,7 +197,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
-            android:layout_weight="1" 
+            android:layout_weight="1"
             android:layout_marginLeft="5dp"
         	android:layout_marginRight="5dp">
 
@@ -207,7 +207,7 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:text="IP address:"
-                android:textColor="#000000" 
+                android:textColor="#000000"
                 android:layout_marginLeft="1dp"
                 android:background="#CEF6D8"
                 android:gravity="center_vertical"/>
@@ -227,8 +227,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:textColor="#000000"                
-                android:text="Channel:" 
+                android:textColor="#000000"
+                android:text="Channel:"
                 android:layout_marginLeft="1dp"
                 android:background="#D8F6CE"
                 android:gravity="center_vertical"/>
@@ -253,14 +253,14 @@
             android:layout_weight="1"
             android:layout_marginLeft="5dp"
         	android:layout_marginRight="5dp" >
-            
+
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="BSSID:"
                 android:layout_weight="1"
-                android:textColor="#000000" 
+                android:textColor="#000000"
                 android:layout_marginLeft="1dp"
                 android:background="#D8F6CE"
                 android:gravity="center_vertical"/>
@@ -276,12 +276,12 @@
                 android:textColor="#669900"/>
 
             <TextView
-                android:id="@+id/textView3"
+                android:id="@+id/textView6"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:textColor="#000000"
-                android:text="Speed:" 
+                android:text="Speed:"
                 android:layout_marginLeft="1dp"
                 android:background="#CEF6D8"
                 android:gravity="center_vertical"/>
@@ -291,14 +291,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:gravity="center"
-                android:text="" 
+                android:text=""
                 android:layout_marginRight="1dp"
                 android:background="#CEF6D8"
                 android:textColor="#669900"/>
-            
+
         </TableRow>
 
     </TableLayout>
 	</LinearLayout>
-    
+
 </LinearLayout>

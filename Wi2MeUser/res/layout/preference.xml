@@ -1,76 +1,105 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-    
-    <PreferenceCategory android:title="Authorization">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+>
+
+    <PreferenceCategory android:title="Authorization"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+	>
         <CheckBoxPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="DataCollection"
             android:title="Data collection"
             android:summaryOn="Allow traffic data collection"
             android:summaryOff="Don't allow traffic data collection">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="OpenNetwork"
             android:title="Open network connection"
             android:summaryOn="connect to open network"
             android:summaryOff="Don't connect to open network">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="Notification"
             android:title="Service Notification"
             android:summaryOn="Show wi2me logo in the status bar"
             android:summaryOff="Don't show wi2me logo in the status bar">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="GPSLocation"
             android:title="Location"
             android:summaryOn="Use GPS Location"
             android:summaryOff="Use Network Location">
         </CheckBoxPreference>
-        
+
         <CheckBoxPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="NotifyConnection"
             android:title="Connection Notification"
             android:summaryOn="Notify when wifi connected"
             android:summaryOff="Don't notify when wifi connected">
-        </CheckBoxPreference> 
-        
+        </CheckBoxPreference>
+
         <CheckBoxPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="ConnectivityCheck"
             android:title="Connectivity Verification"
             android:summaryOn="Check the connectivity with the defined frequency"
             android:summaryOff="Don't check the connectivity">
         </CheckBoxPreference>
-           
-    </PreferenceCategory> 
-  	
-    <PreferenceCategory android:title="Configuration">  
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="Configuration"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+	>
         <Preference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="BatteryLevel"
             android:title="Battery level"
             android:summary="Mininum battery level to run the application">
-        </Preference>      
+        </Preference>
         <ListPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="Threshold"
             android:title="Threshold"
             android:summary="Mininum threshold to connect to a Access Point">
-        </ListPreference>  
+        </ListPreference>
         <EditTextPreference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="ScanInterval"
             android:title="Scanning Interval"
             android:summary="The interval of scanning in second">
         </EditTextPreference>
         <Preference
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
             android:key="ConnectivityFrequency"
             android:title="Frequency of Connectivity Verification"
             android:summary="The frequency of the connectivity verification, you should authorize the connectivity verification to set this frequency">
-        </Preference> 
-    </PreferenceCategory>           
+        </Preference>
+    </PreferenceCategory>
 </PreferenceScreen>
 
 
- 
+
 
 

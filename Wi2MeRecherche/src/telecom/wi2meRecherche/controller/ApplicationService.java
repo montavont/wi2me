@@ -31,11 +31,11 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+
 
 import telecom.wi2meRecherche.R;
 import telecom.wi2meRecherche.Wi2MeRecherche;
@@ -49,7 +49,6 @@ import telecom.wi2meCore.controller.services.ThreadSynchronizingService;
 import telecom.wi2meCore.controller.services.TimeService;
 import telecom.wi2meCore.controller.services.cell.CellService;
 import telecom.wi2meCore.controller.services.communityNetworks.CommunityNetworkService;
-import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
 import telecom.wi2meCore.controller.services.move.MoveService;
 import telecom.wi2meCore.controller.services.persistance.DatabaseHelper;
 import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
@@ -65,32 +64,12 @@ import telecom.wi2meCore.model.Logger;
 import telecom.wi2meCore.model.TraceManager;
 import telecom.wi2meCore.model.WirelessNetworkCommandLooper;
 import telecom.wi2meCore.model.Logger.TraceString;
-import telecom.wi2meCore.model.cellCommands.CellCleanerCommand;
-import telecom.wi2meCore.model.cellCommands.CellConnector;
-import telecom.wi2meCore.model.cellCommands.CellDownloader;
-import telecom.wi2meCore.model.cellCommands.CellScanner;
-import telecom.wi2meCore.model.cellCommands.CellTransferrerContainer;
-import telecom.wi2meCore.model.cellCommands.CellUploader;
 import telecom.wi2meCore.model.entities.ExternalEvent;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meCore.model.WirelessNetworkCommand;
-import telecom.wi2meCore.model.wifiCommands.CommunityNetworkConnector;
-import telecom.wi2meCore.model.wifiCommands.Pinger;
-import telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand;
 
 import telecom.wi2meRecherche.model.parameters.ParameterFactory;
-import telecom.wi2meRecherche.model.wifiCommands.WifiConnector;
-import telecom.wi2meRecherche.model.wifiCommands.WifiBestRssiSelector;
-import telecom.wi2meRecherche.model.wifiCommands.WifiCommandPoppingStayConnected;
-import telecom.wi2meCore.model.wifiCommands.WifiDownloader;
-import telecom.wi2meCore.model.wifiCommands.WifiSPDYDownloader;
-import telecom.wi2meCore.model.wifiCommands.WifiWebPageDownloader;
-import telecom.wi2meCore.model.wifiCommands.WifiScanner;
-import telecom.wi2meCore.model.wifiCommands.WifiSensor;
-import telecom.wi2meCore.model.wifiCommands.WifiTransferrerContainer;
-import telecom.wi2meCore.model.wifiCommands.WifiUploader;
-import telecom.wi2meCore.model.ShellPoppingCommand;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -110,18 +89,13 @@ import android.widget.Toast;
 
 
 
-
-
-
-
-
 public class ApplicationService extends Service {
-	
+
 	private static String ASSETS_FILES_DIRECTORY = "files/";
-	
+
         HashMap<String, IWirelessNetworkCommandLooper> WirelessLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
         HashMap<String, Thread> WirelessThreads = new HashMap<String, Thread>();
-	
+
 
 	IParameterManager parameters;
 	Flag wifiWorkingFlag;
@@ -131,36 +105,36 @@ public class ApplicationService extends Service {
 	String configuration;
 	Context context;
 	boolean wasCellularConnected;
-	
+
 	ServiceBinder binder;
-	
+
 	private NotificationManager mNM;
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
 	private int NOTIFICATION = 0;
 
-	
+
 	@Override
 	public void onCreate()
 	{
-    		super.onCreate(); 
-    		
+    		super.onCreate();
+
     		cellThreadContainer = new CellThreadContainer();
     		context = this;
-    		
-    		Log.d(getClass().getSimpleName(), "++ " + "Running onCreate");    	
-    		
+
+    		Log.d(getClass().getSimpleName(), "++ " + "Running onCreate");
+
     		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
     		parameters = ParameterFactory.getNewParameterManager();
-    		
+
     		binder = new ServiceBinder(parameters);
 
     		//binder also keeps the last info of the log
     		Logger.getInstance().addObserver(binder);
     		try {
-		        
+
 		        ControllerServices.initializeServices(new TimeService(),
 								new CellService(this),
 								new MoveService(this, new TimeService()),
@@ -173,7 +147,7 @@ public class ApplicationService extends Service {
 								new NotificationServices(this),
 								new CommunityNetworkService(this)
 								);
-		        
+
     			ConfigurationManager.loadParameters(context, parameters);
     			configuration = ConfigurationManager.getConfiguration();
 			} catch (Exception e) {
@@ -181,11 +155,11 @@ public class ApplicationService extends Service {
 				//If we have problems loading the parameters file, we should tell and finish
 				Toast.makeText(this, "ERROR LOADING CONFIGURATION FILE: "+e.getMessage()+". Please, check ensure USB storage is off. Otherwise, replace configuration file and try again.", Toast.LENGTH_LONG).show();
 				binder.loadingError = true;
-				return;	
+				return;
 			}
-       
+
 	        // We get if the 3G connection is available to enable it again when closing
-		int version = Build.VERSION.SDK_INT;			
+		int version = Build.VERSION.SDK_INT;
 		if (version <= 8)
 		{
 			//TKER TODO LOook into
@@ -196,25 +170,6 @@ public class ApplicationService extends Service {
 		{
 			wasCellularConnected = false;
 		}
-			
-        	/*// Set the icon, scrolling text and timestamp
-	        Notification notification = new Notification(R.drawable.icon, "Wi2Me service running",
-                System.currentTimeMillis());
-
-	        // The PendingIntent to launch our activity if the user selects this notification
-        	PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, Wi2MeRecherche.class), 0);
-
-        	// Set the info for the views that show in the notification panel.
-	        notification.setLatestEventInfo(this, "Wi2Me Xplorer", "Select to open application", contentIntent);
-        
-	        notification.flags = Notification.FLAG_NO_CLEAR;
-        
-		mNM.notify(NOTIFICATION, notification);
-
-		startForeground(NOTIFICATION, notification);
-	        
-	        Log.d(getClass().getSimpleName(), "++ " + "Finished onCreate");*/
 	}
 
 	private class WirelessLooperThread extends Thread
@@ -225,8 +180,8 @@ public class ApplicationService extends Service {
 		{
 			this.looper = looper;
 		}
-        	
-		@Override		
+
+		@Override
 		public void run()
 		{
         		looper.loop(parameters);
@@ -239,13 +194,13 @@ public class ApplicationService extends Service {
 		for (String looperKey:WirelessLoopers.keySet())
 		{
 			IWirelessNetworkCommandLooper looper = WirelessLoopers.get(looperKey);
-			WirelessThreads.put(looperKey, new WirelessLooperThread(looper));			
+			WirelessThreads.put(looperKey, new WirelessLooperThread(looper));
 			if (looperKey.equals("cellCommands"))
 			{
 				cellThreadContainer.cellThread = WirelessThreads.get(looperKey);
 			}
 		}
-       
+
 
 
 		try
@@ -253,7 +208,7 @@ public class ApplicationService extends Service {
 			PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
 			String version = pInfo.versionName;
 			Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), "APPLICATION.VERSION:" + version));
-	
+
 			ApplicationInfo ai = getPackageManager().getApplicationInfo(getPackageName(), 0);
 
 			ZipFile zf = new ZipFile(ai.sourceDir);
@@ -273,14 +228,14 @@ public class ApplicationService extends Service {
 			Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 		}
 
- 
+
 		Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), "STARTING.CONFIGURATION:" + configuration));
-        
+
 		for (Thread loopThr:WirelessThreads.values())
-		{	
+		{
 			loopThr.start();
 		}
-		
+
 		(new Thread()
 		{
 			public void run(){
@@ -302,7 +257,7 @@ public class ApplicationService extends Service {
 	@Override
 	public void onDestroy()
 	{
-    	
+
 	    	Log.d(getClass().getSimpleName(), "++ " + "Running onDestroy");
         	if (binder.isBateryLow)
 		{
@@ -311,25 +266,25 @@ public class ApplicationService extends Service {
     				binder.stop();
 	    			ControllerServices.getInstance().getNotification().playNotificationSound();
     			}
-    			
+
 	    	}
-    	
+
     		if (wasCellularConnected){
     			//disable wifi if connected
     			ControllerServices.getInstance().getWifi().disableAsync();
     			ControllerServices.getInstance().getCell().connectAsync();
     		}
-    		    	    	
-    		ControllerServices.finalizeServices();    	
-    		
+
+    		ControllerServices.finalizeServices();
+
     		super.onDestroy();
 	}
 
 	private void stopThreads()
 	{
-		//Stop 
+		//Stop
 	    	//we also interrupt what is being done, as it may be sleeping to scan, or downloading something
-		    	
+
 		for (String looperKey:WirelessLoopers.keySet())
 		{
 			WirelessLoopers.get(looperKey).breakLoop();
@@ -349,7 +304,7 @@ public class ApplicationService extends Service {
 		wifiWorkingFlag.setActive(false);
 
 	    	Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), "STOPPING"));
-				
+
 	}
 
 	@Override
@@ -357,15 +312,15 @@ public class ApplicationService extends Service {
 		binder.setBound(true);
         return binder;
     }
-	
+
 	@Override
     public boolean onUnbind(Intent intent) {
 		binder.setBound(false);
 		return super.onUnbind(intent);
     }
-   
 
- 
+
+
     /**
      * Show a notification while this service is running.
      */
@@ -381,18 +336,17 @@ public class ApplicationService extends Service {
                 new Intent(this, Wi2MeRecherche.class), 0);
 
         // Set the info for the views that show in the notification panel.
-        notification.setLatestEventInfo(this, "Wi2Me Xplorer",
-        		"Select to open application", contentIntent);
-        
+        //notification.setLatestEventInfo(this, "Wi2Me Xplorer", "Select to open application", contentIntent);
+
         notification.flags = Notification.FLAG_NO_CLEAR;
 
         // Send the notification.
  	mNM.notify(NOTIFICATION, notification);
-        
+
 	startForeground(NOTIFICATION, notification);
     }
 
-    
+
 	public class ServiceBinder extends Binder implements Observer
 	{
 	    	private boolean firstRun;
@@ -405,7 +359,7 @@ public class ApplicationService extends Service {
 		private boolean isRunning;
 		public boolean isBateryLow;
 		public IParameterManager parameters;
-    	
+
 		public synchronized boolean isRunning() {
 			return isRunning;
 		}
@@ -442,12 +396,12 @@ public class ApplicationService extends Service {
 			this.parameters = parameters;
 			isBateryLow = false;
 			firstRun = true;
-			startedDate = new Date(Calendar.getInstance().getTimeInMillis());    		
+			startedDate = new Date(Calendar.getInstance().getTimeInMillis());
 	    		loadingError = false;
     			observable = null;
     			wifiData = null;
 	    	}
-		
+
 		public void start()
 		{
 			DatabaseHelper.initialize(context);
@@ -457,12 +411,10 @@ public class ApplicationService extends Service {
 
 			if (wifiWorkingFlag.isActive())
 			{
-				//WirelessLoopers.put("wifiCommands", new WirelessNetworkCommandLooper(new WifiCleanerCommand())); //TKE
 				WirelessLoopers.put("wifiCommands", new WirelessNetworkCommandLooper());
 			}
 			if (cellWorkingFlag.isActive())
 			{
-				//WirelessLoopers.put("cellCommands", new WirelessNetworkCommandLooper(new CellCleanerCommand())); //TKE
 				WirelessLoopers.put("cellCommands", new WirelessNetworkCommandLooper());
 			}
 
@@ -502,7 +454,7 @@ public class ApplicationService extends Service {
 								{
 									commandParams.put(reader.nextName(), reader.nextString());
 								}
-								reader.endObject();	
+								reader.endObject();
 							}
 							else
 							{
@@ -565,12 +517,12 @@ public class ApplicationService extends Service {
 			{
 				looper.initializeCommands(parameters);
 			}
-		        
+
 		        parameters.setParameter(Parameter.WIFI_WORKING_FLAG, wifiWorkingFlag);
 		        parameters.setParameter(Parameter.CELL_WORKING_FLAG, cellWorkingFlag);
 
 		        if ((Boolean)parameters.getParameter(Parameter.LOCK_NETWORK))
-		       	{ 
+		       	{
 				LockNetwork();
 			}
 
@@ -580,27 +532,25 @@ public class ApplicationService extends Service {
 			startThreads();
 			setRunning(true);
 		}
-		
+
 		public void stop()
 		{
 	    		stopThreads();
-	    
+
 		        if ((Boolean)parameters.getParameter(Parameter.LOCK_NETWORK))
 			{
 				UnlockNetwork();
 			}
-			
+
 			for (IWirelessNetworkCommandLooper looper:WirelessLoopers.values())
 			{
 				looper.finalizeCommands(parameters);
 			}
-			
+
 			TraceManager.finalizeManager();
-			
+
 		        // Cancel the persistent notification.
 		        mNM.cancel(NOTIFICATION);
-	        
-	        
 	    		if (DatabaseHelper.isInitialized())
 			{
 				Logger.getInstance().flush();
@@ -608,17 +558,17 @@ public class ApplicationService extends Service {
 			}
 		    	setRunning(false);
 		}
-		
+
     		public IControllerServices getServices()
 		{
 	    		return ControllerServices.getInstance();
     		}
-    	
+
 	    	public ILogger getLogger()
 		{
     			return Logger.getInstance();
 	    	}
-    	
+
     		public boolean isFirstRun()
 		{
     			boolean ret = firstRun;
@@ -630,7 +580,7 @@ public class ApplicationService extends Service {
 		{
 			this.bound = b;
 		}
-		
+
 		public synchronized boolean isBound()
 		{
 			return bound;
@@ -649,14 +599,14 @@ public class ApplicationService extends Service {
 				break;
 			}
 		}
-    	
+
 	}
-    
+
 	private class BatteryLevelSupervisor implements IBatteryLevelReceiver
 	{
-    	
+
 		private int minLevel;
-    	
+
     		public BatteryLevelSupervisor(int minLevel)
 		{
     			this.minLevel = minLevel;
@@ -682,29 +632,29 @@ public class ApplicationService extends Service {
     				}
     			}
     		}
-    	
+
 
     	}
-   
+
 
 	private ArrayList<String> popIPTablesCommand(String command)
-	{	
-		ArrayList<String> retval = new ArrayList<String>();	
+	{
+		ArrayList<String> retval = new ArrayList<String>();
 		OutputStreamWriter osw = null;
 		try
 		{
 			Process process = Runtime.getRuntime().exec("su");
 			osw = new OutputStreamWriter(process.getOutputStream());
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String line;	
+			String line;
 
 			osw.write(command);
 			osw.flush();
 			osw.close();
- 
+
 			while ((line = bufferedReader.readLine()) != null)
-			{	
-		    		retval.add(line);	
+			{
+		    		retval.add(line);
 			}
 		}
 		catch (Exception e)
@@ -719,30 +669,30 @@ public class ApplicationService extends Service {
 	private void LockNetwork()
 	{
 
-		
+
 		int UID_OFFSET = 10000;
 		int uid = 0;
-		ArrayList iptablesRetVal = new ArrayList<String>();	
+		ArrayList iptablesRetVal = new ArrayList<String>();
 
 
-		//Create Chain : 
+		//Create Chain :
 	      	iptablesRetVal = popIPTablesCommand("iptables -N wi2me");
 		if (iptablesRetVal.size() > 0)
 		{
 			Log.e(getClass().getSimpleName(), "Error creating wi2me chain");
-		}		
+		}
 		else
 		{
-			//redirect output to wi2me chain 
+			//redirect output to wi2me chain
 		      	iptablesRetVal = popIPTablesCommand("iptables -A OUTPUT -j wi2me -p all");
 			if (iptablesRetVal.size() > 0)
 			{
 				Log.e(getClass().getSimpleName(), "Error appending jump to wi2me rule to OUTPUT");
 			}
-		
+
 			else
-			{		
-				//Allow traffic for wi2Me : 
+			{
+				//Allow traffic for wi2Me :
 				uid = context.getApplicationInfo().uid - UID_OFFSET;
 		      		iptablesRetVal = popIPTablesCommand("iptables -A wi2me -m owner --uid-owner u0_a" + uid + " -j RETURN ");
 				if (iptablesRetVal.size() > 0)
@@ -752,7 +702,7 @@ public class ApplicationService extends Service {
 				else
 				{
 				     	//Allow DNS
-		      			iptablesRetVal = popIPTablesCommand("iptables -A wi2me -p udp --dport 53 -j RETURN");  
+		      			iptablesRetVal = popIPTablesCommand("iptables -A wi2me -p udp --dport 53 -j RETURN");
 					if (iptablesRetVal.size() > 0)
 					{
 						Log.e(getClass().getSimpleName(), "Error appending rule to let DNS through");
@@ -808,8 +758,8 @@ public class ApplicationService extends Service {
 		{
 			popIPTablesCommand("iptables -D wi2me 1");
 		}
-		
-		
+
+
 		iptablesRetVal = popIPTablesCommand("iptables -X wi2me ");
 		if (iptablesRetVal.size() > 0)
 		{
@@ -817,9 +767,9 @@ public class ApplicationService extends Service {
 		}
 	}
 
-	// Returns false if network is unlocked, true otherwise	
+	// Returns false if network is unlocked, true otherwise
 	private boolean isNetworkLocked()
-	{		
+	{
 		boolean retval = true;
 		ArrayList iptablesRetVal = new ArrayList<String>();
 

@@ -28,6 +28,7 @@ import telecom.wi2meCore.model.entities.User;
 import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meRecherche.controller.ApplicationService;
 import telecom.wi2meRecherche.controller.ApplicationService.ServiceBinder;
+//import telecom.wi2meRecherche.R;
 
 import java.io.BufferedReader;
 import java.io.File;
