@@ -119,7 +119,7 @@ public class WifiService implements IWifiService{
 		try {
 			wifiSleepPolicy = Settings.System.getInt(context.getContentResolver(), Settings.System.WIFI_SLEEP_POLICY);
 		} catch (SettingNotFoundException e) {
-			Log.e("Getting Wifi Sleep policy", "++ "+e.getMessage(), e);
+			Log.e("WifiService", "Getting Wifi Sleep policy "+e.getMessage(), e);
 		}
 		Settings.System.putInt(context.getContentResolver(), Settings.System.WIFI_SLEEP_POLICY, Settings.System.WIFI_SLEEP_POLICY_NEVER);
 

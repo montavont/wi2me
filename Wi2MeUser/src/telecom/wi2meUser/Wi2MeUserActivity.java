@@ -158,7 +158,7 @@ public class Wi2MeUserActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+		wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		deviceId = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
 		packageName = this.getPackageName();
 		context = this;

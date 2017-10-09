@@ -107,31 +107,31 @@ public class Wi2MeRecherche extends Activity
 	private static final int MENU_PREFERENCES = 5;
 
 
-	
+
 	////TRIAL VARIABLES
 	private Boolean trial  = ConfigurationManager.TRIAL;
 	private Date trialExpire= new Date(112,8,11);
-	
-	
+
+
 	LogObserver logObserver;
 
 	ProgressDialog exportingProcessDialog;
 	ProgressDialog stoppingProcessDialog;
-	
+
 	ServiceBinder binder;
-	
+
 	ServiceConnection serviceConnection;
 	Activity currentActivity;
-	
+
 	Context context;
-	
+
 	String packageName;
-	
+
 	String deviceId;
-	
+
 	WifiManager wifi;
-	
-	
+
+
 
 	ListView localizationView;
 	ListView wifiDataView;
@@ -139,10 +139,10 @@ public class Wi2MeRecherche extends Activity
 	ListView cellDataView;
 	ListView cellView;
 	TextView traceView;
-	
+
 	MenuItem menuItemStart;
 	MenuItem menuItemStop;
-		
+
     	public TraceString logTrace = null;
 	long cell_start_time = 0;
     	long wifi_start_time = 0;
@@ -159,25 +159,26 @@ public class Wi2MeRecherche extends Activity
 	private Runnable refreshTask;
 	private static final long UI_REFRESH_PERIOD = 50;
 	private boolean refreshUI = true;
-	
+
 	/** Called when the activity is first created./ */
 	@Override
-	public void onCreate(Bundle savedInstanceState) 
+	public void onCreate(Bundle savedInstanceState)
 	{
     		Log.d(getClass().getSimpleName(), "?? " + "Running onCreate");
 	        super.onCreate(savedInstanceState);
         	setContentView(R.layout.mainscreen);
 	        currentActivity = this;
-              
-        	wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+
+        	//wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        	wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 	        deviceId = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         	packageName = this.getPackageName();
 	        context = this;
-        
+
         	logObserver = new LogObserver();
-        
+
         	startService();
-	        clearInfo();      
+	        clearInfo();
 
 		refreshTask = new Runnable()
 		{
@@ -185,10 +186,10 @@ public class Wi2MeRecherche extends Activity
 			public void run()
 			{
 				runOnUiThread(new Runnable()
-				{ 
+				{
 					@Override
 					public void run()
-					{				
+					{
 						updateInfo();
 					}
 				});
@@ -198,14 +199,14 @@ public class Wi2MeRecherche extends Activity
 
 
 	}
-    
-    public boolean onCreateOptionsMenu(Menu menu) { 
-    	
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+
 	    	menuItemStart=menu.add(0, MENU_START , 0, "Start");
 		menuItemStart.setVisible(false);
-		
+
 		menuItemStop=menu.add(0, MENU_STOP , 0, "Stop");
-				
+
 		while (binder == null){
 			try {
 				Thread.sleep(500);
@@ -218,34 +219,34 @@ public class Wi2MeRecherche extends Activity
 			menuItemStart.setVisible(true);
 			menuItemStop.setVisible(false);
 		}
-		
-		menu.add(0, MENU_EXPORT_RESULTS , 0, "Export Results");		 
-		
+
+		menu.add(0, MENU_EXPORT_RESULTS , 0, "Export Results");
+
 		menu.add(0, MENU_EXPORT_LOGCAT , 0, "Export Logcat");
-		
+
 		menu.add(0, MENU_ACCOUNT_MANAGEMENT , 0, "Account Management");
-		
+
 		menu.add(0, MENU_PREFERENCES , 0, "Preference");
-			
+
 		return super.onCreateOptionsMenu(menu);
 	}
-    
+
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		
+
 		// TRIAL VERSION MANAGEMENT
 		Date dateFormat = new Date();
-		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);	
-			
+		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);
+
 		if ((dateFormat.after(trialExpire))&&(trial)) //trial expired
 		{
 			Log.d(getClass().getSimpleName(), "++ TRIAL EXPIRED");
 			Toast.makeText(context, getResources().getString(R.string.TRIAL_EXPIRED), Toast.LENGTH_LONG).show();
-			stopAndQuit();		
-		} else 
+			stopAndQuit();
+		} else
 		{
-		
+
 			switch(item.getItemId()){
-			
+
 				case MENU_START:
 					if ((Boolean)binder.parameters.getParameter(Parameter.USE_GPS_POSITION))
 					{
@@ -270,16 +271,16 @@ public class Wi2MeRecherche extends Activity
 					menuItemStop.setVisible(true);
 					break;
 				case MENU_STOP:
-					stop();	
+					stop();
 					refreshUI = false;
 					menuItemStart.setVisible(true);
 					menuItemStop.setVisible(false);
 					break;
-			
+
 				case MENU_EXPORT_RESULTS:
 						if (!DatabaseHelper.databaseFileExists(packageName)){//if we do not have traces there is nothing to upload
 							Toast.makeText(context, getResources().getString(R.string.NOTHING_TO_UPLOAD_MESSAGE), Toast.LENGTH_LONG).show();
-							break;			
+							break;
 						}
 
 						//service must be stopped
@@ -291,7 +292,7 @@ public class Wi2MeRecherche extends Activity
 							{
 
 								@Override
-								public void onClick(DialogInterface arg0, int arg1) 
+								public void onClick(DialogInterface arg0, int arg1)
 								{
 									runExport(false);
 								}});
@@ -299,14 +300,14 @@ public class Wi2MeRecherche extends Activity
 							{
 
 								@Override
-								public void onClick(DialogInterface arg0, int arg1) 
+								public void onClick(DialogInterface arg0, int arg1)
 								{
 									runExport(true);
 								}})*/
 							builder.show();
 
 
-													
+
 						}else{
 							Toast.makeText(this, getResources().getString(R.string.STOP_SERVICE_TO_UPLOAD_RESULTS_MESSAGE), Toast.LENGTH_LONG).show();
 						}
@@ -314,34 +315,34 @@ public class Wi2MeRecherche extends Activity
 				case MENU_EXPORT_LOGCAT:
 						exportLogcat();
 						break;
-						
+
 				case MENU_ACCOUNT_MANAGEMENT:
 						startActivity(new Intent(this, Wi2MeAccountManagerActivity.class));
 						break;
 				case MENU_PREFERENCES:
 						startActivity(new Intent(this, Wi2MePreferenceActivity.class));
 						break;
-				} 
+				}
 		}
-		return super.onMenuItemSelected(featureId, item); 
+		return super.onMenuItemSelected(featureId, item);
 	}
 
-	private void stop() { 
+	private void stop() {
     	stoppingProcessDialog = new ProgressDialog(this);
     	stoppingProcessDialog.setMessage(getResources().getString(R.string.STOPPING_SERVICE_MESSAGE));
        	stoppingProcessDialog.show();
 		(new Thread(){
 			public void run(){
 				binder.stop();
-		       	runOnUiThread(new Runnable() {				
+		       	runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 				       	if (stoppingProcessDialog.isShowing()) {
 				            stoppingProcessDialog.dismiss();
 							clearInfo();
-				         }		
+				         }
 					}
-					
+
 				});
 
 			}
@@ -350,24 +351,24 @@ public class Wi2MeRecherche extends Activity
 
 	private void exportLogcat()
 	{
-		
+
 	    try {
 	      Process process = Runtime.getRuntime().exec("logcat -d -v time");
-	
+
 	      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-	                       
+
 	      FileWriter outFile = new FileWriter(Environment.getExternalStorageDirectory() + "/Logcat_"+ deviceId +"_"+ Calendar.getInstance().getTimeInMillis() + ".txt");
 	      PrintWriter out = new PrintWriter(outFile);
-	      
-	      String line;	
-	      while ((line = bufferedReader.readLine()) != null) {		
-	    	  out.println(line);	
+
+	      String line;
+	      while ((line = bufferedReader.readLine()) != null) {
+	    	  out.println(line);
 	      }
 	      out.flush();
 	      out.close();
-	      
+
 	      Toast.makeText(context, getResources().getString(R.string.LOGCAT_EXPORT_SUCCESSFUL_MESSAGE), Toast.LENGTH_LONG).show();
-		
+
 	    } catch (Exception e) {
 	    	Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 	    	Toast.makeText(context, getResources().getString(R.string.LOGCAT_EXPORT_ERROR_MESSAGE), Toast.LENGTH_LONG).show();
@@ -378,7 +379,7 @@ public class Wi2MeRecherche extends Activity
 	{
 		String msg = "";
 		if (sendFileFTP(Path,
-				ConfigurationManager.REMOTE_UPLOAD_DIRECTORY + Name, 
+				ConfigurationManager.REMOTE_UPLOAD_DIRECTORY + Name,
 				ConfigurationManager.SERVER_IP,
 				"anonymous",
 				""))
@@ -389,12 +390,12 @@ public class Wi2MeRecherche extends Activity
 		{
 			msg = "Error. The file could not be sent. Please make sure you have internet connection. Otherwise, close the application, enable USB storage and send the file manually to " + getResources().getString(R.string.MAIL_TO_SEND_DATABASE) + ".</string>";
 		}
-					
-		return msg;					
+
+		return msg;
 
 	}
 
-	
+
 	private void runExport(boolean uploadDB)
 	{
 		final boolean upload = uploadDB;
@@ -431,55 +432,55 @@ public class Wi2MeRecherche extends Activity
 				{
 					msg = getResources().getString(R.string.ERROR_COMPRESSING_DATABASE);
 				}
-		
+
 				Log.d(getClass().getSimpleName(), "++ " + "DATABASE About to be reset");
 				//erase the content of this already sent (or not) database
 				DatabaseHelper.resetDatabase(packageName);
 				Log.d(getClass().getSimpleName(), "++ " + "DATABASE Reset OK");
-		
-				
+
+
 		       		runOnUiThread(new Runnable()
 				{
 					@Override
 					public void run() {
 				       	if (exportingProcessDialog.isShowing()) {
 				            exportingProcessDialog.dismiss();
-				         }		
+				         }
 				       	Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 					}
-					
+
 				});
 
 			}
 		}).start();
 	}
-	
-	private void openMobileNetworkSettings() {	
+
+	private void openMobileNetworkSettings() {
 		AlertDialog deleteAlert = new AlertDialog.Builder(this).create();
 		deleteAlert.setTitle("Mobile data enabling");
 		deleteAlert.setMessage("Mobile data network is disabled. Please CHECK the option to enable it, press BACK and try to Start again.");
 		deleteAlert.setButton("OK", new AlertDialog.OnClickListener(){
 
 			@Override
-			public void onClick(DialogInterface dialog, int which) {    
+			public void onClick(DialogInterface dialog, int which) {
 				Intent intent = new Intent(Settings.ACTION_DATA_ROAMING_SETTINGS);
-				ComponentName cName = new ComponentName("com.android.phone","com.android.phone.Settings"); 
-				intent.setComponent(cName); 
+				ComponentName cName = new ComponentName("com.android.phone","com.android.phone.Settings");
+				intent.setComponent(cName);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
 			}
 		});
 		deleteAlert.show();
 	}
-	
-	private void openLocationSettings() {	
+
+	private void openLocationSettings() {
 		AlertDialog deleteAlert = new AlertDialog.Builder(this).create();
 		deleteAlert.setTitle("Location enabling");
 		deleteAlert.setMessage("Either GPS or Network location option is disabled. Please make sure both of them are enabled, press BACK and try to Start again.");
 		deleteAlert.setButton("OK", new AlertDialog.OnClickListener(){
 
 			@Override
-			public void onClick(DialogInterface dialog, int which) {    
+			public void onClick(DialogInterface dialog, int which) {
 				Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
@@ -488,14 +489,14 @@ public class Wi2MeRecherche extends Activity
 		deleteAlert.show();
 	}
 
-	private void openWifiSettings() {	
+	private void openWifiSettings() {
 		AlertDialog deleteAlert = new AlertDialog.Builder(this).create();
 		deleteAlert.setTitle("Wifi connection");
 		deleteAlert.setMessage("You are not connected to a Wifi Access Point with internet connection to upload the data. Please TURN ON the interface, CHOSE an access point, connect to it, WAIT until connection is finished, press BACK and try to upload again.");
 		deleteAlert.setButton("OK", new AlertDialog.OnClickListener(){
 
 			@Override
-			public void onClick(DialogInterface dialog, int which) {    
+			public void onClick(DialogInterface dialog, int which) {
 				Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
@@ -505,7 +506,7 @@ public class Wi2MeRecherche extends Activity
 	}
 
 	private boolean checkWifiConnection() {
-		
+
 		if (wifi.isWifiEnabled()){
 			WifiInfo info = wifi.getConnectionInfo();
 			if (info != null){
@@ -523,7 +524,7 @@ public class Wi2MeRecherche extends Activity
         	serviceConnection = new ServiceConnection()
 		{
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				binder = (ServiceBinder) service;	
+				binder = (ServiceBinder) service;
 				if (binder.loadingError){
 					stopAndQuit();
 				}else{
@@ -541,8 +542,8 @@ public class Wi2MeRecherche extends Activity
 						}
 					}
 				}
-				
-			
+
+
 			}
 			public void onServiceDisconnected(ComponentName name) {
 			}
@@ -551,37 +552,37 @@ public class Wi2MeRecherche extends Activity
 
 		bindService(new Intent(this, ApplicationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
 	}
-		
+
 	private void unbind(){
     	if (serviceConnection != null){
     		removeObservers();
     		unbindService(serviceConnection);
     		serviceConnection = null;
-    	}		
+    	}
 	}
-	
+
 	private void removeObservers(){
     		if (binder != null){
     			binder.getLogger().deleteObserver(logObserver);
-    		}		
+    		}
 	}
-	
+
 	private void startService(){
 		startService(new Intent(this, ApplicationService.class));
-		
+
 	}
-	
-	
+
+
 	private void stopService(){
     		stopService(new Intent(this, ApplicationService.class));
-    		removeObservers(); 	
+    		removeObservers();
 	}
-	
+
     private void stopAndQuit() {
-    	stopService();		
+    	stopService();
 		finish();
 	}
-    
+
 	private void exit(){
 		if(binder.isRunning()){
 			AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
@@ -599,7 +600,7 @@ public class Wi2MeRecherche extends Activity
 
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
-		
+
 					if (binder.isRunning()){
 						stop();
 					}
@@ -613,51 +614,51 @@ public class Wi2MeRecherche extends Activity
 					}
 
 					unbind();
-					stopAndQuit();		
+					stopAndQuit();
 				}
 			});
 			builder.show();
 		}
 		else{
-			stopAndQuit();		
+			stopAndQuit();
 		}
 	}
-    
+
     public void onBackPressed(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onBackPressed");
     	exit();
     }
-    
+
     public void onStart(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onStart");
     	super.onStart();
     }
-    
+
     public void onStop(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onStop");
     	super.onStop();
     }
-    
+
     public void onRestart(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onRestart");
     	super.onRestart();
     }
-    
+
     public void onPause(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
     	super.onPause();
     	unbind();
     }
-    
+
     public void onResume(){
 
     	Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
     	super.onResume();
 	bind();
 	updateInfo(); //TKE IHM empty bug ?
-    		
+
     }
-    
+
     public void onDestroy(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onDestroy");
     	super.onDestroy();
@@ -665,50 +666,50 @@ public class Wi2MeRecherche extends Activity
     		stopService();
     	}
     }
-    
+
 
 	private class LogObserver implements Observer
 	{
-		
+
 		@Override
 		public void update(Observable observable, Object data)
-		{			
+		{
 			logTrace = (TraceString) data;
 			switch(logTrace.type)
 			{
 				case CELL:
-					
+
 					switch (logTrace.content.getStoringType())
 					{
 						case CELL_CONNECTION_EVENT:
 							mCellConnectionEvent = (CellularConnectionEvent) logTrace.content;
 							break;
-								
+
 						case CELL_CONNECTION_DATA:
 							mCellConnectionData = (CellularConnectionData) logTrace.content;
 							break;
 					}
 					break;
-						
+
 				case WIFI:
 					switch (logTrace.content.getStoringType())
 					{
 						case WIFI_CONNECTION_EVENT:
-						
+
 							mWifiConnectionEvent = (WifiConnectionEvent) logTrace.content;
 							break;
-							
-						case WIFI_CONNECTION_DATA:	
+
+						case WIFI_CONNECTION_DATA:
 							mWifiConnectionData = (WifiConnectionData) logTrace.content;
 							break;
-						
+
 					}
 					break;
 			}
 		}
-    	
+
 	}
-	
+
 	private boolean compressFile(String pathFileInput, String pathFileOutput){
 		byte[] buffer = new byte[100000];
 		InputStream file = null;
@@ -717,18 +718,18 @@ public class Wi2MeRecherche extends Activity
             BufferedOutputStream out = new BufferedOutputStream(
                     new GZIPOutputStream(new FileOutputStream(pathFileOutput)));
               int c;
-              while ((c = file.read(buffer)) != -1) 
+              while ((c = file.read(buffer)) != -1)
             	  out.write(buffer, 0, c);
               file.close();
               out.close();
-              
+
               return true;
 		} catch (Exception e) {
 			Log.e(getClass().getSimpleName(), "++ "+e.getMessage(), e);
 			return false;
 		}
 	}
-	
+
 	   public boolean upload( String ftpServer, String user, String password,
 		         String fileName, String source ) throws MalformedURLException,
 		         IOException
@@ -756,7 +757,7 @@ public class Wi2MeRecherche extends Activity
 		         {
 		        	int sent = 0;
 		        	long total = 0;
-		            URL url = new URL( sb.toString() );		            
+		            URL url = new URL( sb.toString() );
 		            URLConnection urlc = url.openConnection();
 
 		            bos = new BufferedOutputStream( urlc.getOutputStream() );
@@ -765,14 +766,14 @@ public class Wi2MeRecherche extends Activity
 		            bis = new BufferedInputStream( new FileInputStream( file ) );
 
 		            int i;
-		            
+
 		            while ((i = bis.read(buffer)) != -1)
 		            {
 		               bos.write( buffer, 0, i );
 		               sent += i;
 		               Log.d(getClass().getSimpleName(), "++ " + "FTP Uploaded Bytes: "+ sent + " of " + total);
 		            }
-		            
+
 		            if (total == sent)
 		            	return true;
 		         }
@@ -804,10 +805,10 @@ public class Wi2MeRecherche extends Activity
 		      }
 		      return false;
 		   }
-	
+
 	private boolean sendFileFTP(String pathFileInput, String pathFileOutput, String server, String user, String pass){
 		SimpleFTP ftp = new SimpleFTP();
-		try {    
+		try {
 			Log.d(getClass().getSimpleName(), "++ " + "FTP About to connect");
 		    // Connect to an FTP server on port 21.
 		    ftp.connect(server, 21, user, pass);
@@ -821,7 +822,7 @@ public class Wi2MeRecherche extends Activity
 		    Log.d(getClass().getSimpleName(), "++ " + "FTP About to run storing command");
 
 		    // You can also upload from an InputStream, e.g.
-		    return ftp.stor(new FileInputStream(new File(pathFileInput)), pathFileOutput);		    
+		    return ftp.stor(new FileInputStream(new File(pathFileInput)), pathFileOutput);
 
 		}
 		catch (IOException e) {
@@ -834,12 +835,12 @@ public class Wi2MeRecherche extends Activity
 				Log.d(getClass().getSimpleName(), "++ " + "FTP Disconnected");
 			} catch (IOException e) {
 				Log.e(getClass().getSimpleName(), "++ " + "FTP " + e.getMessage(), e);
-			}		
+			}
 		}
 	}
 	/*
 	private class LogcatPrintWriter extends PrintWriter{
-		
+
 	}*/
 	/** Customer ListView to show the information in traces*/
 
@@ -878,7 +879,7 @@ public class Wi2MeRecherche extends Activity
 			else {
 				holder = (ViewHolder) convertView.getTag();
 			}
-				
+
 			holder.traceItem.setText((String) infoTraceList.get(position).get("traceItem"));
 			holder.traceValue.setText((String) infoTraceList.get(position).get("traceValue"));
 			return convertView;
@@ -896,7 +897,7 @@ public class Wi2MeRecherche extends Activity
 					inserted = true;
 				}
 			}
-			
+
 			if (!inserted)
 			{
 				newVal = new HashMap<String, String>();
@@ -905,7 +906,7 @@ public class Wi2MeRecherche extends Activity
 				infoTraceList.add(newVal);
 			}
 		}
-	
+
 		class ViewHolder {
 			TextView traceItem;
 			TextView traceValue;
@@ -918,7 +919,7 @@ public class Wi2MeRecherche extends Activity
 	{
 
 		localizationView = (ListView) findViewById(R.id.gridViewLocalization);
-		
+
 		myListAdapter localizationAdapter = (myListAdapter) localizationView.getAdapter();
 
 		if (logTrace != null)
@@ -929,12 +930,12 @@ public class Wi2MeRecherche extends Activity
 			localizationAdapter.setData("Timestamp (ms)", String.valueOf(logTrace.content.getTimestamp()));
 			localizationAdapter.setData("Speed (m/s)", String.valueOf(logTrace.content.getSpeed()));
 			localizationAdapter.setData("Battery Level", String.valueOf(logTrace.content.getBatteryLevel())+"%");
-						
+
 			localizationAdapter.notifyDataSetChanged();
-											
+
 			traceView = (TextView) findViewById(R.id.trace);
 			traceView.setText(logTrace.content.toString());
-						
+
 			if (mCellConnectionEvent != null)
 			{
 				cellView = (ListView) findViewById(R.id.gridViewCell);
@@ -943,9 +944,9 @@ public class Wi2MeRecherche extends Activity
 				adapterCell.setData("Signal Level (dBm)", String.valueOf(mCellConnectionEvent.getConnectionTo().getLeveldBm()));
 				adapterCell.setData("Network type", mCellConnectionEvent.getConnectionTo().getNetworkType());
 				adapterCell.setData("CID/LAC", String.valueOf(mCellConnectionEvent.getConnectionTo().getCid())+"/"+String.valueOf(mCellConnectionEvent.getConnectionTo().getLac()));
-				
+
 				adapterCell.notifyDataSetChanged();
-				
+
 				TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
 				cellStatus.setText(mCellConnectionEvent.getEvent());
 				mCellConnectionEvent = null;
@@ -959,7 +960,7 @@ public class Wi2MeRecherche extends Activity
 				if(mCellConnectionData.getConnectionData().getType().startsWith("OUT")){
 					connectionStatus.setText(mCellConnectionData.getConnectionData().getType().replaceFirst("OUT", "Cell-Upload"));
 				}
-				
+
 				if (mCellConnectionData.getConnectionData().getType().contains("START")){
 					cell_start_time=mCellConnectionData.getTimestamp();
 					cell_start = true;
@@ -968,8 +969,8 @@ public class Wi2MeRecherche extends Activity
 					cell_start = true;
 					cell_start_time=mCellConnectionData.getTimestamp();
 				}
-				
-				
+
+
 				cellDataView = (ListView) findViewById(R.id.gridViewConnection);
 				myListAdapter adapterCellData = (myListAdapter) cellDataView.getAdapter();
 				adapterCellData.setData("IP address", mCellConnectionData.getConnectionData().getIp());
@@ -978,18 +979,18 @@ public class Wi2MeRecherche extends Activity
 				adapterCellData.setData("Tx/Rx packets", "-");
 				adapterCellData.setData("Throughput (KB/s)", String.valueOf((float)(mCellConnectionData.getConnectionData().getBytesTransferred())/(mCellConnectionData.getTimestamp()-cell_start_time)));
 				adapterCellData.setData("Transfer progress", String.valueOf((int)((float)(mCellConnectionData.getConnectionData().getBytesTransferred())/(float)(mCellConnectionData.getConnectionData().getTotalBytes())*100))+"%"+" (Total:"+String.valueOf(mCellConnectionData.getConnectionData().getTotalBytes())+')');
-			
-				adapterCellData.notifyDataSetChanged(); 
-		
+
+				adapterCellData.notifyDataSetChanged();
+
 				cellView = (ListView) findViewById(R.id.gridViewCell);
 				myListAdapter adapterCell2 = (myListAdapter) cellView.getAdapter();
 				adapterCell2.setData("Operator Name", mCellConnectionData.getConnectedTo().getOperatorName());
 				adapterCell2.setData("Signal Level (dBm)", String.valueOf(mCellConnectionData.getConnectedTo().getLeveldBm()));
 				adapterCell2.setData("Network type", mCellConnectionData.getConnectedTo().getNetworkType());
 				adapterCell2.setData("CID/LAC", String.valueOf(mCellConnectionData.getConnectedTo().getCid())+"/"+String.valueOf(mCellConnectionData.getConnectedTo().getLac()));
-			
+
 				adapterCell2.notifyDataSetChanged();
-		
+
 				TextView cellStatus2=(TextView) findViewById(R.id.CellStatus);
 				cellStatus2.setText(mCellConnectionData.toString());
 				mCellConnectionData = null;
@@ -997,26 +998,26 @@ public class Wi2MeRecherche extends Activity
 			if (mWifiConnectionEvent != null)
 			{
 				wifiView = (ListView) findViewById(R.id.gridViewWifi);
-				
+
 				myListAdapter wifiAdapter1 = (myListAdapter) wifiView.getAdapter();
 				wifiAdapter1.setData("SSID", mWifiConnectionEvent.getConnectionTo().getSsid());
 				wifiAdapter1.setData("Signal strength (dBm)", String.valueOf(mWifiConnectionEvent.getConnectionTo().getLevel()));
 				wifiAdapter1.setData("Channel", String.valueOf(mWifiConnectionEvent.getConnectionTo().getChannel()));
 				wifiAdapter1.setData("BSSID", mWifiConnectionEvent.getConnectionTo().getBSSID());
 				wifiAdapter1.setData("Rate (Mbps)", String.valueOf(mWifiConnectionEvent.getConnectionTo().getLinkSpeed()));
-				
+
 				wifiAdapter1.notifyDataSetChanged();
-				
+
 				TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
 				wifiStatus.setText(mWifiConnectionEvent.getEvent());
 
 				mWifiConnectionEvent = null;
-				
+
 			}
 			if (mWifiConnectionData != null)
 			{
 				wifiDataView = (ListView) findViewById(R.id.gridViewConnection);
-				
+
 				if (mWifiConnectionData.getConnectionData().getType().contains("START")||mWifiConnectionData.getConnectionData().getBytesTransferred() < lastBytesTransferred){
 					wifi_start_time=mWifiConnectionData.getTimestamp();
 					wifi_start = true;
@@ -1025,7 +1026,7 @@ public class Wi2MeRecherche extends Activity
 					wifi_start = true;
 					wifi_start_time=mWifiConnectionData.getTimestamp();
 				}
-				
+
 				myListAdapter adapterWifiData = (myListAdapter) wifiDataView.getAdapter();
 				adapterWifiData.setData("IP address", mWifiConnectionData.getConnectionData().getIp());
 				adapterWifiData.setData("Elapsed time (ms)", String.valueOf(mWifiConnectionData.getTimestamp()-wifi_start_time));
@@ -1033,8 +1034,8 @@ public class Wi2MeRecherche extends Activity
 				adapterWifiData.setData("Tx/Rx packets", String.valueOf(mWifiConnectionData.getConnectionData().getTxPackets())+"/"+String.valueOf(mWifiConnectionData.getConnectionData().getRxPackets()));
 				adapterWifiData.setData("Throughput (KB/s)", String.valueOf((float)(mWifiConnectionData.getConnectionData().getBytesTransferred())/(mWifiConnectionData.getTimestamp()-wifi_start_time)));
 				adapterWifiData.setData("Transfer progress", String.valueOf((int)((float)(mWifiConnectionData.getConnectionData().getBytesTransferred())/(float)(mWifiConnectionData.getConnectionData().getTotalBytes())*100))+"%"+" (Total:"+String.valueOf(mWifiConnectionData.getConnectionData().getTotalBytes())+')');
-				
-				adapterWifiData.notifyDataSetChanged(); 
+
+				adapterWifiData.notifyDataSetChanged();
 
 				TextView connectionStatus=(TextView) findViewById(R.id.connectionStatus);
 				if(mWifiConnectionData.getConnectionData().getType().startsWith("IN")){
@@ -1043,7 +1044,6 @@ public class Wi2MeRecherche extends Activity
 				if(mWifiConnectionData.getConnectionData().getType().startsWith("OUT")){
 					connectionStatus.setText(mWifiConnectionData.getConnectionData().getType().replaceFirst("OUT", "Wifi-Upload"));
 				}
-				
 				wifiView = (ListView) findViewById(R.id.gridViewWifi);
 
 				myListAdapter adapterWifi = (myListAdapter) wifiView.getAdapter();
@@ -1052,17 +1052,11 @@ public class Wi2MeRecherche extends Activity
 				adapterWifi.setData("Channel", String.valueOf(mWifiConnectionData.getConnectedTo().getChannel()));
 				adapterWifi.setData("BSSID", mWifiConnectionData.getConnectedTo().getBSSID());
 				adapterWifi.setData("Rate (Mbps)", String.valueOf(mWifiConnectionData.getConnectedTo().getLinkSpeed()));
-				
 				TextView wifiStatus2=(TextView) findViewById(R.id.wifiStatus);
-				
-				adapterWifi.notifyDataSetChanged(); 
-				
+				adapterWifi.notifyDataSetChanged();
 				lastBytesTransferred = mWifiConnectionData.getConnectionData().getBytesTransferred();
 				mWifiConnectionData = null;
 			}
-
-			
-			
 			if (refreshUI)
 			{
       				refreshHandler.postDelayed(refreshTask, UI_REFRESH_PERIOD);
@@ -1070,12 +1064,12 @@ public class Wi2MeRecherche extends Activity
 
 		}
 	}
-	
+
 	private void clearInfo()
 	{
-		
+
 		localizationView = (ListView) findViewById(R.id.gridViewLocalization);
-		
+
 		ArrayList<HashMap<String, String>> traceValueList = new ArrayList<HashMap<String, String>>();
 		HashMap<String, String> traceValueItem = new HashMap<String, String>();
 		traceValueItem.put("traceItem", "Provider/Accuracy (m)");
@@ -1101,14 +1095,14 @@ public class Wi2MeRecherche extends Activity
 		traceValueItem.put("traceItem", "Battery Level");
 		traceValueItem.put("traceValue","");
 		traceValueList.add(traceValueItem);
-		
+
 		myListAdapter adapter = new myListAdapter(traceValueList,currentActivity);
 		localizationView.setAdapter(adapter);
-							
+
 		traceView = (TextView) findViewById(R.id.trace);
 		traceView.setText("");
-		
-		
+
+
 		wifiView = (ListView) findViewById(R.id.gridViewWifi);
 		ArrayList<HashMap<String, String>> wifiTraceList = new ArrayList<HashMap<String, String>>();
 		HashMap<String, String> wifiTraceItem = new HashMap<String, String>();
@@ -1131,13 +1125,13 @@ public class Wi2MeRecherche extends Activity
 		wifiTraceItem.put("traceItem", "Rate (Mbps)");
 		wifiTraceItem.put("traceValue", "");
 		wifiTraceList.add(wifiTraceItem);
-		
+
 		myListAdapter wifiAdapter = new myListAdapter(wifiTraceList,currentActivity);
 		wifiView.setAdapter(wifiAdapter);
-		
+
 		TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
 		wifiStatus.setText("");
-		
+
 		cellView = (ListView) findViewById(R.id.gridViewCell);
 		ArrayList<HashMap<String, String>> cellTraceList = new ArrayList<HashMap<String, String>>();
 		HashMap<String, String> cellTraceItem = new HashMap<String, String>();
@@ -1156,13 +1150,13 @@ public class Wi2MeRecherche extends Activity
 		cellTraceItem.put("traceItem", "CID/LAC");
 		cellTraceItem.put("traceValue", "");
 		cellTraceList.add(cellTraceItem);
-		
+
 		myListAdapter adapterCell = new myListAdapter(cellTraceList,currentActivity);
 		cellView.setAdapter(adapterCell);
-		
+
 		TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
 		cellStatus.setText("");
-		
+
 		wifiDataView = (ListView) findViewById(R.id.gridViewConnection);
 		ArrayList<HashMap<String, String>> connectionTraceList = new ArrayList<HashMap<String, String>>();
 		HashMap<String, String> connectionTraceItem = new HashMap<String, String>();
@@ -1189,15 +1183,13 @@ public class Wi2MeRecherche extends Activity
 		connectionTraceItem.put("traceItem", "Transfer progress");
 		connectionTraceItem.put("traceValue", "");
 		connectionTraceList.add(connectionTraceItem);
-		
-		
+
+
 		myListAdapter adapterConnection = new myListAdapter(connectionTraceList,currentActivity);
 		wifiDataView.setAdapter(adapterConnection);
-		
+
 		TextView connectionStatus=(TextView) findViewById(R.id.connectionStatus);
 		connectionStatus.setText("");
 	}
-	
-		
 }
 

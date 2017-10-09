@@ -20,7 +20,7 @@
 	<string name="DISABLE_DROIDWALL_UPLOAD_MESSAGE">Droidwall must be disabled to send the results. Select the option to disable the Firewall, and press BACK to return and try to Upload Results again.</string>
 	<string name="ENABLE_DROIDWALL_START_MESSAGE">Droidwall must be enabled to start the service. Select the option to enable the Firewall, and press BACK to return and try to Start again.</string>
 	<string name="TRIAL_EXPIRED">Trial Version Expired</string>
-	
+
 	<string name="EXPORT_POPUP_TITLE">Export results</string>
 	<string name="EXPORT_POPUP_LOCAL">Export to SD</string>
 	<string name="EXPORT_POPUP_SERVER">Upload to Server</string>

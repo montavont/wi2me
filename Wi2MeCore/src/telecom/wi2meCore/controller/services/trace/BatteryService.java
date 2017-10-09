@@ -49,7 +49,7 @@ public class BatteryService implements IBatteryService{
 	}
 
 	@Override
-	public void unregisterLevelReceiver(IBatteryLevelReceiver receiver) {	
+	public void unregisterLevelReceiver(IBatteryLevelReceiver receiver) {
 		synchronized (this){
 			try{
 				int index = broadcastReceivers.indexOf(new BatteryBroadcastReceiver(receiver));
@@ -59,15 +59,15 @@ public class BatteryService implements IBatteryService{
 				BroadcastReceiver toUnregister = broadcastReceivers.remove(index);
 				context.unregisterReceiver(toUnregister);
 	    	}catch(Exception e){
-	    		Log.e("Unregistering Battery Level Receiver", "++ "+e.getMessage(), e);
+	    		Log.e("Battery", "Unregistering Battery Level Receiver "+e.getMessage(), e);
 	    	}
 		}
 	}
-	
+
 	private class BatteryBroadcastReceiver extends BroadcastReceiver {
 
 		private IBatteryLevelReceiver receiver;
-		
+
 		public BatteryBroadcastReceiver(IBatteryLevelReceiver levelReceiver){
 			this.receiver = levelReceiver;
 		}

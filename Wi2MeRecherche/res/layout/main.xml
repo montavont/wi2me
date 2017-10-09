@@ -4,32 +4,32 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
-<TextView  
+<TextView
 	android:id="@+id/started_date"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:text="Running since:..."
     />
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:text="---------------------------------"
     />
-<TextView  
+<TextView
 	android:id="@+id/cell_log"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:text="Waiting for Cellular output.."
     />
-<TextView  
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+<TextView
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:text="---------------------------------"
     />
-<TextView  
+<TextView
 	android:id="@+id/wifi_log"
-    android:layout_width="fill_parent" 
-    android:layout_height="wrap_content" 
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
     android:text="Waiting for WiFi output.."
     />
 </LinearLayout>

@@ -22,7 +22,7 @@ package telecom.wi2meCore.model;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile; 
+import java.io.RandomAccessFile;
 import java.nio.ByteOrder;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -37,7 +37,7 @@ public class Utils
 	public static final String TYPE_DOWNLOAD = "IN";
 	public static final String TYPE_UPLOAD = "OUT";
 	public static final String TYPE_SNIFF = "SNIFF";
-	
+
 	public static byte[] inStreamToByteArray(InputStream inStream)
 	{
 		int bytesRead = 0;
@@ -49,12 +49,12 @@ public class Utils
 				outStream.write(buffer, 0, bytesRead);
 			}
 		} catch (IOException e) {
-			Log.e("Error converting inputstream to byte array", "++ "+e.getMessage(), e);
+			Log.e("Utils", "Error converting inputstream to byte array "+e.getMessage(), e);
 		}
-		
+
 		return outStream.toByteArray();
 	}
-	
+
 	public static byte[] RAFToByteArray(RandomAccessFile raf)
 	{
 		int bytesRead = 0;
@@ -66,12 +66,12 @@ public class Utils
 				outStream.write(buffer, 0, bytesRead);
 			}
 		} catch (IOException e) {
-			Log.e("Error converting inputstream to byte array", "++ "+e.getMessage(), e);
+			Log.e("Utils", "Error converting inputstream to byte array "+e.getMessage(), e);
 		}
-		
+
 		return outStream.toByteArray();
 	}
-	
+
 	public static String intToIp(long i) {
 		if (ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN)
 			return ((i >> 24 ) & 0xFF) + "." +

@@ -9,25 +9,23 @@ buildscript {
     }
 }
 
-evaluationDependsOn(':Wi2MeCore')
-
 apply plugin: 'android'
+
+dependencies {
+	compile project(':Wi2MeCore')
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
 
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0"
-
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
-            resources {
-                    srcDirs= ["res"]
-            }
+            res.srcDirs= ["res"]
+	        java {
+    	        srcDirs 'src'
+        	}
         }
     }
-
-    lintOptions {
-        abortOnError false
-    }
-
 }
