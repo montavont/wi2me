@@ -37,6 +37,7 @@ import telecom.wi2meUser.controller.ApplicationService.ServiceBinder;
 
 
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
@@ -63,16 +64,16 @@ import android.widget.TextView;
 
 /**
  * This is the Preferences screen of Wi2MeUser.
- * 
+ *
  * @author Xin CHEN
  */
 
 public class Wi2MePreferenceActivity extends PreferenceActivity{
-	
+
 	private static final String CONFIG_FILE = ConfigurationManager.WI2ME_DIRECTORY+ConfigurationManager.CONFIG_FILE;
 	private int batterylevelsetted;
 	private int frequencysetted;
-	
+
 	Preference battery;
 	CheckBoxPreference openNetwork;
 	CheckBoxPreference dataCollection;
@@ -84,18 +85,18 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 	EditTextPreference scanInterval;
 	Preference connectivityCheckFrequency;
 	Activity current;
-	
+
 	ServiceBinder binder;
 	ServiceConnection serviceConnection;
 
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 		current = this;
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.layout.preference); 
-		
+		addPreferencesFromResource(R.layout.preference);
+
 		battery=(Preference) findPreference("BatteryLevel");
 		openNetwork=(CheckBoxPreference) findPreference("OpenNetwork");
 		dataCollection=(CheckBoxPreference) findPreference("DataCollection");
@@ -106,18 +107,18 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 		scanInterval = (EditTextPreference) findPreference("ScanInterval");
 		connectivityCheck = (CheckBoxPreference) findPreference ("ConnectivityCheck");
 		connectivityCheckFrequency = (Preference) findPreference("ConnectivityFrequency");
-			
+
 	}
 	public void onResume(){
 		Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
 		super.onResume();
-		
+
 		serviceConnection = new ServiceConnection() {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.d(getClass().getSimpleName(), "?? " + "Bind connection");
-				
+
 				File confFile = new File(Environment.getExternalStorageDirectory() + CONFIG_FILE);
-				binder = (ServiceBinder) service;	
+				binder = (ServiceBinder) service;
 				if (binder.loadingError){
 					finish();
 				}else{
@@ -133,21 +134,20 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 			}
 			public void onServiceDisconnected(ComponentName name) {}
 		};
-		
+
 		bindService(new Intent(this, ApplicationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
 
 	}
-	
+
 	public void onStop(){
-		Toast.makeText(this, "The modifications will ", Toast.LENGTH_LONG);
-		super.onStop();		
+		super.onStop();
 	}
-	
+
 	/**
 	 * function to load all the configurations saved
 	 */
 	public void loadConfig(){
-		
+
 		/**Set parameter AllowDataCollection */
 		try {
 			dataCollection.setChecked(Boolean.parseBoolean(readProperties("ALLOW_TRACE_CONNECTIONS")));
@@ -157,7 +157,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 		dataCollection.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-				
+
 				try {
 					changeParameter((Boolean)arg1, Parameter.ALLOW_TRACE_CONNECTIONS);
 					dataCollection.setChecked((Boolean)arg1);
@@ -167,7 +167,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 				return false;
 			}
 
-		});		
+		});
 
 		/** Set parameter ConnectionToOpenNetwork */
 		try {
@@ -178,7 +178,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 		openNetwork.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-				
+
 				try {
 					changeParameter((Boolean)arg1, Parameter.CONNECT_TO_OPEN_NETWORKS);
 					openNetwork.setChecked((Boolean)arg1);
@@ -189,100 +189,101 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 			}
 
 		});
-		
+
 		/** Set parameter batteryLevel */
 		battery.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			
+
 			@Override
+			@SuppressLint("InflateParams") // No parent available
 			public boolean onPreferenceClick(Preference p) {
-				LayoutInflater factory = LayoutInflater.from(current); 
+				LayoutInflater factory = LayoutInflater.from(current);
 				View view = factory.inflate(R.layout.batterylevelpopup, null);
-				
+
 				final SeekBar batterySeekBar = (SeekBar)view.findViewById(R.id.batteryseekBar);
 				final TextView batteryLevel=(TextView) view.findViewById (R.id.batteryLevel);
-				
+
 				try {
 					batteryLevel.setText(readProperties("MIN_BATTERY_LEVEL")+"%");
 					batterySeekBar.setProgress(Integer.parseInt(readProperties("MIN_BATTERY_LEVEL")));
-					
+
 				} catch (IOException e) {
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-					
+
 				}
-				
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(current);
 				builder.setTitle("Battery Level");
 				builder.setView(view);
-				
+
 				builder.setPositiveButton("Save", new OnClickListener(){
-					
+
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
-												
+
 						try {
 							changeParameter(batterylevelsetted, Parameter.MIN_BATTERY_LEVEL);
 						} catch (IOException e) {
 							Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 						}
-						
+
 						}
 				});
-				
+
 				builder.setNegativeButton("Cancel", new OnClickListener(){
-					
+
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
 
 						}
 				});
-				
-				
-				
-				
+
+
+
+
 				builder.show();
-				
+
 				batterySeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 
 					@Override
 					public void onProgressChanged(SeekBar seekBar, int progress,
 							boolean fromUser) {
 						if(fromUser){
-						
+
 								batteryLevel.setText(Integer.toString(progress)+"%");
 								batterylevelsetted = progress;
-							
+
 						}
-						
+
 					}
 
 					@Override
 					public void onStartTrackingTouch(SeekBar arg0) {
 						// TODO Auto-generated method stub
-						
+
 					}
 
 					@Override
 					public void onStopTrackingTouch(SeekBar arg0) {
 						// TODO Auto-generated method stub
-						
+
 					}
 				});
-				
+
 				return false;
 			}
 		});
-		
+
 		/** Set parameter Notification */
 		try {
 			notification.setChecked(Boolean.parseBoolean(readProperties("NOTIFY_SERVICE_STATUS")));
 		} catch (IOException e1) {
 			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
 		}
-		
+
 		notification.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-				
+
 				try {
 					changeParameter((Boolean)arg1, Parameter.NOTIFY_SERVICE_STATUS);
 					notification.setChecked((Boolean)arg1);
@@ -293,20 +294,20 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 			}
 
 		});
-		
 
-		
+
+
 		/** set GPS Location parameter */
 		try {
 			location.setChecked(Boolean.parseBoolean(readProperties("USE_GPS_POSITION")));
 		} catch (IOException e1) {
 			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
 		}
-		
+
 		location.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-				
+
 				try {
 					changeParameter((Boolean)arg1, Parameter.USE_GPS_POSITION);
 					location.setChecked((Boolean)arg1);
@@ -317,18 +318,18 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 			}
 
 		});
-		
+
 		/** set notify_when_wifi_connected parameter */
 		try {
 			connectionNotification.setChecked(Boolean.parseBoolean(readProperties("NOTIFY_WHEN_WIFI_CONNECTED")));
 		} catch (IOException e1) {
 			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
 		}
-		
+
 		connectionNotification.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-				
+
 				try {
 					changeParameter((Boolean)arg1, Parameter.NOTIFY_WHEN_WIFI_CONNECTED);
 					connectionNotification.setChecked((Boolean)arg1);
@@ -339,7 +340,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 			}
 
 		});
-		
+
 		/**Set parameter ConnectivityCheck */
 		try {
 			connectivityCheck.setChecked(Boolean.parseBoolean(readProperties("PERFORM_CONNECTIVITY_CHECK")));
@@ -357,7 +358,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 		connectivityCheck.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
 			@Override
 			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-				
+
 				try {
 					changeParameter((Boolean)arg1, Parameter.PERFORM_CONNECTIVITY_CHECK);
 					connectivityCheck.setChecked((Boolean)arg1);
@@ -375,10 +376,10 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 				return false;
 			}
 
-		});		
-		
+		});
+
 		/** set threshold parameter*/
-		
+
 		threshold.setEntries(getResources().getStringArray(R.array.thresholdDisplayWord));
 		threshold.setEntryValues(getResources().getStringArray(R.array.thresholdReturnValue));
 		threshold.setNegativeButtonText("Cancel");
@@ -391,10 +392,10 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 			int index = list.indexOf(threshold_read);
 			if(index!=-1){threshold.setValueIndex(index);}
 		} catch (IOException e) {
-			
+
 			e.printStackTrace();
 		}
-		
+
 		threshold.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener(){
 
 			@Override
@@ -407,7 +408,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 				}
 				return false;
 			}});
-		
+
 		/** set scanInterVal parameter */
 		try {
 			int scanInterval_read = Integer.parseInt(readProperties("WIFI_SCAN_INTERVAL"));
@@ -428,99 +429,101 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 					}
 					else {
 						//TODO
-						Toast.makeText(current, "Please enter only numbers", Toast.LENGTH_LONG);
+						Toast.makeText(current, "Please enter only numbers", Toast.LENGTH_LONG).show();
+
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 				return false;
 			}});
-		
+
 		/** Set parameter ConnectiviyCheckFrequency */
 		connectivityCheckFrequency.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
-			
+
 			@Override
+			@SuppressLint("InflateParams") // No parent available
 			public boolean onPreferenceClick(Preference p) {
-				LayoutInflater factory = LayoutInflater.from(current); 
+				LayoutInflater factory = LayoutInflater.from(current);
 				View view = factory.inflate(R.layout.connectivitycheckfrequencypopup, null);
-				
+
 				final SeekBar frequencySeekBar = (SeekBar)view.findViewById(R.id.connectivityCheckFrequencySeekBar);
 				final TextView connectivityFrequency=(TextView) view.findViewById (R.id.connectivityCheckFrequency);
-				
+
 				try {
 					connectivityFrequency.setText(String.valueOf(Integer.parseInt(readProperties("CONNECTIVITY_CHECK_FREQUENCY"))/60000)+"minutes");
 					frequencySeekBar.setProgress((Integer.parseInt(readProperties("CONNECTIVITY_CHECK_FREQUENCY"))/60000)-1);
-					
+
 				} catch (IOException e) {
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-					
+
 				}
-				
+
 				AlertDialog.Builder builder = new AlertDialog.Builder(current);
 				builder.setTitle("Frequency of the connectivity verification");
 				builder.setView(view);
-				
+
 				builder.setPositiveButton("Save", new OnClickListener(){
-					
+
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
-												
+
 						try {
 							changeParameter(frequencysetted, Parameter.CONNECTIVITY_CHECK_FREQUENCY);
 						} catch (IOException e) {
 							Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 						}
-						
+
 						}
 				});
-				
+
 				builder.setNegativeButton("Cancel", new OnClickListener(){
-					
+
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
 
 						}
 				});
-				
-				
-				
-				
+
+
+
+
 				builder.show();
-				
+
 				frequencySeekBar.setOnSeekBarChangeListener(new OnSeekBarChangeListener(){
 
 					@Override
 					public void onProgressChanged(SeekBar seekBar, int progress,
 							boolean fromUser) {
 						if(fromUser){
-						
+
 								connectivityFrequency.setText(Integer.toString(progress+1)+"minutes");
 								frequencysetted = (progress+1)*60000;
-							
+
 						}
-						
+
 					}
 
 					@Override
 					public void onStartTrackingTouch(SeekBar arg0) {
 						// TODO Auto-generated method stub
-						
+
 					}
 
 					@Override
 					public void onStopTrackingTouch(SeekBar arg0) {
 						// TODO Auto-generated method stub
-						
+
 					}
 				});
-				
+
 				return false;
 			}
 		});
-		
+
 	}
-	
-	/** Function used while a parameter is changed 
+
+	/** Function used while a parameter is changed
 	 * @param property : the parameter to changer
 	 * @param param : the new value of the parameter*/
 	public void changeParameter(Object param, Parameter property)throws IOException{
@@ -528,7 +531,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 		Properties props = new Properties();
         props.load(configFileIn);
         configFileIn.close();
-        
+
         switch(property){
         	case MIN_BATTERY_LEVEL:
         		props.setProperty("MIN_BATTERY_LEVEL", param.toString());
@@ -570,17 +573,17 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
         		props.setProperty("CONNECTIVITY_CHECK_FREQUENCY",param.toString());
         		binder.parameters.setParameter(Parameter.CONNECTIVITY_CHECK_FREQUENCY, param);
                 break;
-        		
+
         }
         /** refresh the list showed when the parameter changed*/
         loadConfig();
-        
+
         /** modify the value of the parameter changed in the configuration file */
         FileOutputStream configFileOut = new FileOutputStream (Environment.getExternalStorageDirectory() + CONFIG_FILE);
         props.store(configFileOut, null);
         configFileOut.close();
 	}
-	
+
 	/** function to get the value of a parameter in the configuration file
 	 * @param type : the searched parameter */
 	public String readProperties(String type) throws IOException{
@@ -589,9 +592,9 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
         props.load(configFileIn);
         configFileIn.close();
         return props.getProperty(type);
-              
+
 	}
-	
+
 	@Override
 	public void onPause(){
     	Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
@@ -599,8 +602,9 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
     	if (serviceConnection != null){
     		unbindService(serviceConnection);
     		serviceConnection = null;
-    	}	
+    	}
 
 	}
 }
- 
+
+

@@ -20,6 +20,7 @@
 package telecom.wi2meCore.controller.services.cell;
 
 import java.util.List;
+import java.util.Locale;
 
 import android.telephony.NeighboringCellInfo;
 import android.telephony.ServiceState;
@@ -28,8 +29,9 @@ import android.telephony.cdma.CdmaCellLocation;
 import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 
+
 public class CellInfo{
-	
+
 	private static final String GSM = "GSM";
 	private static final String CDMA = "CDMA";
 	private static final String NONE = "NONE";
@@ -44,8 +46,8 @@ public class CellInfo{
 	private static final String HSDPA = "HSDPA";
 	private static final String HSPA = "HSPA";
 	private static final String CELL_INFO = " Operator Name: %s \n Operator: %s \n CID: %d \n LAC: %d \n Type: %s \n Signal(dBm): %d \n Phone Type: %s \n Neighbours: %d";
-	
-	public String operatorName;		
+
+	public String operatorName;
 	public String networkType;
 	public String phoneType;
 	public String operator;
@@ -55,7 +57,7 @@ public class CellInfo{
 	public List<NeighboringCellInfo> neighbors;
 	private ServiceState serviceState;
 	private boolean changed;
-	
+
 	/**
 	 * Constructor. Sets the parameters to 0.
 	 */
@@ -65,7 +67,7 @@ public class CellInfo{
 		lac = 0;
 		changed = false;
 	}
-	
+
 	/**
 	 * Says whether the cell has changed or not.
 	 * @return boolean
@@ -73,7 +75,7 @@ public class CellInfo{
 	public boolean isChanged() {
 		return changed;
 	}
-	
+
 	/**
 	 * Sets the "changed" parameter.
 	 * @param changed
@@ -89,7 +91,7 @@ public class CellInfo{
 	public int getLeveldBm() {
 		return leveldBm;
 	}
-	
+
 	/**
 	 * Sets the serviceState
 	 * @param serviceState
@@ -106,13 +108,13 @@ public class CellInfo{
 		this.leveldBm = level;
 		this.changed = true;
 	}
-	
+
 	public String toString(){
-		return String.format(CELL_INFO, operatorName, operator, cid, lac, networkType, leveldBm, phoneType, neighbors.size());
+		return String.format(Locale.US, CELL_INFO, operatorName, operator, cid, lac, networkType, leveldBm, phoneType, neighbors.size());
 	}
-	
+
 	/**
-	 * Get a copy of the object with its last changes 
+	 * Get a copy of the object with its last changes
 	 * @return The copy of the object
 	 */
 	public synchronized CellInfo getCopyOfCurrentCell(){
@@ -121,30 +123,30 @@ public class CellInfo{
 		//changed = false;
 		return copy;
 	}
-	
+
 	/**
 	 * Updates the parameters of this CellInfo..
 	 * @param telephonyManager
 	 */
-	public synchronized void update(TelephonyManager telephonyManager){	
-			operatorName = telephonyManager.getNetworkOperatorName();			
+	public synchronized void update(TelephonyManager telephonyManager){
+			operatorName = telephonyManager.getNetworkOperatorName();
 			networkType = getNetworkType(telephonyManager.getNetworkType());
 			phoneType = getPhoneType(telephonyManager.getPhoneType());
 			neighbors = telephonyManager.getNeighboringCellInfo();
-			
+
 			if (telephonyManager.hasIccCard())
 			{
 				if (phoneType.equals(GSM))
 				{
 					GsmCellLocation location = (GsmCellLocation) telephonyManager.getCellLocation();
 					operator = telephonyManager.getNetworkOperator();
-				
+
 					if (location != null)
 					{
 						cid = location.getCid();
 						lac = location.getLac();
-	
-						Log.d(getClass().getSimpleName(), "CID "+cid+" LAC "+lac);				
+
+						Log.d(getClass().getSimpleName(), "CID "+cid+" LAC "+lac);
 					}
 				}
 				else
@@ -155,7 +157,7 @@ public class CellInfo{
 						operator = serviceState.getOperatorNumeric() + location.getSystemId();
 						cid = location.getBaseStationId();
 						lac = location.getNetworkId();
-						Log.d(getClass().getSimpleName(), "CID "+cid+" LAC "+lac);				
+						Log.d(getClass().getSimpleName(), "CID "+cid+" LAC "+lac);
 					}
 				}
 			} else
@@ -164,10 +166,10 @@ public class CellInfo{
 				cid=0;
 				lac=0;
 			}
-			
+
 			changed = true;
 	}
-	
+
 	/**
 	 * Copies the current cellInfo into a new one.
 	 * @param copy
@@ -185,7 +187,7 @@ public class CellInfo{
 			copy.changed = changed;
 			return copy;
 	}
-		
+
 	/**
 	 * Gives the phone type (GSM, CDMA)
 	 * @param type
@@ -202,7 +204,7 @@ public class CellInfo{
 		}
 		return NONE;
 	}
-	
+
 	/**
 	 * Gives the network type (GPRS, EDGE, etc.)
 	 * @param atype
@@ -246,7 +248,7 @@ public class CellInfo{
 	public static int getLeveldBm(int gsmSignalStrength) {
 		return -113 + 2 * gsmSignalStrength;
 	}
-	
+
 	/**
 	 * Returns a new object, class CellInfo with the identifier attributes in 0. This is called the null object of type CellInfo
 	 * @return The null object cell info
@@ -266,7 +268,7 @@ public class CellInfo{
 	 * @return Whether they are equal or not (boolean).
 	 */
 	public boolean equals(Object otherCellInfo){
-		CellInfo other = (CellInfo) otherCellInfo;		
+		CellInfo other = (CellInfo) otherCellInfo;
 		return this.cid == other.cid && this.lac == other.lac && this.operator.equals(other.operator);
 	}
 }

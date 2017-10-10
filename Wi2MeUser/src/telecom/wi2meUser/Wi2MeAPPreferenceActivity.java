@@ -100,7 +100,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 		lvListe = (ListView) findViewById(R.id.listviewAP);
 		btSave = (Button) findViewById(R.id.buttonSave);
 		btCancel = (Button) findViewById(R.id.buttonCancel);
-		
+
 
 		//Verify the USB storage
 		File accountFile = new File(Environment.getExternalStorageDirectory() +ACCOUNT_FILE);
@@ -113,7 +113,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.d(getClass().getSimpleName(), "?? " + "Bind connection");
 
-				binder = (ServiceBinder) service;	
+				binder = (ServiceBinder) service;
 				if (binder.loadingError){
 					Log.d(getClass().getSimpleName(), "!! " + "Error Binding connection");
 					finish();
@@ -150,10 +150,9 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 				APPrefListAdapter adapter = (APPrefListAdapter)lvListe.getAdapter();
 				for(HashMap<String,String> np : adapter.getPrefs())
 				{
-					
 					String ssid = np.get("SSID");
 					String grade = np.get("Grade");
-		
+
 					if ((ssid != null) && (grade != null))
 					{
 						getAPGrade.put(ssid, Integer.parseInt(grade));
@@ -190,7 +189,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 					}
 
 				}
-		
+
 
 				finish();
 
@@ -339,7 +338,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 		Collections.sort(networkPreferenceList, new APComparator());
 		APPrefListAdapter adapter = new APPrefListAdapter(networkPreferenceList,currentActivity);
 		lvListe.setAdapter(adapter);
-		
+
 
 
 
@@ -374,7 +373,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 			final ViewHolder holder;
 			final int pos = position;
 			if (convertView == null) {
-				convertView = mInflater.inflate(R.layout.preference_ap_row, null);
+				convertView = mInflater.inflate(R.layout.preference_ap_row, parent);
 				holder = new ViewHolder();
 				holder.v = (TextView) convertView.findViewById(R.id.SSID_cell);
 				holder.rating = (RatingBar)convertView.findViewById(R.id.rating_cell);
@@ -391,7 +390,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 							float starsf = (touchPositionX / width) * 5.0f;
  							int stars = (int)starsf + 1;
 							holder.rating.setRating(stars);
-	
+
 							Log.d(getClass().getSimpleName(), "?? " + "Setting rating for " + holder.v.getText());
 							for(HashMap<String,String> np : netPrefs)
 							{
@@ -535,7 +534,7 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 		if (serviceConnection != null){
 			getApplicationContext().unbindService(serviceConnection);
 			serviceConnection = null;
-		}	
+		}
 	}
 
 	/** Function called when Back button pressed*/
@@ -546,16 +545,16 @@ public class Wi2MeAPPreferenceActivity extends Activity{
 		Log.d(getClass().getSimpleName(), "?? " + "Running onBackPressed");
 		boolean changed = false;
 		boolean newAP = false;
-	
+
 
 		HashMap<String,Integer> getAPGrade = new HashMap<String,Integer>();
 		APPrefListAdapter adapter = (APPrefListAdapter)lvListe.getAdapter();
 		for(HashMap<String,String> np : adapter.getPrefs())
 		{
-			
+
 			String ssid = np.get("SSID");
 			String grade = np.get("Grade");
-	
+
 			if ((ssid != null) && (grade != null))
 			{
 				getAPGrade.put(ssid, Integer.parseInt(grade));
