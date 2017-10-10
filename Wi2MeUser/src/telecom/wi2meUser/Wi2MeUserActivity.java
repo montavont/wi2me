@@ -63,6 +63,7 @@ import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meCore.model.wifiCommands.WifiBytesTransferedReceiver;
 import telecom.wi2meUser.controller.ApplicationService;
 import telecom.wi2meUser.controller.ApplicationService.ServiceBinder;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -153,6 +154,7 @@ public class Wi2MeUserActivity extends Activity {
 
 	/** Called when the activity is first created. */
 	@Override
+	@SuppressLint("HardwareIds") // We actually want to log the hardware id
 	public void onCreate(Bundle savedInstanceState) {
 		Log.d(getClass().getSimpleName(), "?? " + "Running onCreate");
 		super.onCreate(savedInstanceState);

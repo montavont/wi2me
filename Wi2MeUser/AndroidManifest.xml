@@ -5,9 +5,27 @@
     android:versionCode="1"
     android:versionName="6.2" >
 
+	<permission android:description="@string/recon_service_desc"
+            android:label="Wi2MeUser Reconnection service"
+            android:name="Wi2MeU"
+            android:protectionLevel="dangerous" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_UPDATES" />
+    <uses-permission android:name="Wi2MeU" />
+	<uses-sdk android:minSdkVersion="11"/>
+	<supports-screens android:anyDensity="true" />
 
     <application
-        android:label="Wi2Me-User">
+        android:label="Wi2Me-User"
+		android:allowBackup="true">
         <activity
             android:label="Wi2Me-User"
             android:name=".Wi2MeUserActivity"
@@ -23,19 +41,7 @@
         <activity android:name=".Wi2MeAccountManagementActivity" android:screenOrientation="portrait"></activity>
         <activity android:name=".Wi2MeAPPreferenceActivity" android:screenOrientation="portrait"></activity>
         <service android:enabled="true" android:name=".controller.ApplicationService" />
-        <service android:enabled="true" android:exported="true" android:name=".controller.ReconnectionService" />
+        <service android:enabled="true" android:exported="true" android:name=".controller.ReconnectionService" android:permission="Wi2MeU"/>
     </application>
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-	<uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.MODIFY_PHONE_STATE" tools:ignore="ProtectedPermissions" />
-    <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_UPDATES" />
-	<uses-sdk android:minSdkVersion="11"/>
-
-	<supports-screens android:anyDensity="true" />
 </manifest>

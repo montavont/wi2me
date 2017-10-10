@@ -34,13 +34,15 @@ import org.apache.http.conn.scheme.SocketFactory;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 
+import android.annotation.SuppressLint;
+
 /**
  * This SSLSocketFactory trust only the certificate pass to the constructor
  * @author Julien Mortuaire
  */
 public class TrustAllSSLSocketFactory extends SSLSocketFactory {
     private javax.net.ssl.SSLSocketFactory factory;
-	
+
     /**
      * TrustAllSSLSocketFactory constructor
 	 * @param publicKey the public key
@@ -50,6 +52,7 @@ public class TrustAllSSLSocketFactory extends SSLSocketFactory {
      * @throws KeyStoreException
      * @throws UnrecoverableKeyException
      */
+	@SuppressLint("AllowAllHostnameVerifier") //Trusting all is the purpose of this class, as we need it to be authentified while intercepted by a captive portal
     public TrustAllSSLSocketFactory(String publicKey, String commonName) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
         super(null);
             SSLContext sslcontext = SSLContext.getInstance("TLS");
@@ -58,10 +61,10 @@ public class TrustAllSSLSocketFactory extends SSLSocketFactory {
             setHostnameVerifier(new AllowAllHostnameVerifier());
     }
 
-    public static SocketFactory getDefault() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException { 
-    	return new TrustAllSSLSocketFactory(null, null); 
+    public static SocketFactory getDefault() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException, UnrecoverableKeyException {
+    	return new TrustAllSSLSocketFactory(null, null);
     }
-    
+
     public Socket createSocket() throws IOException { return factory.createSocket(); }
     public Socket createSocket(Socket socket, String s, int i, boolean flag) throws IOException { return factory.createSocket(socket, s, i, flag); }
     public Socket createSocket(InetAddress inaddr, int i, InetAddress inaddr1, int j) throws IOException { return factory.createSocket(inaddr, i, inaddr1, j); }

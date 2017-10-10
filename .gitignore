@@ -6,3 +6,5 @@ Wi2MeRecherche/build/
 Wi2MeUser/build/
 build/
 local.properties
+*.iml
+.idea

@@ -31,13 +31,13 @@ import java.io.LineNumberReader;
 import java.io.RandomAccessFile;
 import java.io.DataOutputStream;
 import java.util.ArrayList;
-import java.util.Arrays; 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.concurrent.Semaphore;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List; 
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
@@ -66,6 +66,7 @@ import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.util.Log;
 import android.util.Pair;
+import android.util.SparseArray;
 
 
 
@@ -80,8 +81,8 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 	private ScanResult connectedTo;
 	private int byteCounter;
 	private static ArrayList<ConnectionInfo> listCI = null;
-	private static HashMap<Integer,Long> uidTxHash = null;
-	private static HashMap<Integer,Long> uidRxHash = null;
+	private static SparseArray<Long> uidTxHash = null;
+	private static SparseArray<Long> uidRxHash = null;
 	private static long sniffSequence = 0;
 	private ListIterator<ConnectionInfo> ite;
 	private Set<Integer> uidSet;
@@ -93,17 +94,17 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 
 	private static HashMap<String, Integer> lastValues;
 	private static HashMap<String, RandomAccessFile> debugFSFiles;
-	
-	/** 
+
+	/**
 	 * Reset the sniffSequece when reseting database
 	 */
 	public static void resetSniffSequence()
 	{
 		sniffSequence = 0;
 	}
-	
-	/** 
-	 * Constructor 
+
+	/**
+	 * Constructor
 	 * @param boolean  download or upload
 	 * @param ScanResult  current connected AP
 	 */
@@ -118,20 +119,20 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		this.debugFSFiles = new HashMap<String, RandomAccessFile>();
 		this.type = type;
 		this.uidSet = new HashSet<Integer>();
-		
+
 		if (this.type.equals(Utils.TYPE_SNIFF))
 		{
 			if (listCI == null)
 			{
 				this.listCI = new ArrayList<ConnectionInfo> ();
 			}
-			if (uidTxHash == null) this.uidTxHash = new HashMap<Integer,Long> ();
-			if (uidRxHash == null) this.uidRxHash = new HashMap<Integer,Long> ();
+			if (uidTxHash == null) this.uidTxHash = new SparseArray<Long> ();
+			if (uidRxHash == null) this.uidRxHash = new SparseArray<Long> ();
 			sniffSequence++;
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Read the local file (TCP/TCP6/UDP/UDP6) to get level 3 traffic information,
 	 * trace the new and updated information
 	 * @param String  download or upload
@@ -143,16 +144,16 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		String remoteAdd = "";
 		ConnectionState cs = null;
 		int uid = -1;
-		
+
 		FileReader tcp = new FileReader(fileName);
 		LineNumberReader lnr = new LineNumberReader(tcp);
-	    
+
 		line = lnr.readLine();
 		while((line = lnr.readLine()) != null)
 		{
-			String[] pieces = line.trim().split(" ");				
-			
-			if (protocol.contains("6")) {			
+			String[] pieces = line.trim().split(" ");
+
+			if (protocol.contains("6")) {
 				localAdd = Utils.string2IPv6(pieces[1].split(":")[0]);
 				remoteAdd = Utils.string2IPv6(pieces[2].split(":")[0]);
 			}
@@ -162,14 +163,14 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 				remoteAdd = Utils.intToIp(Long.parseLong(pieces[2].split(":")[0], 16));
 			}
 			if (localAdd.equals("127.0.0.1") || localAdd.equals("0000:0000:0000:0000:0000:0000:0000:0000")) continue;
-			
+
 			int localPort = Integer.parseInt(pieces[1].split(":")[1],16);
 			int remotePort = Integer.parseInt(pieces[2].split(":")[1],16);
-			
+
 			if (pieces[7].length() != 0) uid = Integer.parseInt(pieces[7]);
 			if (pieces[8].length() != 0) uid = Integer.parseInt(pieces[8]);
 			if (uid != -1 && !uidSet.contains(uid)) uidSet.add(uid);
-			
+
 			switch (Integer.parseInt(pieces[3], 16)){
 				case 1:
 					cs = ConnectionState.ESTABLISHED;
@@ -220,31 +221,31 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 				{
 			    		element.setUpdated();
 					ci.setUpdated();
-					if (!element.getConnectionState().equals(ci.getConnectionState()))	
+					if (!element.getConnectionState().equals(ci.getConnectionState()))
 					{
-			    			ite.set(ci);			    	    	  			
-				  		WifiConnectionInfo wci = WifiConnectionInfo.getNewWifiConnectionInfo(TraceManager.getTrace(), sniffSequence, ci);			
-				  		Logger.getInstance().log(wci);			  			
+			    			ite.set(ci);			    	    	  
+				  		WifiConnectionInfo wci = WifiConnectionInfo.getNewWifiConnectionInfo(TraceManager.getTrace(), sniffSequence, ci);
+				  		Logger.getInstance().log(wci);			  
 			  		}
 			    	}
-			}	
+			}
 			if (!ci.getUpdated())
 			{
 				ci.setUpdated();
 				listCI.add(ci);
-				WifiConnectionInfo wci = WifiConnectionInfo.getNewWifiConnectionInfo(TraceManager.getTrace(), sniffSequence, ci);			
-		  		Logger.getInstance().log(wci);	
+				WifiConnectionInfo wci = WifiConnectionInfo.getNewWifiConnectionInfo(TraceManager.getTrace(), sniffSequence, ci);
+		  		Logger.getInstance().log(wci);
 			}
-		}		
+		}
 		lnr.close();
 		tcp.close();
 	}
-	
-	/** 
+
+	/**
 	 * Examinate several local files that contain traffic information, both network level and application level
 	 * generate the traces with the wifi information
 	 * @param IParameterManager  parameter "ALLOW_TRACE_CONNECTIONS" to give the permission of trace
-	 * @throws IOException throw exception when encounter the problem of reading file 
+	 * @throws IOException throw exception when encounter the problem of reading file
 	*/
 	public void sniffer() throws IOException
 	{
@@ -258,16 +259,16 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		int txb = 0;
 		String iface = "";
 		String debugFolder= "/sys/class/net/";
-		
+
 		allowTraceConnections = (Boolean) this.parameters.getParameter(Parameter.ALLOW_TRACE_CONNECTIONS);
 
-		WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo(); 
+		WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 		if (info != null)
 		{
 			List<String> ifaces = (List<String>) this.parameters.getParameter(Parameter.MONITORED_INTERFACES);
 			List<String> debugfsEntries = Arrays.asList( ConfigurationManager.RXP_FILE, ConfigurationManager.TXP_FILE, ConfigurationManager.RXB_FILE, ConfigurationManager.TXB_FILE);
 			WifiAP connectionToWifiAP = WifiAP.getNewWifiAP(info.getBSSID(), info.getSSID(), info.getRssi(), WifiAP.frequencyToChannel(connectedTo.frequency), connectedTo.capabilities, info.getLinkSpeed());
-			
+
 			for (int i = 0; i < ifaces.size(); i++)
 			{
 				logData = false;
@@ -333,7 +334,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		}
 		return;
 	}
-	
+
 	@Override
 	public void receiveTransferredBytes(int bytes, long totalBytes) {
 		receiveTransferredBytes(bytes, totalBytes, "");
@@ -356,13 +357,13 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 
 		if (bytes != 0 || eventDescription.contains("START") || eventDescription.contains("TRANSFERRING"))
 		{
-		
+
 			List<String> ifaces = (ArrayList<String>)this.parameters.getParameter(Parameter.MONITORED_INTERFACES);
 
 			List<String> debugfsEntries = Arrays.asList( ConfigurationManager.RXP_FILE, ConfigurationManager.TXP_FILE);
 			for (String iface : ifaces)
 			{
-					
+
 				logData = false;
 				try
 				{
@@ -377,7 +378,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 								debugFSFiles.put(iface+f, getFile(debugFolder + iface + f));
 							}
 						}
-	
+
 						rx = Integer.parseInt(debugFSFiles.get(iface + ConfigurationManager.RXP_FILE).readLine());
 						logData = logData || isNewData(iface + ConfigurationManager.RXP_FILE, rx);
 
@@ -421,7 +422,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 													tx,
 													rx,
 													(int) retries)
-					);			
+					);
 
 					Logger.getInstance().log(connectionData);
 				}
@@ -433,7 +434,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 	public int getTransferredBytes() {
 		return byteCounter;
 	}
-	/** 
+	/**
 	 * Get access of local file
 	 * @param String file path
 	*/
@@ -442,7 +443,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		File f = new File(filename);
 		return new RandomAccessFile(f, "r");
 	}
-	/** 
+	/**
 	 * Read local file
 	 * @param String file path
 	*/
@@ -476,7 +477,7 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		}
 		return retval;
 	}
-	
+
 
 	private boolean isNewData(String file, Integer value)
 	{
@@ -495,10 +496,10 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 		{
 			lastValues.put(file, value);
 		}
-	
+
 		return retval;
 	}
 
-		
+
 }
 

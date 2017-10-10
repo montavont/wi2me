@@ -62,7 +62,7 @@ public class WifiService implements IWifiService{
 	private static final String CONNECTING_TIMEOUT_MESSAGE = "The timeout for connecting elapsed";
 	private static final String DISCONNECTING_TIMEOUT_MESSAGE = "The timeout for disconnecting elapsed";
 
-	private static final String CONNECTION_START_EVENT = "CONNECTION_START";	
+	private static final String CONNECTION_START_EVENT = "CONNECTION_START";
 	private static final String CANNOT_DISCONNECT_MESSAGE = "FATAL ERROR: Wifi network cannot be disconnected. Unable to continue";
 
 	private Context context;
@@ -70,7 +70,7 @@ public class WifiService implements IWifiService{
 	private ConnectivityManager connectivityManager;
 	private InterfaceEnablerThread enablerThread;
 	private InterfaceDisablerThread disablerThread;
-	private SupplicantConnectedReceiver supplicantConnectedReceiver;	
+	private SupplicantConnectedReceiver supplicantConnectedReceiver;
 	private ScanningThread scanningThread;
 	private ScanResultReceiver scanResultReceiver;
 	private ConnectingThread connectingThread;
@@ -89,7 +89,7 @@ public class WifiService implements IWifiService{
 
 
 	public WifiService(Context context){
-		wifi = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+		wifi = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 		connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		this.context = context;
 
@@ -108,7 +108,7 @@ public class WifiService implements IWifiService{
 		context.registerReceiver(eventLoggingReceiver,  new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION));
 		context.registerReceiver(eventLoggingReceiver,  new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
 		context.registerReceiver(eventLoggingReceiver,  new IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION));
-		
+
 		//Register receiver to retrieve the finish status of connection attempts
 		statusReceiver = new ConnectionStatusReceiver();
 		context.registerReceiver(statusReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
@@ -130,7 +130,7 @@ public class WifiService implements IWifiService{
 
 		//USE WIFI LOCK TO PREVENT IT FROM TURNING OFF
 		wifiLock = wifi.createWifiLock(WifiManager.WIFI_MODE_FULL, "MyWifiLock");
-		wifiLock.acquire(); 
+		wifiLock.acquire();
 	}
 
 	@Override
@@ -166,7 +166,7 @@ public class WifiService implements IWifiService{
 		if (enablerThread != null){
 			if (enablerThread.isAlive())
 				//If it is still running, we need to wait it to finish
-				return;			
+				return;
 		}
 		enablerThread = new InterfaceEnablerThread();
 		enablerThread.start();
@@ -185,7 +185,7 @@ public class WifiService implements IWifiService{
 	}
 
 	@Override
-	public void cleanNetworks() 
+	public void cleanNetworks()
 	{
 		int max_sleep = 10;
 		int slept = 0;
@@ -220,7 +220,7 @@ public class WifiService implements IWifiService{
 		List<WifiConfiguration> ConfiguredNetworks = wifi.getConfiguredNetworks();
 		if (ConfiguredNetworks != null)
 		{
-			for (WifiConfiguration network : ConfiguredNetworks){	
+			for (WifiConfiguration network : ConfiguredNetworks){
 				wifi.disableNetwork(network.networkId);
 			}
 		}
@@ -235,7 +235,7 @@ public class WifiService implements IWifiService{
 		List<WifiConfiguration> ConfiguredNetworks = wifi.getConfiguredNetworks();
 		if (ConfiguredNetworks != null)
 		{
-			for (WifiConfiguration network : wifi.getConfiguredNetworks()){	
+			for (WifiConfiguration network : wifi.getConfiguredNetworks()){
 				wifi.enableNetwork(network.networkId,false);
 			}
 		}
@@ -250,7 +250,7 @@ public class WifiService implements IWifiService{
 		List<WifiConfiguration> ConfiguredNetworks = wifi.getConfiguredNetworks();
 		if (ConfiguredNetworks != null)
 		{
-			for (WifiConfiguration network : wifi.getConfiguredNetworks()){	
+			for (WifiConfiguration network : wifi.getConfiguredNetworks()){
 				wifi.removeNetwork(network.networkId);
 			}
 		}
@@ -278,7 +278,7 @@ public class WifiService implements IWifiService{
 		if (disablerThread != null){
 			if (disablerThread.isAlive())
 				//If it is still running, we need to wait it to finish
-				return;			
+				return;
 		}
 		disablerThread = new InterfaceDisablerThread();
 		disablerThread.start();
@@ -309,7 +309,7 @@ public class WifiService implements IWifiService{
 		if (scanningThread != null){
 			if (scanningThread.isAlive())
 				//If it is still running, we need to wait it to finish
-				return null;			
+				return null;
 		}
 		scanningThread = new ScanningThread();
 
@@ -321,11 +321,11 @@ public class WifiService implements IWifiService{
 			if (!scanningThread.scanningSuccessful){
 				throw new TimeoutException(SCANNING_TIMEOUT_MESSAGE);
 			}
-			else{ //If the scanning was successful, the thread has a reference of the results				
+			else{ //If the scanning was successful, the thread has a reference of the results
 				return scanningThread.results;
 			}
 		} catch (InterruptedException e) {
-			//If it is interrupted, we should let it interrupt the caller			
+			//If it is interrupted, we should let it interrupt the caller
 			throw e;
 		} finally{
 			context.unregisterReceiver(scanResultReceiver);
@@ -337,7 +337,7 @@ public class WifiService implements IWifiService{
 	@Override
 	public List<ScanResult> getScanResults()
 	{
-		return	wifi.getScanResults();	
+		return	wifi.getScanResults();
 	}
 
 	@Override
@@ -348,9 +348,9 @@ public class WifiService implements IWifiService{
 
 
 	@Override
-	public boolean connect(WifiConfiguration netConfiguration, ScanResult target) throws TimeoutException, InterruptedException 
+	public boolean connect(WifiConfiguration netConfiguration, ScanResult target) throws TimeoutException, InterruptedException
 	{
-			
+
 		targetAP = target;
 
 		if (!this.isInterfaceEnabled())
@@ -362,7 +362,7 @@ public class WifiService implements IWifiService{
 			if (connectingThread.isAlive())
 			{
 				//If it is still running, we need to wait it to finish
-				return false;			
+				return false;
 			}
 		}
 
@@ -371,7 +371,7 @@ public class WifiService implements IWifiService{
 		try {
 			WifiConnectionEvent connectionEvent = null;
 			WifiAP connectionToWifiAP = null;
-			connectionToWifiAP = WifiAP.getWifiAPFromScanResult(target);	
+			connectionToWifiAP = WifiAP.getWifiAPFromScanResult(target);
 			connectionEvent = WifiConnectionEvent.getNewWifiConnectionEvent(TraceManager.getTrace(), CONNECTION_START_EVENT, connectionToWifiAP);
 			Logger.getInstance().log(connectionEvent);
 
@@ -398,7 +398,7 @@ public class WifiService implements IWifiService{
 			else
 			{
 				//If it exists, use the existing one and don't create a new one.
-				netId = knownNetworks.get(knownNetworkPosition).networkId;				
+				netId = knownNetworks.get(knownNetworkPosition).networkId;
 			}
 			wifi.enableNetwork(netId, true);
 			connectingThread.join();
@@ -408,7 +408,7 @@ public class WifiService implements IWifiService{
 			}
 			return connectingThread.connectingSuccessful;
 		} catch (InterruptedException e) {
-			//If it is interrupted, we should let it interrupt the caller			
+			//If it is interrupted, we should let it interrupt the caller
 			throw e;
 		}finally{
 			connectingThread = null;
@@ -416,16 +416,16 @@ public class WifiService implements IWifiService{
 	}
 
 	@Override
-	public void disconnect() throws TimeoutException, InterruptedException {		
+	public void disconnect() throws TimeoutException, InterruptedException {
 		if (!this.isInterfaceEnabled())
 			return;
-		if (!isConnectedToAP()){ 
+		if (!isConnectedToAP()){
 			return;
 		}
 		if (disconnectingThread != null){
 			if (disconnectingThread.isAlive())
 				//If it is still running, we need to wait it to finish
-				return;			
+				return;
 		}
 		disconnectingThread = new DisconnectingThread();
 		disconnectingThread.start();
@@ -436,11 +436,11 @@ public class WifiService implements IWifiService{
 			if (!disconnectingThread.disconnectingSuccessful)
 				throw new TimeoutException(DISCONNECTING_TIMEOUT_MESSAGE);
 		} catch (InterruptedException e) {
-			//If it is interrupted, we should let it interrupt the caller			
+			//If it is interrupted, we should let it interrupt the caller
 			throw e;
 		}finally{
 			disconnectingThread = null;
-		}	
+		}
 	}
 
 	@Override
@@ -528,7 +528,7 @@ public class WifiService implements IWifiService{
 
 		public boolean enablingSuccessful = false;
 
-		public void run(){			
+		public void run(){
 			try {
 				Thread.sleep(TimeoutConstants.WIFI_INTERFACE_ENABLING_TIMEOUT);
 				//If the timeout elapses, enabling was unsuccessful
@@ -579,7 +579,7 @@ public class WifiService implements IWifiService{
 
 		public boolean disablingSuccessful = false;
 
-		public void run(){			
+		public void run(){
 			try {
 				Thread.sleep(TimeoutConstants.WIFI_INTERFACE_DISABLING_TIMEOUT);
 				//If the timeout elapses, disabling was unsuccessful
@@ -609,7 +609,7 @@ public class WifiService implements IWifiService{
 		public boolean scanningSuccessful = false;
 		public List<ScanResult> results;
 
-		public void run(){			
+		public void run(){
 			try {
 				Thread.sleep(TimeoutConstants.WIFI_SCANNING_TIMEOUT);
 				//If the timeout elapses, scanning was unsuccessful
@@ -626,7 +626,7 @@ public class WifiService implements IWifiService{
 	 */
 	private void announceScanResultsReady(){
 		if (scanningThread != null){
-			scanningThread.results = wifi.getScanResults();	
+			scanningThread.results = wifi.getScanResults();
 			scanningThread.interrupt();
 		}
 	}
@@ -639,7 +639,7 @@ public class WifiService implements IWifiService{
 	private class ScanResultReceiver extends BroadcastReceiver{
 
 		@Override
-		public void onReceive(Context context, Intent intent) {			
+		public void onReceive(Context context, Intent intent) {
 			announceScanResultsReady();
 		}
 
@@ -653,7 +653,7 @@ public class WifiService implements IWifiService{
 
 		public boolean disconnectingSuccessful = false;
 
-		public void run(){			
+		public void run(){
 
 			try {
 				Thread.sleep(TimeoutConstants.WIFI_DISCONNECTING_TIMEOUT);
@@ -721,13 +721,13 @@ public class WifiService implements IWifiService{
 	private class EventLoggingReceiver extends BroadcastReceiver
 	{
 
-		//This indeed looks ugly, although, on some devices the CONNECTED and DISCONNECTED events may be fired more than once identically. This will allow us to drop the echoes 
+		//This indeed looks ugly, although, on some devices the CONNECTED and DISCONNECTED events may be fired more than once identically. This will allow us to drop the echoes
 		private boolean expecting_connected = true;
 		private boolean expecting_disconnected = true;
 		private final Semaphore mSema = new Semaphore(1, true);
 
 		@Override
-		public void onReceive(Context context, Intent intent) 
+		public void onReceive(Context context, Intent intent)
 		{
 
 			NetworkInfo.DetailedState netState = null;
@@ -736,17 +736,17 @@ public class WifiService implements IWifiService{
 
 			String action = intent.getAction();
 
-			Log.d(this.getClass().getSimpleName(), "++ ACTION " + action); //TKE 
+			Log.d(this.getClass().getSimpleName(), "++ ACTION " + action); //TKE
 
 
 			if (action == ConnectivityManager.CONNECTIVITY_ACTION)
 			{
 
-				
+
 				NetworkInfo mNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 				// This is a starting case, targetAP might be null, we do not really care anyway...
 				if (mNetworkInfo != null && targetAP != null)
-				{	
+				{
 					try
 					{
 						if (mNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI)
@@ -821,7 +821,7 @@ public class WifiService implements IWifiService{
 							event = WifiConnectionEvent.getNewWifiConnectionEvent(TraceManager.getTrace(), netState.name(), connectionToWifiAP);
 							break;
 					}
-				}	
+				}
 			}
 			else if ( action == WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
 			{
@@ -831,7 +831,7 @@ public class WifiService implements IWifiService{
 			if (event != null)
 			{
 				Logger.getInstance().log(event);
-			}	
+			}
 		}
 	}
 
@@ -843,7 +843,7 @@ public class WifiService implements IWifiService{
 	{
 
 		@Override
-		public void onReceive(Context context, Intent intent) 
+		public void onReceive(Context context, Intent intent)
 		{
 
 			NetworkInfo.DetailedState netState = null;
@@ -856,7 +856,7 @@ public class WifiService implements IWifiService{
 				NetworkInfo mNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
 				// This is a starting case, targetAP might be null, we do not really care anyway...
 				if (mNetworkInfo != null)
-				{	
+				{
 						if (mNetworkInfo.getType() == ConnectivityManager.TYPE_WIFI)
 						{
 							netState = mNetworkInfo.getDetailedState();
@@ -867,7 +867,7 @@ public class WifiService implements IWifiService{
 									{
 										connectingThread.connectingSuccessful = true;
 										announceConnectionFinished();
-									}				
+									}
 									break;
 								case DISCONNECTED:
 									announceDisonnectionFinished();
@@ -895,7 +895,7 @@ public class WifiService implements IWifiService{
 							}
 							break;
 					}
-				}	
+				}
 			}
 			else if ( action == WifiManager.SUPPLICANT_STATE_CHANGED_ACTION)
 			{

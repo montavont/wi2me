@@ -4,7 +4,6 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    
     <SeekBar
         android:id="@+id/batteryseekBar"
         android:layout_width="189dp"
@@ -18,5 +17,4 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:textAppearance="?android:attr/textAppearanceLarge" />
-       
 </LinearLayout>

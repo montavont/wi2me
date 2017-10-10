@@ -44,9 +44,7 @@ public class CellCleanerCommand extends CleanerCommand
 	{
 		/*---CLEAN EVERYTHING TO START AGAIN---*/
 		//the only thing we need is to ensure that the cellular connection is over
-		if(Build.VERSION.SDK_INT<=8){
-			ControllerServices.getInstance().getCell().disconnectOrDie();
-		}
+		ControllerServices.getInstance().getCell().disconnectOrDie();
 		/*------*/
 	}
 }

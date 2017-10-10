@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-apply plugin: 'android-library'
+apply plugin: 'com.android.library'
 
 dependencies {
     compile fileTree(dir: 'libs', include: '*.jar')
@@ -17,7 +17,7 @@ dependencies {
 
 android {
     compileSdkVersion 26
-	buildToolsVersion "26.0"
+	buildToolsVersion "26.0.1"
 
     useLibrary 'org.apache.http.legacy' // TODO : move to current HTTP API
 

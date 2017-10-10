@@ -9,7 +9,7 @@ buildscript {
     }
 }
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 dependencies {
 	compile project(':Wi2MeCore')
@@ -19,7 +19,7 @@ dependencies {
 android {
     useLibrary 'org.apache.http.legacy' // TODO : move to current HTTP API
     compileSdkVersion 26
-    buildToolsVersion "26.0"
+    buildToolsVersion "26.0.1"
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

@@ -50,7 +50,6 @@ public class CommunityNetworkService implements ICommunityNetworkService{
 	ICommunityNetwork Free;
 	ICommunityNetwork Neuf;
 	ICommunityNetwork Fon;
-	private static CommunityNetworkService instance=null;
 
 	private static final String CONNECTING_TIMEOUT_MESSAGE = "The timeout for connecting to Community Network elapsed";
 	private static final String START = "START";

@@ -23,6 +23,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.X509TrustManager;
+import android.annotation.SuppressLint;
 
 /**
  * This X509TrustManager trust only the certificate pass to the constructor
@@ -31,7 +32,7 @@ import javax.net.ssl.X509TrustManager;
 public class TrustAllManager implements X509TrustManager {
 	private String publicKey;
 	private String commonName;
-	
+
 	/**
 	 * TrustAllManager constructor
 	 * @param publicKey the public key
@@ -41,10 +42,11 @@ public class TrustAllManager implements X509TrustManager {
 		this.publicKey = publicKey;
 		this.commonName = "CN="+commonName;
 	}
-	
+
     /* (non-Javadoc)
      * @see javax.net.ssl.X509TrustManager#checkClientTrusted(java.security.cert.X509Certificate[], java.lang.String)
      */
+	@SuppressLint("TrustAllX509TrustManager") //Trusting all is the purpose of this class, as we need it to be authentified while intercepted by a captive portal
     public void checkClientTrusted(X509Certificate[] cert, String authType) throws CertificateException {
     }
     /* (non-Javadoc)

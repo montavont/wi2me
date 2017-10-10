@@ -38,7 +38,7 @@ import telecom.wi2meCore.model.parameters.Parameter;
  *
  */
 public class ParameterDefaultValues {
-	
+
 	public static final int WIFI_SCAN_INTERVAL = 3000; //in milliseconds
 	public static final int NOT_MOVING_TIME = 99999999; //in milliseconds
 	public static final boolean WIFI_CONNECTION_ATTEMPT = false;
@@ -103,45 +103,45 @@ public class ParameterDefaultValues {
 	public static Object getDefaultValue(Parameter type) {
 		switch (type){
 		case MIN_BATTERY_LEVEL:
-			return new Integer(MIN_BATTERY_LEVEL);
+			return Integer.valueOf(MIN_BATTERY_LEVEL);
 		case RUN_WIFI:
-			return new Boolean(RUN_WIFI);
+			return Boolean.valueOf(RUN_WIFI);
 		case RUN_CELLULAR:
-			return new Boolean(RUN_CELLULAR);
+			return Boolean.valueOf(RUN_CELLULAR);
 		case CONNECT_CELLULAR:
-			return new Boolean(CONNECT_CELLULAR);
+			return Boolean.valueOf(CONNECT_CELLULAR);
 		case FIRST_FIX_WAITING:
-			return new Boolean(FIRST_FIX_WAITING);
+			return Boolean.valueOf(FIRST_FIX_WAITING);
 		case WIFI_SCAN_INTERVAL:
-			return new Integer(WIFI_SCAN_INTERVAL);
+			return Integer.valueOf(WIFI_SCAN_INTERVAL);
 		case NOT_MOVING_TIME:
-			return new Integer(NOT_MOVING_TIME);
+			return Integer.valueOf(NOT_MOVING_TIME);
 		case WIFI_CONNECTION_ATTEMPT:
-			return new Boolean(WIFI_CONNECTION_ATTEMPT);
+			return Boolean.valueOf(WIFI_CONNECTION_ATTEMPT);
 		case WIFI_CONNECTED:
-			return new Boolean(WIFI_CONNECTED);
+			return Boolean.valueOf(WIFI_CONNECTED);
 		case PING_PACKETS:
-			return new Integer(PING_PACKETS);
+			return Integer.valueOf(PING_PACKETS);
 		case PING_DEADLINE:
-			return new Float(PING_DEADLINE);
+			return Float.valueOf(PING_DEADLINE);
 		case PING_INTERVAL:
-			return new Float(PING_INTERVAL);
+			return Float.valueOf(PING_INTERVAL);
 		case COMMUNITY_NETWORK_CONNECTED:
-			return new Boolean(INTERNET_CONNECTED);
+			return Boolean.valueOf(INTERNET_CONNECTED);
 		case CELL_CONNECTION_DELAY:
-			return new Integer(CELL_CONNECTION_DELAY);
+			return Integer.valueOf(CELL_CONNECTION_DELAY);
 		case CELL_SCANNING:
-			return new Boolean(CELL_SCANNING);
+			return Boolean.valueOf(CELL_SCANNING);
 		case CELL_CONNECTION_ATTEMPT:
-			return new Boolean(CELL_CONNECTION_ATTEMPT);
+			return Boolean.valueOf(CELL_CONNECTION_ATTEMPT);
 		case CELL_CONNECTED:
-			return new Boolean(CELL_CONNECTED);
+			return Boolean.valueOf(CELL_CONNECTED);
 		case CELL_CONNECTING:
-			return new Boolean(CELL_CONNECTING);
+			return Boolean.valueOf(CELL_CONNECTING);
 		case CELL_TRANSFERRING:
-			return new Boolean(CELL_TRANSFERRING);
+			return Boolean.valueOf(CELL_TRANSFERRING);
 		case CELL_CONTINUE_TRANSFERRING:
-			return new Boolean(CELL_CONTINUE_TRANSFERRING);
+			return Boolean.valueOf(CELL_CONTINUE_TRANSFERRING);
 		case CELL_TRANSFER_COMMANDS:
 			//this default value is a container with empty lists of uploaders and downloaders
 			return new CellTransferrerContainer(new ArrayList<CellUploader>(), new ArrayList<CellDownloader>());
@@ -149,49 +149,49 @@ public class ParameterDefaultValues {
 			//this default value is a container with empty lists of uploaders and downloaders
 			return new WifiTransferrerContainer(new ArrayList<WifiUploader>(), new ArrayList<WifiDownloader>(), new ArrayList<Pinger>());
 		case NOTIFY_WHEN_WIFI_CONNECTED:
-			return new Boolean(NOTIFY_WHEN_WIFI_CONNECTED);
+			return Boolean.valueOf(NOTIFY_WHEN_WIFI_CONNECTED);
 		case CONNECT_TO_OPEN_NETWORKS:
-			return new Boolean(CONNECT_OPEN_NETWORKS);
+			return Boolean.valueOf(CONNECT_OPEN_NETWORKS);
 		case NOTIFY_SERVICE_STATUS:
-			return new Boolean(NOTIFY_SERVICE_STATUS);
+			return Boolean.valueOf(NOTIFY_SERVICE_STATUS);
 		case SENSOR_ONLY:
-			return new Boolean(SENSOR_ONLY);
+			return Boolean.valueOf(SENSOR_ONLY);
 		case WIFI_THRESHOLD:
-			return new Integer(WIFI_THRESHOLD);
+			return Integer.valueOf(WIFI_THRESHOLD);
 		case USE_GPS_POSITION:
-			return new Boolean(USE_GPS_POSITION);
+			return Boolean.valueOf(USE_GPS_POSITION);
 		case ALLOW_TRACE_CONNECTIONS:
-			return new Boolean(ALLOW_TRACE_CONNECTIONS);
+			return Boolean.valueOf(ALLOW_TRACE_CONNECTIONS);
 		case ALLOW_UPLOAD_TRACES:
-			return new Boolean(ALLOW_UPLOAD_TRACES);
+			return Boolean.valueOf(ALLOW_UPLOAD_TRACES);
 		case CONNECTIVITY_CHECK_FREQUENCY:
-			return new Integer(CONNECTIVITY_CHECK_FREQUENCY);
+			return Integer.valueOf(CONNECTIVITY_CHECK_FREQUENCY);
 		case PERFORM_CONNECTIVITY_CHECK:
-			return new Boolean(PERFORM_CONNECTIVITY_CHECK);
+			return Boolean.valueOf(PERFORM_CONNECTIVITY_CHECK);
 		case IS_FIRST_LOOP:
-			return new Boolean(IS_FIRST_LOOP);
+			return Boolean.valueOf(IS_FIRST_LOOP);
 		case REMOTE_UPLOAD_DIRECTORY:
-			return new String(REMOTE_UPLOAD_DIRECTORY);
+			return String.valueOf(REMOTE_UPLOAD_DIRECTORY);
 		case SERVER_IP:
-			return new String(SERVER_IP);
+			return String.valueOf(SERVER_IP);
 		case DOWNLOAD_URL:
-			return new String(DOWNLOAD_URL);
+			return String.valueOf(DOWNLOAD_URL);
 		case DOWNLOAD_PATH:
-			return new String(DOWNLOAD_PATH);
+			return String.valueOf(DOWNLOAD_PATH);
 		case UPLOAD_URL:
-			return new String(UPLOAD_URL);
+			return String.valueOf(UPLOAD_URL);
 		case UPLOAD_SCRIPT:
-			return new String(UPLOAD_SCRIPT);
+			return String.valueOf(UPLOAD_SCRIPT);
 		case CONNECTION_CHECK_URL:
-			return new String(CONNECTION_CHECK_URL);
+			return String.valueOf(CONNECTION_CHECK_URL);
 		case WI2ME_DIRECTORY:
-			return new String(WI2ME_DIRECTORY);
+			return String.valueOf(WI2ME_DIRECTORY);
 		case IPC_RECONNECTION_NEEDED:
-			return new Boolean(IPC_RECONNECTION_NEEDED);
+			return Boolean.valueOf(IPC_RECONNECTION_NEEDED);
 		case LOCK_NETWORK:
-			return new Boolean(LOCK_NETWORK);
+			return Boolean.valueOf(LOCK_NETWORK);
 		case MONITORED_INTERFACES:
-			return new String(MONITORED_INTERFACES);
+			return String.valueOf(MONITORED_INTERFACES);
 		default:
 			return null;
 		}
