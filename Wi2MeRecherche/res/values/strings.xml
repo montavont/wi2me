@@ -4,9 +4,9 @@
     <string name="app_name">Wi2MeRecherche</string>
     <string name="operator_name">Operator Name:</string>
 
-	<string name="STOPPING_SERVICE_MESSAGE">Stopping service...</string>
+	<string name="STOPPING_SERVICE_MESSAGE">Stopping service &#8230;</string>
 	<string name="NOTHING_TO_UPLOAD_MESSAGE">Nothing to upload.</string>
-	<string name="SENDING_DATABASE_MESSAGE">Sending database...</string>
+	<string name="SENDING_DATABASE_MESSAGE">Sending database &#8230;</string>
 	<string name="EXPORT_OK_MESSAGE">Export OK</string>
 	<string name="DATABASE_UPLOAD_SUCCESSFUL_MESSAGE">Database successfully sent!!</string>
 	<string name="ERROR_COMPRESSING_DATABASE">Error compressing the database. Check the device\'s storage is not mounted and that you have enough disk space, then relaunch.</string>
@@ -26,4 +26,5 @@
 	<string name="EXPORT_POPUP_SERVER">Upload to Server</string>
 	<string name="DISABLEMENT_TIMEOUT">Timeout disabling wlan interface, try doing it from settings and restart</string>
 	<string name="ABOUT_WI2ME">About Wi2Me</string>
+	<string name="PERCENTAGE" formatted="false">%s %%</string>
 </resources>

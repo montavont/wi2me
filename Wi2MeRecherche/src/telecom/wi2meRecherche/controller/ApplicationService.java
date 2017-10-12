@@ -50,7 +50,6 @@ import telecom.wi2meCore.controller.services.TimeService;
 import telecom.wi2meCore.controller.services.cell.CellService;
 import telecom.wi2meCore.controller.services.communityNetworks.CommunityNetworkService;
 import telecom.wi2meCore.controller.services.move.MoveService;
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper;
 import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.trace.BatteryService;
 import telecom.wi2meCore.controller.services.trace.IBatteryLevelReceiver;
@@ -93,8 +92,8 @@ public class ApplicationService extends Service {
 
 	private static String ASSETS_FILES_DIRECTORY = "files/";
 
-        HashMap<String, IWirelessNetworkCommandLooper> WirelessLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
-        HashMap<String, Thread> WirelessThreads = new HashMap<String, Thread>();
+    HashMap<String, IWirelessNetworkCommandLooper> WirelessLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
+    HashMap<String, Thread> WirelessThreads = new HashMap<String, Thread>();
 
 
 	IParameterManager parameters;
@@ -122,8 +121,6 @@ public class ApplicationService extends Service {
 
     		cellThreadContainer = new CellThreadContainer();
     		context = this;
-
-    		Log.d(getClass().getSimpleName(), "++ " + "Running onCreate");
 
     		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
@@ -258,8 +255,7 @@ public class ApplicationService extends Service {
 	public void onDestroy()
 	{
 
-	    	Log.d(getClass().getSimpleName(), "++ " + "Running onDestroy");
-        	if (binder.isBateryLow)
+       	if (binder.isBateryLow)
 		{
     			if (binder.isRunning)
 			{
@@ -288,15 +284,17 @@ public class ApplicationService extends Service {
 		for (String looperKey:WirelessLoopers.keySet())
 		{
 			WirelessLoopers.get(looperKey).breakLoop();
-			WirelessThreads.get(looperKey).interrupt();//Same keys anyway
-			try
+			if (WirelessThreads.containsKey(looperKey))
 			{
-				WirelessThreads.get(looperKey).join(10000);
-			}
-			catch (InterruptedException e)
-			{
-				//Should not happen
-				Log.e(getClass().getSimpleName(), "++ "+e.getMessage(), e);
+				WirelessThreads.get(looperKey).interrupt();//Same keys anyway
+				try
+				{
+					WirelessThreads.get(looperKey).join(10000);
+				}
+				catch (InterruptedException e)
+				{
+					Log.e(getClass().getSimpleName(), "++ "+e.getMessage(), e);
+				}
 			}
 		}
 
@@ -404,10 +402,9 @@ public class ApplicationService extends Service {
 
 		public void start()
 		{
-			DatabaseHelper.initialize(context);
 			TextTraceHelper.initialize(context);
-		        wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
-	        	cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
+		    wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
+	        cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
 
 			if (wifiWorkingFlag.isActive())
 			{
@@ -535,9 +532,9 @@ public class ApplicationService extends Service {
 
 		public void stop()
 		{
-	    		stopThreads();
+    		stopThreads();
 
-		        if ((Boolean)parameters.getParameter(Parameter.LOCK_NETWORK))
+	        if ((Boolean)parameters.getParameter(Parameter.LOCK_NETWORK))
 			{
 				UnlockNetwork();
 			}
@@ -549,27 +546,22 @@ public class ApplicationService extends Service {
 
 			TraceManager.finalizeManager();
 
-		        // Cancel the persistent notification.
-		        mNM.cancel(NOTIFICATION);
-	    		if (DatabaseHelper.isInitialized())
-			{
-				Logger.getInstance().flush();
-	    			DatabaseHelper.getDatabaseHelper().closeDatabase();
-			}
-		    	setRunning(false);
+		    mNM.cancel(NOTIFICATION);
+			Logger.getInstance().flush();
+	    	setRunning(false);
 		}
 
-    		public IControllerServices getServices()
+   		public IControllerServices getServices()
 		{
 	    		return ControllerServices.getInstance();
-    		}
+   		}
 
-	    	public ILogger getLogger()
+    	public ILogger getLogger()
 		{
     			return Logger.getInstance();
-	    	}
+    	}
 
-    		public boolean isFirstRun()
+   		public boolean isFirstRun()
 		{
     			boolean ret = firstRun;
     			firstRun = false;

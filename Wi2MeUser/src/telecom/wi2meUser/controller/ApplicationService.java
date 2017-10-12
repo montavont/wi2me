@@ -126,8 +126,6 @@ public class ApplicationService  extends Service {
 		cellThreadContainer = new CellThreadContainer();
 		context = this;
 
-		Log.d(getClass().getSimpleName(), "++ " + "Running onCreate");
-
 		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 
 		parameters = ParameterFactory.getNewParameterManager();
@@ -219,8 +217,6 @@ public class ApplicationService  extends Service {
 
 	@Override
 	public void onDestroy() {
-
-		Log.d(getClass().getSimpleName(), "++ " + "Running onDestroy");
 
 		// Lost connection
 		lostConnectionReceiver.unregister();

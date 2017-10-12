@@ -30,13 +30,13 @@ import android.os.Bundle;
 import android.util.Log;
 
 public class LocationService implements ILocationService{
-	
+
 	private static final int TIME_INTERVAL = 3000;
 	private static final int MAX_METERS = 0;
-	
+
 	private LocationManager locationManager;
 	private List<LocationListener> locationListeners;
-	
+
 	public LocationService(Context context){
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
 		locationListeners = new ArrayList<LocationListener>();
@@ -50,12 +50,12 @@ public class LocationService implements ILocationService{
 			locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, timeInterval, maxMeters, listener);
 		}
 	}
-	
+
 	@Override
 	public void registerLocationReceiver(ILocationReceiver receiver) {
 		registerLocationReceiver(receiver, TIME_INTERVAL, MAX_METERS);
 	}
-	
+
 
 	@Override
 	public void registerNetworkLocationReceiver(ILocationReceiver receiver) {
@@ -107,16 +107,16 @@ public class LocationService implements ILocationService{
 	public boolean isGPSEnabled() {
 		return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 	}
-	
+
 	@Override
 	public boolean isNetworkLocationEnabled() {
 		return locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 	}
-	
+
 	private class ServiceLocationListener implements LocationListener {
 
 		private ILocationReceiver receiver;
-		
+
 		public ServiceLocationListener(ILocationReceiver receiver){
 			this.receiver = receiver;
 		}
@@ -148,13 +148,13 @@ public class LocationService implements ILocationService{
 
 		@Override
 		public void onProviderEnabled(String provider) {
-			// DO NOT IMPLEMENT			
+			// DO NOT IMPLEMENT
 		}
 
 		@Override
 		public void onStatusChanged(String provider, int status, Bundle extras) {
-			// DO NOT IMPLEMENT			
+			// DO NOT IMPLEMENT
 		}
-		
+
 	}
 }

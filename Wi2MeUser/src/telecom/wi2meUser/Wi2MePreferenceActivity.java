@@ -110,7 +110,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 
 	}
 	public void onResume(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
 		super.onResume();
 
 		serviceConnection = new ServiceConnection() {
@@ -597,7 +596,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity{
 
 	@Override
 	public void onPause(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
     	super.onPause();
     	if (serviceConnection != null){
     		unbindService(serviceConnection);

@@ -86,7 +86,7 @@ public class Wi2MeAccountManagementActivity extends Activity
 
 	String operator_trans;
 
-	public void onCreate(Bundle savedInstanceState) 
+	public void onCreate(Bundle savedInstanceState)
 	{
 
 		currentActivity = this;
@@ -123,11 +123,11 @@ public class Wi2MeAccountManagementActivity extends Activity
 			}
 
 			String login_recv= b.getString("login");
-			login.setText(login_recv);	
+			login.setText(login_recv);
 
 			String password_recv = b.getString("password");
 			password.setText(password_recv);
-		}  
+		}
 
 		show_password.setChecked(false);
 		password.setTransformationMethod(new PasswordTransformationMethod());
@@ -149,13 +149,12 @@ public class Wi2MeAccountManagementActivity extends Activity
 
 	@Override
 	public void onResume(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
 		super.onResume();
 		serviceConnection = new ServiceConnection() {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.d(getClass().getSimpleName(), "?? " + "Bind connection");
 
-				binder = (ServiceBinder) service;	
+				binder = (ServiceBinder) service;
 				if (binder.loadingError){
 					finish();
 				}else{
@@ -172,14 +171,13 @@ public class Wi2MeAccountManagementActivity extends Activity
 
 	@Override
 	public void onPause(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
 		super.onPause();
 		if (serviceConnection != null){
 			getApplicationContext().unbindService(serviceConnection);
 			serviceConnection = null;
-		}	
+		}
 
-	}	
+	}
 
 	/** Function called to load the screen, with the informations filled (the case of modification ) or without the informations filled (the case of add a account)*/
 	public void setAccountManagement(){
@@ -305,7 +303,7 @@ public class Wi2MeAccountManagementActivity extends Activity
 									// TODO Auto-generated catch block
 									e1.printStackTrace();
 								}
-							}	
+							}
 
 						});
 
@@ -328,7 +326,7 @@ public class Wi2MeAccountManagementActivity extends Activity
 				}
 
 
-			} 
+			}
 		});
 
 

@@ -28,7 +28,7 @@
 	        <ListView
 	            android:id="@+id/gridViewLocalization"
 	            android:layout_width="wrap_content"
-	            android:layout_height="115dp"
+	            android:layout_height="115sp"
 	            android:layout_below="@+id/localization"
 	            android:scrollbars="none"
 	            android:clickable="false">
@@ -45,14 +45,14 @@
 	            android:layout_below="@+id/gridViewLocalization">
 
 	            <TextView
-	                android:layout_width="0dp"
+	                android:layout_width="0sp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
 	                android:text="Connection Status" />
 
 	            <TextView
 	                android:id="@+id/connectionStatus"
-	                android:layout_width="0dp"
+	                android:layout_width="0sp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"/>
 	        </LinearLayout>
@@ -60,7 +60,7 @@
 	        <ListView
 	            android:id="@+id/gridViewConnection"
 	            android:layout_width="wrap_content"
-	            android:layout_height="115dp"
+	            android:layout_height="115sp"
 	            android:layout_below="@+id/linearLayout6"
 	            android:scrollbars="none"
 	            android:clickable="false">
@@ -77,7 +77,7 @@
 	            android:layout_below="@+id/gridViewConnection">
 
 	            <TextView
-	                android:layout_width="0dp"
+	                android:layout_width="0sp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
 	                android:text="Wifi Status"/>
@@ -85,7 +85,7 @@
 	            
 	            <TextView
 	                android:id="@+id/wifiStatus"
-	                android:layout_width="0dp"
+	                android:layout_width="0sp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"/>
 	        </LinearLayout>
@@ -93,7 +93,7 @@
 	        <ListView
 	            android:id="@+id/gridViewWifi"
 	            android:layout_width="wrap_content"
-	            android:layout_height="95dp"
+	            android:layout_height="95sp"
 	            android:layout_below="@+id/linearLayout7"
 	            android:scrollbars="none"
 	            android:clickable="false">
@@ -109,14 +109,14 @@
 	            android:layout_below="@+id/gridViewWifi">
 
 	            <TextView
-	                android:layout_width="0dp"
+	                android:layout_width="0sp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1"
 	                android:text="2G/3G Status" />
 
 	            <TextView
 	                android:id="@+id/CellStatus"
-	                android:layout_width="0dp"
+	                android:layout_width="0sp"
 	                android:layout_height="wrap_content"
 	                android:layout_weight="1" />
 	        </LinearLayout>
@@ -124,7 +124,7 @@
 	        <ListView
 	            android:id="@+id/gridViewCell"
 	            android:layout_width="wrap_content"
-	            android:layout_height="75dp"
+	            android:layout_height="75sp"
 	            android:layout_below="@+id/linearLayout8"
 	            android:scrollbars="none"
 	            android:clickable="false">
@@ -143,7 +143,7 @@
 	            android:layout_width="match_parent"
 	            android:layout_height="wrap_content"
 	            android:layout_below="@+id/textView1"
-	            android:textSize="13dp"/>
+	            android:textSize="13sp"/>
 
 
 	</RelativeLayout>
