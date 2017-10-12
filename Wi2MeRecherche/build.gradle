@@ -18,11 +18,12 @@ dependencies {
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0"
+    buildToolsVersion "26.0.1"
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'
             res.srcDirs= ["res"]
+            assets.srcDirs = ['assets']
 	        java {
     	        srcDirs 'src'
         	}

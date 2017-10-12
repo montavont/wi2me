@@ -68,7 +68,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 	private static Set<Integer> uidTotal;
 	/*--- CONSTANTS FOR DATABASE ---*/
 	public static PackageManager packageManager;
-	private static final String KEY_NAME = "id";	
+	private static final String KEY_NAME = "id";
 	private static final String UIDTABLENAME = "Uid";
 	private static final int DATABASE_VERSION = 1;
 	public static final String DATABASE_NAME = "TraceLog";
@@ -275,7 +275,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 	}
 
 	@Override
-	public void onOpen(SQLiteDatabase db) {		
+	public void onOpen(SQLiteDatabase db) {
 		super.onOpen(db);
 		if (!db.isReadOnly())
 		{
@@ -286,7 +286,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 	}
 
 	@Override
-	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {		
+	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		dropTables();
 		onCreate(db);
 	}
@@ -345,7 +345,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 			db.execSQL("DROP TABLE " + WifiAP.TABLE_NAME + ";");
 			db.execSQL("DROP TABLE " + UIDTABLENAME + ";");
 
-			db.execSQL("DROP TABLE " + Trace.TABLE_NAME + ";");        	
+			db.execSQL("DROP TABLE " + Trace.TABLE_NAME + ";");        
 			//If everything went fine, commit the changes
 			db.setTransactionSuccessful();
 
@@ -375,7 +375,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 		try{ 
 			db.execSQL(TRACE_TABLE_CREATE);
 
-			db.execSQL(WIFI_AP_TABLE_CREATE);		
+			db.execSQL(WIFI_AP_TABLE_CREATE);
 			db.execSQL(WIFI_SCAN_RESULT_TABLE_CREATE);
 			db.execSQL(generateDeletionTriggerForWifiAP(WifiScanResult.TABLE_NAME));
 			db.execSQL(WIFI_CONNECTION_EVENT_TABLE_CREATE);
@@ -466,7 +466,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 		values.put(Trace.SPEED, trace.getSpeed());
 		values.put(Trace.BEARING, trace.getBearing());
 		values.put(Trace.PROVIDER, trace.getProvider());
-		values.put(Trace.BATT_LEVEL, trace.getBatteryLevel());    	
+		values.put(Trace.BATT_LEVEL, trace.getBatteryLevel());    
 		values.put(Trace.TYPE, type);
 		return db.insertOrThrow(Trace.TABLE_NAME, "", values);
 	}
@@ -474,7 +474,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 	private long saveWifiAP(SQLiteDatabase db, WifiAP ap) throws SQLException{
 		ContentValues values = new ContentValues();
 		values.put(WifiAP.BSSID, ap.getBSSID());
-		values.put(WifiAP.SSID, ap.getSsid());    	
+		values.put(WifiAP.SSID, ap.getSsid());    
 		values.put(WifiAP.LEVEL, ap.getLevel());
 		values.put(WifiAP.CHANNEL, ap.getChannel());
 		values.put(WifiAP.LINK_SPEED, ap.getLinkSpeed());
@@ -484,10 +484,10 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 
 	private long saveUid(SQLiteDatabase db, int uid) throws SQLException{
 		ContentValues values = new ContentValues();
-		String uidName = packageManager.getNameForUid(uid);		
+		String uidName = packageManager.getNameForUid(uid);
 		//Log.e("UidName", uidName);
 		values.put("Uid", uid);
-		values.put("UidName", uidName);    	
+		values.put("UidName", uidName);    
 		return db.insertOrThrow(UIDTABLENAME, "", values);
 	}
 
@@ -553,7 +553,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 				//First we save the trace in its table
 				traceId = saveTrace(db, t, t.getStoringType().toString());
 
-				saveType(db, t, t.getStoringType(), traceId);        		
+				saveType(db, t, t.getStoringType(), traceId);        
 			}
 
 			//If everything went fine, commit the changes
@@ -579,7 +579,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 		switch (type){
 		case WIFI_SCAN_RESULT:
 			WifiScanResult wScanResult = (WifiScanResult) trace;
-			//Now we save the scan results in the corresponding table, using the Id of the trace        	
+			//Now we save the scan results in the corresponding table, using the Id of the trace        
 			for (WifiAP ap : wScanResult.getResults()){
 				wifiAPId = saveWifiAP(db, ap);
 				values = new ContentValues();
@@ -726,7 +726,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 			break;
 		case CELL_SCAN_RESULT:
 			CellularScanResult cScanResult = (CellularScanResult) trace;
-			//Now we save the scan results in the corresponding table, using the Id of the trace        	
+			//Now we save the scan results in the corresponding table, using the Id of the trace        
 			for (Cell c : cScanResult.getResults()){
 				cellId = saveCell(db, c);
 				values = new ContentValues();
@@ -789,7 +789,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 		@Override
 		public Trace next() {
 			Trace ret = null;
-			Cursor c;			
+			Cursor c;
 			Long wifiAPId;
 			WifiAP wifiAP;
 			Long cellId;
@@ -800,7 +800,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 			TraceType type = TraceType.valueOf(cursor.getString(cursor.getColumnIndex(Trace.TYPE)));
 
 			switch (type){
-			case WIFI_SCAN_RESULT:				
+			case WIFI_SCAN_RESULT:
 				List<WifiAP> results = new ArrayList<WifiAP>();
 				//We get the WifiScan results
 				c = dbh.getReadableDatabase().query(WifiScanResult.TABLE_NAME, null, WifiScanResult.TRACE_REFERENCE + " =? ", new String[] { traceId.toString() }, null, null, null);
@@ -987,7 +987,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 				//Instantiate the Trace to return
 				ret = CellularConnectionData.getNewCellularConnectionData(mainTrace, cell, ConnectionData.getNewConnectionData(ipCell, bytesTransferredCell, totalBytesCell, typeConnectionCell, txCell, rxCell, retriesCell));
 				break;
-			case CELL_SCAN_RESULT:				
+			case CELL_SCAN_RESULT:
 				List<Cell> resultsCell = new ArrayList<Cell>();
 				//We get the WifiScan results
 				c = dbh.getReadableDatabase().query(CellularScanResult.TABLE_NAME, null, CellularScanResult.TRACE_REFERENCE + " =? ", new String[] { traceId.toString() }, null, null, null);
@@ -1020,7 +1020,7 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 			cursor.moveToNext();
 
 			//return the result
-			return ret;			
+			return ret;
 		}
 
 		@Override
@@ -1029,80 +1029,6 @@ public class DatabaseHelper extends SQLiteOpenHelper implements ITraceDatabase {
 		}
 
 	}
-
-	/*
-	@Override
-	public long saveWifiScanResult(WifiScanResult result){
-		return saveTraceByType(result, TraceType.WIFI_SCAN_RESULT);
-	}
-
-	@Override
-	public long saveWifiConnectionEvent(WifiConnectionEvent wifiConnectionEvent) {
-		return saveTraceByType(wifiConnectionEvent, TraceType.WIFI_CONNECTION_EVENT);
-	}
-
-	@Override
-	public long saveCommunityNetworkConnectionEvent(
-			CommunityNetworkConnectionEvent communityNetworkConnectionEvent) {
-		return saveTraceByType(communityNetworkConnectionEvent, TraceType.COMMUNITY_NETWORK_CONNECTION_EVENT);
-	}
-
-	@Override
-	public long saveWifiConnectionData(WifiConnectionData wifiConnectionData) {
-		return saveTraceByType(wifiConnectionData, TraceType.WIFI_CONNECTION_DATA);
-	}
-
-	@Override
-	public long saveWifiSnifferData(WifiSnifferData wifiSnifferData) {
-		return saveTraceByType(wifiSnifferData, TraceType.WIFI_SNIFFER_DATA);
-	}
-
-	@Override
-	public long saveWifiConnectionInfo(WifiConnectionInfo wifiConnectionInfo){
-		return saveTraceByType(wifiConnectionInfo, TraceType.WIFI_CONNECTION_INFO);
-	}
-
-	@Override
-	public long saveBytesperUid(BytesperUid bytesperUid) {
-		return saveTraceByType(bytesperUid, TraceType.BYTES_PER_UID);
-	}
-
-	@Override
-	public long saveWifiPing(WifiPing wifiPing) {
-		return saveTraceByType(wifiPing, TraceType.WIFI_PING);
-	}
-
-	@Override
-	public long saveCellularConnectionEvent(CellularConnectionEvent cellularConnectionEvent) {
-		return saveTraceByType(cellularConnectionEvent, TraceType.CELL_CONNECTION_EVENT);
-	}
-
-	@Override
-	public long saveCellularConnectionData(CellularConnectionData cellularConnectionData) {
-		return saveTraceByType(cellularConnectionData, TraceType.CELL_CONNECTION_DATA);
-	}
-
-	@Override
-	public long saveCellularScanResult(CellularScanResult cellularScanResult) {
-		return saveTraceByType(cellularScanResult, TraceType.CELL_SCAN_RESULT);
-	}
-
-
-	@Override
-	public long saveWifiExternalEvent(ExternalEvent externalEvent) {
-		return saveTraceByType(externalEvent, TraceType.EXTERNAL_EVENT);
-	}
-
-	private long getCommunityNetworkIdByName(String name){
-		long ret = INVALID_ID;
-		Cursor c = dbh.getReadableDatabase().query(ICommunityNetwork.TABLE_NAME, null, ICommunityNetwork.NAME + " =? ", new String[] { name }, null, null, null);
-		if (c.moveToFirst()){
-			ret = c.getLong(c.getColumnIndex(KEY_NAME));
-		}
-		c.close();
-		return ret;
-	}*/
-
 
 	public static boolean databaseFileExists(String packageName){
 		String databaseFileName = getDBFileName(packageName);

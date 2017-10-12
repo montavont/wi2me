@@ -26,16 +26,16 @@ import android.content.Context;
 import android.content.res.AssetManager;
 
 /**
- * Service managing the assets contained in the folder assets. 
+ * Service managing the assets contained in the folder assets.
  * Allows the program to load the assets files or to get their size.
  * Assets files : javascript plugins (manages the authentication on the community networks) and files to transfer (Wi2MeRecherche only)
  * @author XXX
  */
 public class AssetServices implements IAssetServices{
-	
+
 	private AssetManager assetManager;
-	
-	/**Constructor loads the assets 
+
+	/**Constructor loads the assets
 	 * @param context
 	 */
 	public AssetServices(Context context){

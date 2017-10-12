@@ -19,32 +19,25 @@
 
 package telecom.wi2meCore.controller.services.persistance;
 
+import android.content.Context;
+import android.os.Environment;
+import android.util.Log;
+
+import java.io.FileOutputStream;
+import java.io.File;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-
-import java.io.FileOutputStream;
-
-
 import telecom.wi2meCore.controller.configuration.CommunityNetworks;
-
-
 import telecom.wi2meCore.model.entities.*;
-import android.os.Environment;
 
-import android.util.Log;
-
-
-import android.content.Context;
-
-import java.io.OutputStreamWriter;
-
-import java.io.File;
 public class TextTraceHelper implements ITraceDatabase
 {
 
 	public static final String TRACEFILE_NAME = "trace";
 	private static final String CSV_SEP = "	";
+	private static String storageFile;
 	private static String packageName;
 
 	private static TextTraceHelper tth = null;
@@ -61,8 +54,8 @@ public class TextTraceHelper implements ITraceDatabase
 		BYTES_PER_UID,
 		CELL_SCAN_RESULT,
 		CELL_CONNECTION_EVENT,
-		CELL_CONNECTION_DATA, 
-		EXTERNAL_EVENT, 
+		CELL_CONNECTION_DATA,
+		EXTERNAL_EVENT,
 		WIFI_PING
 	}
 
@@ -74,7 +67,7 @@ public class TextTraceHelper implements ITraceDatabase
 	public static void initialize(Context context)
 	{
 		packageName = context.getPackageName();
-		Log.e("DEBUG", "++ " + "TTRTT trace file : " + Environment.getDataDirectory() + "/data/" + packageName + "/databases/" + TRACEFILE_NAME);
+		storageFile = Environment.getDataDirectory() + "/data/" + packageName + "/databases/" + TRACEFILE_NAME;
 		tth = new TextTraceHelper();
 	}
 
@@ -83,9 +76,16 @@ public class TextTraceHelper implements ITraceDatabase
 		return tth;
 	}
 
+	public static boolean dataAvailable()
+	{
+		File f = new File(storageFile);
+		return f.exists();
+	}
 
 	public void resetTables()
 	{
+		File f = new File(storageFile);
+		f.delete();
 		return;
 	}
 	public void closeDatabase()
@@ -93,14 +93,13 @@ public class TextTraceHelper implements ITraceDatabase
 		return;
 	}
 
-
 	private String apToString(WifiAP ap)
 	{
 		String retval = "";
 
 		retval += ap.getBSSID();
 		retval += CSV_SEP;
-		retval += ap.getSsid();    	
+		retval += ap.getSsid();
 		retval += CSV_SEP;
 		retval += ap.getLevel();
 		retval += CSV_SEP;
@@ -116,7 +115,7 @@ public class TextTraceHelper implements ITraceDatabase
 	private String cellToString(Cell cell)
 	{
 		String retval = "";
-	
+
 		retval += cell.getOperatorName();
 		retval += CSV_SEP;
 		retval += cell.getOperator();
@@ -153,14 +152,14 @@ public class TextTraceHelper implements ITraceDatabase
 		}
 		catch (java.io.FileNotFoundException e)
 		{
-			Log.e(getClass().getSimpleName(), "++ " + "Error creating/accessing trace file : " + e.getMessage());	
+			Log.e(getClass().getSimpleName(), "++ " + "Error creating/accessing trace file : " + e.getMessage());
 		}
-		
+
 		if (traceWriter != null)
 		{
 			for (Trace trace : traces)
 			{
-		
+
 				String trace_str_prefix = "";
 				ArrayList<String> trace_strings = new ArrayList<String>();
 				trace_str_prefix += trace.getTimestamp();
@@ -179,7 +178,7 @@ public class TextTraceHelper implements ITraceDatabase
 				trace_str_prefix += CSV_SEP;
 				trace_str_prefix += trace.getProvider();
 				trace_str_prefix += CSV_SEP;
-				trace_str_prefix += trace.getBatteryLevel(); 
+				trace_str_prefix += trace.getBatteryLevel();
 				trace_str_prefix += CSV_SEP;
 				trace_str_prefix += trace.getStoringType();
 
@@ -201,9 +200,9 @@ public class TextTraceHelper implements ITraceDatabase
 						CommunityNetworkConnectionEvent cnConnectionEvent = (CommunityNetworkConnectionEvent) trace;
 						trace_strings.add(
 								cnConnectionEvent.getEvent()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ cnConnectionEvent.getUsername()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ apToString(cnConnectionEvent.getConnectedTo())
 						);
 						break;
@@ -211,19 +210,19 @@ public class TextTraceHelper implements ITraceDatabase
 						WifiConnectionData wcd = (WifiConnectionData) trace;
 						trace_strings.add(
 								wcd.getConnectionData().getType()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wcd.getConnectionData().getIp()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wcd.getConnectionData().getBytesTransferred()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wcd.getConnectionData().getTotalBytes()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wcd.getConnectionData().getTxPackets()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wcd.getConnectionData().getRxPackets()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wcd.getConnectionData().getRetries()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ apToString(wcd.getConnectedTo())
 						);
 						break;
@@ -232,17 +231,17 @@ public class TextTraceHelper implements ITraceDatabase
 						WifiConnectionInfo wci = (WifiConnectionInfo) trace;
 						trace_strings.add(
 								wci.getSniffSequence()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wci.getConnectionInfo().getProtocol()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wci.getConnectionInfo().getLocalAdd()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wci.getConnectionInfo().getRemoteAdd()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wci.getConnectionInfo().getLocalPort()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wci.getConnectionInfo().getRemotePort()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wci.getConnectionInfo().getConnectionState().toString()
 						);
 						break;
@@ -251,17 +250,17 @@ public class TextTraceHelper implements ITraceDatabase
 						WifiSnifferData wsd = (WifiSnifferData) trace;
 						trace_strings.add(
 								wsd.getSnifferData().getRxBytes()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wsd.getSnifferData().getTxBytes()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wsd.getSnifferData().getTxPackets()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wsd.getSnifferData().getRxPackets()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wsd.getSnifferData().getRetries()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ wsd.getSniffSequence()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ apToString(wsd.getConnectedTo())
 						);
 						break;
@@ -270,11 +269,11 @@ public class TextTraceHelper implements ITraceDatabase
 						BytesperUid bpu = (BytesperUid) trace;
 						trace_strings.add(
 								bpu.getSniffSequence()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ bpu.getUid()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ bpu.getTxBytes()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ bpu.getRxBytes()
 						);
 						break;
@@ -282,19 +281,19 @@ public class TextTraceHelper implements ITraceDatabase
 						WifiPing ping = (WifiPing) trace;
 						trace_strings.add(
 								ping.getPingedIp()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ ping.getPacketsSent()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ ping.getPacketsReceived()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ ping.getRttMin()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ ping.getRttMax()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ ping.getRttAvg()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ ping.getRttMdev()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ apToString(ping.getConnectionTo())
 						);
 						break;
@@ -302,7 +301,7 @@ public class TextTraceHelper implements ITraceDatabase
 						CellularConnectionEvent cConnectionEvent = (CellularConnectionEvent) trace;
 						trace_strings.add(
 								cConnectionEvent.getEvent()
-								+ CSV_SEP 
+								+ CSV_SEP
 								+ cellToString(cConnectionEvent.getConnectionTo())
 						);
 						break;
@@ -310,25 +309,25 @@ public class TextTraceHelper implements ITraceDatabase
 						CellularConnectionData ccd = (CellularConnectionData) trace;
 						trace_strings.add(
 							ccd.getConnectionData().getType()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ ccd.getConnectionData().getIp()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ ccd.getConnectionData().getBytesTransferred()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ ccd.getConnectionData().getTotalBytes()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ ccd.getConnectionData().getTxPackets()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ ccd.getConnectionData().getRxPackets()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ ccd.getConnectionData().getRetries()
-							+ CSV_SEP 
+							+ CSV_SEP
 							+ cellToString(ccd.getConnectedTo())
 						);
 						break;
 					case CELL_SCAN_RESULT:
 						CellularScanResult cScanResult = (CellularScanResult) trace;
-						//Now we save the scan results in the corresponding table, using the Id of the trace        	
+						//Now we save the scan results in the corresponding table, using the Id of the trace
 						for (Cell c : cScanResult.getResults())
 						{
 							trace_strings.add(
@@ -356,7 +355,7 @@ public class TextTraceHelper implements ITraceDatabase
 				}
 				catch (java.io.IOException e)
 				{
-					Log.e(getClass().getSimpleName(), "++ " + "Error writing trace : "+e.getMessage());	
+					Log.e(getClass().getSimpleName(), "++ " + "Error writing trace : "+e.getMessage());
 				}
 			}
 		}
@@ -371,139 +370,11 @@ public class TextTraceHelper implements ITraceDatabase
 		}
 		catch (java.io.IOException e)
 		{
-		
-			Log.e(getClass().getSimpleName(), "++ " + "Error closing trace file: "+e.getMessage());	
+
+			Log.e(getClass().getSimpleName(), "++ " + "Error closing trace file: "+e.getMessage());
 		}
 
 		return;
 	}
-
-
-	// TODO REmove all specific function, use the bloody logger !
-	/*
-	private synchronized long saveTraceByType(Trace trace, TraceType type)
-	{
-		FileOutputStream traceOutputStream = null;
-		OutputStreamWriter traceWriter = null;
-
-		try
-		{
-			traceOutputStream = new FileOutputStream(Environment.getDataDirectory() + "/data/" + packageName + "/databases/" + TRACEFILE_NAME);
-			traceWriter = new OutputStreamWriter(traceOutputStream);
-		}
-		catch (java.io.FileNotFoundException e)
-		{
-			Log.e(getClass().getSimpleName(), "++ " + "Error creating/accessing trace file : " + e.getMessage());	
-		}
-		
-	
-		if (traceWriter != null)
-		{
-				switch (type)
-				{
-					case WIFI_SCAN_RESULT:
-					case WIFI_CONNECTION_EVENT:
-					case COMMUNITY_NETWORK_CONNECTION_EVENT:
-					case WIFI_CONNECTION_DATA:
-					case WIFI_CONNECTION_INFO:
-					case WIFI_SNIFFER_DATA:
-					case BYTES_PER_UID:
-					case WIFI_PING:
-					case CELL_CONNECTION_EVENT:
-					case CELL_CONNECTION_DATA:
-					case CELL_SCAN_RESULT:
-					case EXTERNAL_EVENT:
-				}
-
-				try
-				{
-					traceWriter.write("boludo\n");
-				}
-				catch (java.io.IOException e)
-				{
-					Log.e(getClass().getSimpleName(), "++ " + "Error writing trace : "+e.getMessage());	
-				}
-		}
-
-		try
-		{
-			if (traceOutputStream != null)
-			{
-				traceOutputStream.close();
-			}
-		}
-		catch (java.io.IOException e)
-		{
-		
-			Log.e(getClass().getSimpleName(), "++ " + "Error closing trace file: "+e.getMessage());	
-		}
-
-		return 0;
-	}
-
-	@Override
-	public long saveWifiScanResult(WifiScanResult result){
-		Log.e(getClass().getSimpleName(), "++ " + "TTRTT trace file scanrRes in ");
-
-		return saveTraceByType(result, TraceType.WIFI_SCAN_RESULT);
-	}
-
-	@Override
-	public long saveWifiConnectionEvent(WifiConnectionEvent wifiConnectionEvent) {
-		return saveTraceByType(wifiConnectionEvent, TraceType.WIFI_CONNECTION_EVENT);
-	}
-
-	@Override
-	public long saveCommunityNetworkConnectionEvent(
-			CommunityNetworkConnectionEvent communityNetworkConnectionEvent) {
-		return saveTraceByType(communityNetworkConnectionEvent, TraceType.COMMUNITY_NETWORK_CONNECTION_EVENT);
-	}
-
-	@Override
-	public long saveWifiConnectionData(WifiConnectionData wifiConnectionData) {
-		return saveTraceByType(wifiConnectionData, TraceType.WIFI_CONNECTION_DATA);
-	}
-
-	@Override
-	public long saveWifiSnifferData(WifiSnifferData wifiSnifferData) {
-		return saveTraceByType(wifiSnifferData, TraceType.WIFI_SNIFFER_DATA);
-	}
-
-	@Override
-	public long saveWifiConnectionInfo(WifiConnectionInfo wifiConnectionInfo){
-		return saveTraceByType(wifiConnectionInfo, TraceType.WIFI_CONNECTION_INFO);
-	}
-
-	@Override
-	public long saveBytesperUid(BytesperUid bytesperUid) {
-		return saveTraceByType(bytesperUid, TraceType.BYTES_PER_UID);
-	}
-
-	@Override
-	public long saveWifiPing(WifiPing wifiPing) {
-		return saveTraceByType(wifiPing, TraceType.WIFI_PING);
-	}
-
-	@Override
-	public long saveCellularConnectionEvent(CellularConnectionEvent cellularConnectionEvent) {
-		return saveTraceByType(cellularConnectionEvent, TraceType.CELL_CONNECTION_EVENT);
-	}
-
-	@Override
-	public long saveCellularConnectionData(CellularConnectionData cellularConnectionData) {
-		return saveTraceByType(cellularConnectionData, TraceType.CELL_CONNECTION_DATA);
-	}
-
-	@Override
-	public long saveCellularScanResult(CellularScanResult cellularScanResult) {
-		return saveTraceByType(cellularScanResult, TraceType.CELL_SCAN_RESULT);
-	}
-
-
-	@Override
-	public long saveWifiExternalEvent(ExternalEvent externalEvent) {
-		return saveTraceByType(externalEvent, TraceType.EXTERNAL_EVENT);
-	}*/
-
 
 }

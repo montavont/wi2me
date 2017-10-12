@@ -9,19 +9,19 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingLeft="20dp"
-    	android:paddingRight="20dp">
+        android:paddingLeft="20sp"
+    	android:paddingRight="20sp">
 
         <TextView
             android:id="@+id/textView5"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:paddingBottom="40dp"
-            android:paddingTop="70dp"
+            android:paddingBottom="40sp"
+            android:paddingTop="70sp"
             android:text="Account Management"
             android:textColor="#00FF00"
-            android:textSize="25dp" />
+            android:textSize="25sp" />
 
 </LinearLayout>
 
@@ -29,27 +29,27 @@
     android:id="@+id/tableLayout1"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp">
+    android:paddingLeft="20sp"
+    android:paddingRight="20sp">
 
     <TableRow
         android:id="@+id/tableRow1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10sp">
 
         <TextView
             android:id="@+id/textView1"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="@string/operator_name"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <Spinner
             android:id="@+id/operator_name"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:prompt="@string/operator_name"/>
@@ -61,23 +61,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:paddingBottom="10dp">
+        android:paddingBottom="10sp">
 
         <TextView
             android:id="@+id/textView2"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
             android:text="Login:"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <EditText
             android:id="@+id/login"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:singleLine="true">
+			android:inputType="text"
+            android:maxLines="1">
+
 
             <requestFocus />
         </EditText>
@@ -91,20 +93,21 @@
 
         <TextView
             android:id="@+id/textView3"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
+			android:inputType="text"
             android:text="Password:"
-            android:textSize="15dp" />
+            android:textSize="15sp" />
 
         <EditText
             android:id="@+id/password"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
             android:layout_weight="1"
-            android:singleLine="true"/>
+            android:maxLines="1"/>
 
 
     </TableRow>
@@ -112,14 +115,14 @@
         android:id="@+id/tableRow4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingBottom="30dp">
+        android:paddingBottom="30sp">
 
     	<CheckBox
         android:id="@+id/showPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Show the password"
-        android:textSize="10dp"/>
+        android:textSize="12sp"/>
     </TableRow>
 
 
@@ -129,18 +132,20 @@
         android:layout_height="wrap_content">
 
         <Button
+			style="?android:attr/buttonBarButtonStyle"
             android:id="@+id/save_AM"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="10sp"
             android:layout_weight="1"
             android:text="Save" />
 
         <Button
+			style="?android:attr/buttonBarButtonStyle"
             android:id="@+id/cancel_AM"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="10sp"
             android:layout_weight="1"
             android:text="Cancel" />
 

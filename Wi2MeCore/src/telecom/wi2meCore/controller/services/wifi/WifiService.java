@@ -121,7 +121,10 @@ public class WifiService implements IWifiService{
 		} catch (SettingNotFoundException e) {
 			Log.e("WifiService", "Getting Wifi Sleep policy "+e.getMessage(), e);
 		}
-		Settings.System.putInt(context.getContentResolver(), Settings.System.WIFI_SLEEP_POLICY, Settings.System.WIFI_SLEEP_POLICY_NEVER);
+		if (wifiSleepPolicy !=  Settings.System.WIFI_SLEEP_POLICY_NEVER)
+		{
+			Log.e("WifiService", "Wifi Sleep policy is not WIFI_SLEEP_POLICY_NEVER : " + wifiSleepPolicy);
+		}
 
 		//acquire wakeLock
 		PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
@@ -139,16 +142,10 @@ public class WifiService implements IWifiService{
 		context.unregisterReceiver(eventLoggingReceiver);
 		context.unregisterReceiver(statusReceiver);
 
-		//return previous wifi sleep policy
-		if (wifiSleepPolicy != -1)
-			Settings.System.putInt(context.getContentResolver(), Settings.System.WIFI_SLEEP_POLICY, wifiSleepPolicy);
 		//release the wifiLock
 		wifiLock.release();
 		//release wakeLock
 		wl.release();
-
-		//We disable it to let the user enable again and recover known networks
-		//wifi.setWifiEnabled(false);
 	}
 
 	@Override

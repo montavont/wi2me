@@ -7,7 +7,7 @@
 
     <SeekBar
         android:id="@+id/batteryseekBar"
-        android:layout_width="189dp"
+        android:layout_width="189sp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:max="100" />

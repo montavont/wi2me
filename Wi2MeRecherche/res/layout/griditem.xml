@@ -18,17 +18,17 @@
 
         <TextView
             android:id="@+id/traceItem"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="13dp" />
+            android:textSize="13sp" />
 
         <TextView
             android:id="@+id/traceValue"
-            android:layout_width="0dp"
+            android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:textSize="13dp" />
+            android:textSize="13sp" />
 
     </TableRow>
 

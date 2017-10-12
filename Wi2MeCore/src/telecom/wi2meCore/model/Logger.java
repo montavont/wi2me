@@ -49,17 +49,17 @@ public class Logger extends ILogger
 		STORAGE_TEXT
 	}
 
-	
+
 	private static ILogger instance = null;
 	private Boolean trial = ConfigurationManager.TRIAL;
 	private int count;
-	
+
 	//private static final int maxCachedTraces = 1000;
 	private static final int maxCachedTraces = 10;
 
 	private ArrayList<Trace> traces;
 	private ArrayList<Trace> toRegister;
-	
+
 	private Semaphore dbSema;
 
 	private Logger(){
@@ -67,7 +67,7 @@ public class Logger extends ILogger
 		dbSema = new Semaphore(1);
 	}
 
-	
+
 	/* (non-Javadoc)
 	 * @see telecom.wi2meTraces.model.ILogger#log(telecom.wi2meTraces.model.entities.Trace)
 	 */
@@ -76,11 +76,11 @@ public class Logger extends ILogger
 	{
 
 		Type type = null;
-	
-		if (trace != null)	
+
+		if (trace != null)
 		{
 			count++;
-			
+
 			switch (trace.getStoringType())
 			{
 				case CELL_SCAN_RESULT:
@@ -104,11 +104,11 @@ public class Logger extends ILogger
 			}
 			this.setChanged();
 			this.notifyObservers(new TraceString(type, trace));
-			
+
 			if (!trial) //not TRIAL log everithing
 			{
 				traces.add(trace);
-				
+
 			} else //is TRIAL
 			{
 				if (count < ConfigurationManager.MAX_TRACES)
@@ -121,14 +121,14 @@ public class Logger extends ILogger
 			}
 		}
 	}
-	
+
 	public static ILogger getInstance(){
 		if (instance == null){
 			instance = new Logger();
 		}
 		return instance;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see telecom.wi2meTraces.model.ILogger#flush()
 	 */
@@ -156,12 +156,12 @@ public class Logger extends ILogger
 			databaseWriting.start();
 		}
 	}
-	
+
 	public enum Type{
 		CELL,
 		WIFI
 	}
-	
+
 	public class TraceString{
 		public Type type;
 		public Trace content;

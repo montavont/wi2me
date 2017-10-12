@@ -4,20 +4,6 @@
     package="telecom.wi2meRecherche"
     android:versionCode="1"
     android:versionName="6.2">
-    <application android:label="Wi2Me-Research">
-        <activity android:name=".Wi2MeRecherche"
-                  android:label="Wi2Me-Research"
-                  android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".Wi2MeAccountManagerActivity" android:screenOrientation="portrait"></activity>
-    	<activity android:name=".Wi2MeAccountManagementActivity" android:screenOrientation="portrait"></activity>
-    	<activity android:name=".Wi2MePreferenceActivity" android:screenOrientation="portrait"></activity>
-		<service android:enabled="true" android:name=".controller.ApplicationService" />
-    </application>
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_SUPERUSER"/>
@@ -31,4 +17,19 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_UPDATES" />
     <uses-sdk android:minSdkVersion="11"/>
 
+    <application android:label="Wi2Me-Research"
+		android:allowBackup="true">
+        <activity android:name=".Wi2MeRecherche"
+                  android:label="Wi2Me-Research"
+                  android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".Wi2MeAccountManagerActivity" android:screenOrientation="portrait"></activity>
+    	<activity android:name=".Wi2MeAccountManagementActivity" android:screenOrientation="portrait"></activity>
+    	<activity android:name=".Wi2MePreferenceActivity" android:screenOrientation="portrait"></activity>
+		<service android:enabled="true" android:name=".controller.ApplicationService" />
+    </application>
 </manifest>

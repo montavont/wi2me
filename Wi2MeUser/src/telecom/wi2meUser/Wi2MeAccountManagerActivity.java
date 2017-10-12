@@ -69,52 +69,51 @@ import android.preference.PreferenceScreen;
  * @author Xin CHEN*/
 
 public class Wi2MeAccountManagerActivity extends PreferenceActivity{
-	
+
 	private static String ACCOUNT_FILE = ConfigurationManager.WI2ME_DIRECTORY+ConfigurationManager.COMMUNITY_ACCOUNTS_FILE;
 	private static String ACCOUNT_KEYS_DIRECTORY = ConfigurationManager.WI2ME_DIRECTORY+ConfigurationManager.ENCRYPTIONKEY_DIRECTORY;
 	PreferenceActivity currentActivity;
 	PreferenceCategory communityNetwork;
-	
+
 	ServiceBinder binder;
 	ServiceConnection serviceConnection;
-	
+
 	String operator_trans;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
+
 
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.accountmanager);
-        
+     
         currentActivity = this;
-   	 	
+   	
         communityNetwork = (PreferenceCategory) currentActivity.findPreference("CommunityNetworks");
 
 	}
-	
+
 	@Override
 	 public void onResume(){
-		 
-		 Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
+		
 		 super.onResume();
 		 communityNetwork.removeAll();
-		 
+		
 		 //Verify the USB storage
 			File accountFile = new File(Environment.getExternalStorageDirectory() + ACCOUNT_FILE);
 			if(!accountFile.exists()){
 				Toast.makeText(currentActivity, "ERROR LOADING ACCOUNT FILE. Please, check ensure USB storage is off.", Toast.LENGTH_LONG).show();
 			}
-		 
+		
 		 serviceConnection = new ServiceConnection() {
 				public void onServiceConnected(ComponentName name, IBinder service) {
 					Log.d(getClass().getSimpleName(), "?? " + "Bind connection");
-					
-					binder = (ServiceBinder) service;	
+
+					binder = (ServiceBinder) service;
 					if (binder.loadingError){
 						finish();
 					}else{
-						
+
 						 try {
 								loadAccountList(communityNetwork);
 							} catch (IOException e) {
@@ -122,31 +121,30 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 								e.printStackTrace();
 							}
 					     setListListener();
-						
+
 					}
 				}
 				public void onServiceDisconnected(ComponentName name){}
 			};
-			
+
 			getApplicationContext().bindService(new Intent(this, ApplicationService.class), serviceConnection, Context.BIND_AUTO_CREATE);
-		
+
 	 }
-	 
+	
 		@Override
 		public void onPause(){
-	 	Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
 	 	super.onPause();
 	 	if (serviceConnection != null){
 	 		getApplicationContext().unbindService(serviceConnection);
 	 		serviceConnection = null;
-	 	}	
+	 	}
 
 		}
 
-	
+
 	/** Function to show the list of the  accounts of community networks */
 	public void loadAccountList(PreferenceCategory cn) throws IOException{
-		
+
 		// Get the list of accounts.
            	ICommunityNetworkService communityService = ControllerServices.getInstance().getCommunity();
 		ArrayList<HashMap<Object,Object>> account = new ArrayList<HashMap<Object,Object>>();
@@ -164,17 +162,17 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
     	// Show the list
     	if(!account.isEmpty()){
     		for(final HashMap<Object, Object> hm : account){
-    		
-    		
-    		MyPreference pref = new MyPreference(this);  	
+ 
+ 
+    		MyPreference pref = new MyPreference(this);
     		pref.setKey((String) hm.get("operator_name"));
     		pref.setTitle((String) hm.get("operator_name").toString());
     		pref.setSummary("Login : "+(String) hm.get("login"));
     		cn.addPreference(pref);
-    		
-    		
+ 
+ 
     		pref.setOnPreferenceClickListener(new OnPreferenceClickListener(){
-    			
+ 
 				@Override
 				public boolean onPreferenceClick(Preference preference) {
 					Intent intent = new Intent(currentActivity, Wi2MeAccountManagementActivity.class);
@@ -182,14 +180,14 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
     				b.putString("operator_name", (String) hm.get("operator_name"));
     		  		b.putString("login",(String) hm.get("login"));
     		  		b.putString("password",(String) hm.get("password"));
-	    			intent.putExtras(b); 
-	    			
+	    			intent.putExtras(b);
+	 
 				  	startActivity(intent);
 				  	intent = new Intent(currentActivity, Wi2MeAccountManagementActivity.class);
 	    			return false;
-					
-			}});    		
-    					
+
+			}}); 
+ 
     	}
 	}
     	// Show the option for add a account
@@ -201,23 +199,23 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
     		@Override
 			public boolean onPreferenceClick(Preference arg0) {
 				startActivity(new Intent(currentActivity, Wi2MeAccountManagementActivity.class));
-				
+
 	    		return false;
 			}
-    		
+ 
 
 		});
-    	
+ 
     	cn.addPreference(prefadd);
-    	
-    	
+ 
+ 
 	}
-    
+ 
 	/** Function to set a Long Click action to a item of the list */
 	public void setListListener(){
         ListView listView = getListView();
 		listView.setOnItemLongClickListener(new OnItemLongClickListener() {
-			
+
 			@Override
 			public boolean onItemLongClick(AdapterView<?> arg0,	android.view.View arg1, int arg2, long arg3) {
 				ListView listView = (ListView) arg0;
@@ -231,7 +229,7 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 			}
 		});
 	}
-		
+
 	/** Customer item of the list of preferences */
 	public class MyPreference extends Preference implements android.view.View.OnLongClickListener {
 
@@ -249,10 +247,10 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 			builder.setTitle("Deletion");
 			builder.setMessage("Are you sure you want to delete this "+operator+" account?");
 			builder.setPositiveButton("Yes", new OnClickListener(){
-				
+
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
-					
+
 	    			operator_trans = operator;
            			ICommunityNetworkService communityService = ControllerServices.getInstance().getCommunity();
 					ArrayList<CommunityNetworks> comNets = new ArrayList<CommunityNetworks>();
@@ -260,10 +258,10 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 						comNets.add(cn);
 					}
 	    			CommunityNetworks cnSelected=communityService.getCNFromNameInApplication(operator, comNets);
-					
+
 					//delete the account from the account file
 					try {
-					
+
 					FileInputStream accountFileIn = new FileInputStream (Environment.getExternalStorageDirectory() + ACCOUNT_FILE);
 					Properties props = new Properties();
 			        props.load(accountFileIn);
@@ -273,7 +271,7 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 			        FileOutputStream configFileOut = new FileOutputStream (Environment.getExternalStorageDirectory() + ACCOUNT_FILE);
 			        props.store(configFileOut, null);
 			        configFileOut.close();
-			        
+			     
 			        String fileName = Environment.getExternalStorageDirectory()+  ACCOUNT_KEYS_DIRECTORY + operator_trans + ".key";
 			        // A File object to represent the filename
 			        File f = new File(fileName);
@@ -281,11 +279,11 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 			        // Make sure the file or directory exists and isn't write protected
 			        if (!f.exists())
 			          throw new IllegalArgumentException(
-			              "Delete: no such file or directory: " + fileName); 
+			              "Delete: no such file or directory: " + fileName);
 
 			        if (!f.canWrite())
 			          throw new IllegalArgumentException("Delete: write protected: "
-			              + fileName); 
+			              + fileName);
 
 			        // If it is a directory, make sure it is empty
 			        if (f.isDirectory()) {
@@ -300,19 +298,19 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 
 			        if (!success)
 			          throw new IllegalArgumentException("Delete: deletion failed");
-			      
-			        
+			   
+			     
 			        }catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 					}
-					
+
 					// delete the account from parameters of ApplicationService
 					ArrayList<CommunityNetworks> communityNets = (ArrayList<CommunityNetworks>) binder.parameters.getParameter(Parameter.COMMUNITY_NETWORKS);
 					ArrayList<User> users = (ArrayList<User>) binder.parameters.getParameter(Parameter.COMMUNITY_NETWORK_USERS);
 					ArrayList<CommunityNetworks> communityNetsCopy = (ArrayList<CommunityNetworks>) communityNets.clone();
 					ArrayList<User> usersCopy = (ArrayList<User>) users.clone();
-					
+
 					for(CommunityNetworks cn : communityNetsCopy){
 						if (communityService.getName(cn).equals(operator)){
 							communityNets.remove(cn);
@@ -324,32 +322,32 @@ public class Wi2MeAccountManagerActivity extends PreferenceActivity{
 							}
 						}
 					}
-					
+
 			        binder.parameters.setParameter(Parameter.COMMUNITY_NETWORK_USERS, users);
 			        binder.parameters.setParameter(Parameter.COMMUNITY_NETWORKS, communityNets);
-					
+
 					// display the account
 					communityNetwork.removePreference(item);
-					
+
 					onResume();
-					
-				}	
+
+				}
 			});
-			
+
 			builder.setNegativeButton("No", new OnClickListener(){
-				
+
 				@Override
 				public void onClick(DialogInterface arg0, int arg1) {
 
 					}
 			});
-			
+
 			builder.show();
-			
+
 			return false;
 		}
 	}
-	
- 
+
+
 
 }

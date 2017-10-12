@@ -95,7 +95,7 @@ import android.widget.Toast;
 
 /**
  * Wi2MeUserActivity is the main screen of Wi2MeUser..
- * 
+ *
  * @author xxx + Xin CHEN
  */
 
@@ -112,7 +112,7 @@ public class Wi2MeUserActivity extends Activity {
 	private static final String DISABLE_DROIDWALL_UPLOAD_MESSAGE = "Droidwall must be disabled to send the results. Select the option to disable the Firewall, and press BACK to return and try to Upload Results again.";
 	private static final String ENABLE_DROIDWALL_START_MESSAGE = "Droidwall must be enabled to start the service. Select the option to enable the Firewall, and press BACK to return and try to Start again.";
 	private static final String TRIAL_EXPIRED = "Trial Version Expired";
-	
+
 	////TRIAL VARIABLES
 	private Boolean trial  = ConfigurationManager.TRIAL;
 	private Date trialExpire= new Date(112,8,11);
@@ -156,7 +156,6 @@ public class Wi2MeUserActivity extends Activity {
 	@Override
 	@SuppressLint("HardwareIds") // We actually want to log the hardware id
 	public void onCreate(Bundle savedInstanceState) {
-		Log.d(getClass().getSimpleName(), "?? " + "Running onCreate");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
@@ -165,13 +164,13 @@ public class Wi2MeUserActivity extends Activity {
 		packageName = this.getPackageName();
 		context = this;
 
-		connectionStatus = (TextView) findViewById(R.id.connectionStatus); 
-		network = (TextView) findViewById(R.id.network); 
-		signalLevel = (TextView) findViewById(R.id.signalLevel);  
-		ipadr = (TextView) findViewById(R.id.ipadr); 
+		connectionStatus = (TextView) findViewById(R.id.connectionStatus);
+		network = (TextView) findViewById(R.id.network);
+		signalLevel = (TextView) findViewById(R.id.signalLevel);
+		ipadr = (TextView) findViewById(R.id.ipadr);
 		channel = (TextView) findViewById(R.id.channel);
-		bssid = (TextView) findViewById(R.id.macAdr); 
-		speed = (TextView) findViewById(R.id.speed); 
+		bssid = (TextView) findViewById(R.id.macAdr);
+		speed = (TextView) findViewById(R.id.speed);
 		btnstart = (Button) findViewById(R.id.btnstart);
 		btnstop = (Button) findViewById(R.id.btnstop);
 		btnstart.setVisibility(View.GONE);
@@ -187,19 +186,12 @@ public class Wi2MeUserActivity extends Activity {
 
 	}
 
-	/*public View onCreateView (String name, Context context, AttributeSet attrs){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onCreateView");	
-    	return btnstart;
-    }*/
-
 	/** Called when the menu key is pressed.*/
 
-	public boolean onCreateOptionsMenu(Menu menu) { 
-		Log.d(getClass().getSimpleName(), "?? " + "Running onCreateMenu");	
-
+	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, 0, 0, R.string.network_management).setIcon(getResources().getDrawable(R.drawable.network_management));
 
-		menu.add(0, 1, 0, R.string.ic_menu_preferences).setIcon(getResources().getDrawable(R.drawable.ic_menu_preferences));	
+		menu.add(0, 1, 0, R.string.ic_menu_preferences).setIcon(getResources().getDrawable(R.drawable.ic_menu_preferences));
 
 		menu.add(0, 2, 0, R.string.log).setIcon(getResources().getDrawable(R.drawable.log));
 
@@ -216,70 +208,70 @@ public class Wi2MeUserActivity extends Activity {
 
 		// TRIAL VERSION MANAGEMENT
 		Date dateFormat = new Date();
-		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);	
-			
+		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);
+
 		if ((dateFormat.after(trialExpire))&&(trial)) //trial expired
 		{
 			Log.d(getClass().getSimpleName(), "++ TRIAL EXPIRED");
 			Toast.makeText(context, TRIAL_EXPIRED, Toast.LENGTH_LONG).show();
-			stopAndQuit();		
-		} else 
+			stopAndQuit();
+		} else
 		{
 
 			switch(item.getItemId()){
 			case 0: // Manage the networks
-	
+
 				startActivity(new Intent(this, Wi2MeNetworkManagerActivity.class));
 				break;
-	
-	
-	
+
+
+
 			case 1:
-	
-				startActivity(new Intent(this, Wi2MePreferenceActivity.class));				
+
+				startActivity(new Intent(this, Wi2MePreferenceActivity.class));
 				break;
-	
-			case 2: 
-	
+
+			case 2:
+
 				//service must be stopped
 				if (!binder.isRunning()){
 					//Export database to a text file
 					exportDatabase();
-	
+
 				}else{
 					Toast.makeText(this, STOP_SERVICE_TO_UPLOAD_RESULTS_MESSAGE, Toast.LENGTH_LONG).show();
 				}
 				break;
-	
-			case 3: 
+
+			case 3:
 				exit();
 				break;
-	
-			} 
+
+			}
 		}
-	
-			return super.onMenuItemSelected(featureId, item); 
+
+			return super.onMenuItemSelected(featureId, item);
 	}
-	
-	
+
+
 		private void exit(){
 			if((binder != null ) && (binder.isRunning())){
 				AlertDialog.Builder builder = new AlertDialog.Builder(currentActivity);
 				builder.setTitle("Exit");
 				builder.setMessage("Wi2MeUser is running. Are you sure you want to exit?");
-	
+
 				builder.setNegativeButton("Cancel", new OnClickListener(){
-	
-	
+
+
 					public void onClick(DialogInterface arg0, int arg1) {
-	
+
 					}
 				});
 				builder.setPositiveButton("Yes", new OnClickListener(){
-	
+
 					@Override
 					public void onClick(DialogInterface arg0, int arg1) {
-	
+
 						if (binder.isRunning()){
 							stop();
 						}
@@ -291,21 +283,21 @@ public class Wi2MeUserActivity extends Activity {
 								Log.e(getClass().getSimpleName(), "++ " + "Waiting for bind interrupted");
 							}
 						}
-	
+
 						unbind();
-						stopAndQuit();		
+						stopAndQuit();
 					}
 				});
 				builder.show();
 			}
 			else{
-				stopAndQuit();		
+				stopAndQuit();
 			}
 		}
-	
+
 
 	/** This function is used to stop the binder with the service and update the screen */
-	private void stop() { 
+	private void stop() {
 		stoppingProcessDialog = new ProgressDialog(this);
 		stoppingProcessDialog.setMessage(STOPPING_SERVICE_MESSAGE);
 		stoppingProcessDialog.setCancelable(false);
@@ -315,7 +307,7 @@ public class Wi2MeUserActivity extends Activity {
 				stopService();
 				unbind();*/
 				binder.stop();
-				runOnUiThread(new Runnable() {				
+				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						APStatusService.getInstance().reset();
@@ -331,7 +323,7 @@ public class Wi2MeUserActivity extends Activity {
 						ipadr.setText("");
 						if (stoppingProcessDialog.isShowing()) {
 							stoppingProcessDialog.dismiss();
-						}		
+						}
 					}
 
 				});
@@ -341,10 +333,10 @@ public class Wi2MeUserActivity extends Activity {
 	}
 
 	/** Function called when MenuItem Upload is chosen*/
-	private void exportDatabase() { 
+	private void exportDatabase() {
 		if (!DatabaseHelper.databaseFileExists(packageName)){//if we do not have traces there is nothing to upload
 			Toast.makeText(context, NOTHING_TO_UPLOAD_MESSAGE, Toast.LENGTH_LONG).show();
-			return;			
+			return;
 		}
 		/*Log.d(getClass().getSimpleName(), "++ " + "Droidwall option run");
 		if (isDroidwallEnabled()){// must be disabled
@@ -356,10 +348,10 @@ public class Wi2MeUserActivity extends Activity {
 			openWifiSettings();
 			return;
 		}*/
-		runExport();		
+		runExport();
 	}
 
-	/** Function used to compress and upload the traces 
+	/** Function used to compress and upload the traces
 	 * User the function "private boolean compressFile(String pathFileInput, String pathFileOutput)"
 	 * and "private boolean sendFileFTP(String pathFileInput, String pathFileOutput, String server, String user, String pass)"*/
 	private void runExport(){
@@ -383,12 +375,12 @@ public class Wi2MeUserActivity extends Activity {
 
 				String compressedFilePath = directory + "/" + compressedFileName;
 
-				boolean successful = compressFile(Environment.getDataDirectory() + 
-						"/data/" + packageName + "/databases/" + 
+				boolean successful = compressFile(Environment.getDataDirectory() +
+						"/data/" + packageName + "/databases/" +
 						DatabaseHelper.DATABASE_NAME, compressedFilePath);
 				if (successful){
 					msg = "Database compression successful!";
-					if (sendFileFTP(compressedFilePath, ConfigurationManager.REMOTE_UPLOAD_DIRECTORY + compressedFileName, 
+					if (sendFileFTP(compressedFilePath, ConfigurationManager.REMOTE_UPLOAD_DIRECTORY + compressedFileName,
 						ConfigurationManager.SERVER_IP, "anonymous", "")){
 						msg = DATABASE_UPLOAD_SUCCESSFUL_MESSAGE;
 
@@ -426,12 +418,12 @@ public class Wi2MeUserActivity extends Activity {
 					msg = ERROR_UPLOADING_DATABASE;
 				}
 
-				runOnUiThread(new Runnable() {				
+				runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
 						if (exportingProcessDialog.isShowing()) {
 							exportingProcessDialog.dismiss();
-						}		
+						}
 						Toast.makeText(context, msg, Toast.LENGTH_LONG).show();
 					}
 
@@ -444,15 +436,15 @@ public class Wi2MeUserActivity extends Activity {
 		}).start();
 	}
 
-	private void openWifiSettings() {	
+	private void openWifiSettings() {
 		AlertDialog deleteAlert = new AlertDialog.Builder(this).create();
 		deleteAlert.setTitle("Wifi connection");
 		deleteAlert.setMessage("You are not connected to a Wifi Access Point with internet connection to upload the data. Please TURN ON the interface, CHOSE an access point, connect to it, WAIT until connection is finished, press BACK and try to upload again.");
 		deleteAlert.setButton("OK", new AlertDialog.OnClickListener(){
 
 			@Override
-			public void onClick(DialogInterface dialog, int which) {    
-				//databaseExport = true;				
+			public void onClick(DialogInterface dialog, int which) {
+				//databaseExport = true;
 				Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
 				intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 				startActivity(intent);
@@ -481,7 +473,7 @@ public class Wi2MeUserActivity extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				Log.d(getClass().getSimpleName(), "?? " + "Bind connection");
 
-				binder = (ServiceBinder) service;	
+				binder = (ServiceBinder) service;
 				if (binder.loadingError){
 					stopAndQuit();
 				}else{
@@ -528,14 +520,14 @@ public class Wi2MeUserActivity extends Activity {
 			removeObservers();
 			unbindService(serviceConnection);
 			serviceConnection = null;
-		}		
+		}
 	}
 
 	private void removeObservers(){
 		if (binder != null){
 			binder.getLogger().deleteObserver(logObserver);
 			//binder = null;
-		}		
+		}
 		StatusService.getInstance().deleteObserver(statusObserver);
 	}
 
@@ -547,7 +539,7 @@ public class Wi2MeUserActivity extends Activity {
 
 	private void stopService(){
 		stopService(new Intent(this, ApplicationService.class));
-		removeObservers(); 	
+		removeObservers(); 
 	}
 
 	private void stopAndQuit() {
@@ -556,42 +548,36 @@ public class Wi2MeUserActivity extends Activity {
 		}catch(Exception e){
 			Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 		}
-		stopService();		
+		stopService();
 		finish();
 	}
 
 	@Override
 	public void onBackPressed(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onBackPressed");
 		exit();
 		//super.onBackPressed();
 	}
 
 	public void onStart(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onStart");
 		super.onStart();
 
 	}
 
 	public void onStop(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onStop");
 		super.onStop();
 
 	}
 
 	public void onRestart(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onRestart");
 		super.onRestart();
 	}
 
 	public void onPause(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
 		super.onPause();
 		unbind();
 	}
 
 	public void onResume(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
 		super.onResume();
 		bind();
 		StatusService.getInstance().addObserver(statusObserver);
@@ -599,7 +585,7 @@ public class Wi2MeUserActivity extends Activity {
 		if(binder!=null){
 			if(binder.isRunning()){
 				btnstart.setVisibility(View.GONE);
-				btnstop.setVisibility(View.VISIBLE); 
+				btnstop.setVisibility(View.VISIBLE);
 			}
 			else{
 				btnstart.setVisibility(View.VISIBLE);
@@ -610,7 +596,6 @@ public class Wi2MeUserActivity extends Activity {
 	}
 
 	public void onDestroy(){
-		Log.d(getClass().getSimpleName(), "?? " + "Running onDestroy");
 		super.onDestroy();
 		if (!binder.isRunning()){
 			stopService();
@@ -620,34 +605,34 @@ public class Wi2MeUserActivity extends Activity {
 
 
 
-	/** Called when the button Start is pressed*/    
+	/** Called when the button Start is pressed*/
 	public void onStartClick(View v) {
 
 		// TRIAL VERSION MANAGEMENT
 		Date dateFormat = new Date();
-		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);	
-			
+		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);
+
 		if ((dateFormat.after(trialExpire))&&(trial)) //trial expired
 		{
 			Log.d(getClass().getSimpleName(), "++ TRIAL EXPIRED");
 			Toast.makeText(context, TRIAL_EXPIRED, Toast.LENGTH_LONG).show();
-			stopAndQuit();		
-		} else 
+			stopAndQuit();
+		} else
 		{
 			binder.start();
 			btnstart.setVisibility(View.GONE);
-			btnstop.setVisibility(View.VISIBLE);  
+			btnstop.setVisibility(View.VISIBLE);
 		}
 	}
 
 
-	/** Called when the button Stop is pressed*/   
+	/** Called when the button Stop is pressed*/
 	public void onStopClick(View v) {
-		stop();	
+		stop();
 	}
 
 	/**This class observes and updates the status of the application on the screen.
-	 * Observed object : StatusService (package telecom.wi2meCore.controller.services) 
+	 * Observed object : StatusService (package telecom.wi2meCore.controller.services)
 	 * @author Gilles Vidal
 	 */
 	private class StatusObserver implements Observer{
@@ -680,11 +665,11 @@ public class Wi2MeUserActivity extends Activity {
 		private TraceString logTrace;
 
 		@Override
-		public void update(Observable observable, Object data) {			
+		public void update(Observable observable, Object data) {
 			logTrace = (TraceString) data;
-			runOnUiThread(new Runnable() {				
+			runOnUiThread(new Runnable() {
 				@Override
-				public void run() {					
+				public void run() {
 					switch(logTrace.type){
 					case CELL:
 						// TODO case cell
@@ -764,7 +749,7 @@ public class Wi2MeUserActivity extends Activity {
 	}
 
 
-	/** Function used to compress the traces 
+	/** Function used to compress the traces
 	 * @param pathFileInput
 	 * @param pathFileOutput*/
 	private boolean compressFile(String pathFileInput, String pathFileOutput){
@@ -775,7 +760,7 @@ public class Wi2MeUserActivity extends Activity {
 			BufferedOutputStream out = new BufferedOutputStream(
 					new GZIPOutputStream(new FileOutputStream(pathFileOutput)));
 			int c;
-			while ((c = file.read(buffer)) != -1) 
+			while ((c = file.read(buffer)) != -1)
 				out.write(buffer, 0, c);
 			file.close();
 			out.close();
@@ -820,7 +805,7 @@ public class Wi2MeUserActivity extends Activity {
 			{
 				int sent = 0;
 				long total = 0;
-				URL url = new URL( sb.toString() );		            
+				URL url = new URL( sb.toString() );
 				URLConnection urlc = url.openConnection();
 
 				bos = new BufferedOutputStream( urlc.getOutputStream() );
@@ -869,7 +854,7 @@ public class Wi2MeUserActivity extends Activity {
 		return false;
 			}
 
-	/** Function used to upload the compressed traces 
+	/** Function used to upload the compressed traces
 	 * @param pathFileInput
 	 * @param pathFileOutput
 	 * @param server
@@ -877,7 +862,7 @@ public class Wi2MeUserActivity extends Activity {
 	 * @param pass*/
 	private boolean sendFileFTP(String pathFileInput, String pathFileOutput, String server, String user, String pass){
 		SimpleFTP ftp = new SimpleFTP();
-		try {    
+		try {
 			Log.d(getClass().getSimpleName(), "++ " + "FTP About to connect");
 			// Connect to an FTP server on port 21.
 			ftp.connect(server, 21, user, pass);
@@ -891,7 +876,7 @@ public class Wi2MeUserActivity extends Activity {
 			Log.d(getClass().getSimpleName(), "++ " + "FTP About to run storing command");
 
 			// You can also upload from an InputStream, e.g.
-			return ftp.stor(new FileInputStream(new File(pathFileInput)), pathFileOutput);		    
+			return ftp.stor(new FileInputStream(new File(pathFileInput)), pathFileOutput);
 
 		}
 		catch (IOException e) {
@@ -904,65 +889,8 @@ public class Wi2MeUserActivity extends Activity {
 				Log.d(getClass().getSimpleName(), "++ " + "FTP Disconnected");
 			} catch (IOException e) {
 				Log.e(getClass().getSimpleName(), "++ " + "FTP " + e.getMessage(), e);
-			}		
-		}
-		/*byte[] buffer = new byte[10000];
-
-		FTPClient client = new FTPClient();
-		client.addProtocolCommandListener(new PrintCommandListener(new PrintWriter(System.out)));
-		try {					
-			int sent = 0;			
-            File file = new File(pathFileInput);
-            long total = file.length();
-            Log.d(getClass().getSimpleName(), "++ " + "FTP About to start. File: " + pathFileInput + " - Size: " + total);
-			InputStream fileStream = new FileInputStream(file);
-			Log.d(getClass().getSimpleName(), "++ " + "FTP About to connect");
-			client.connect(server);
-			Log.d(getClass().getSimpleName(), "++ " + "FTP Connected to server");
-			if (!client.login(user, pass)){
-				Log.d(getClass().getSimpleName(), "++ " + "FTP Login failure");
-				return false;
-			}			
-			Log.d(getClass().getSimpleName(), "++ " + "FTP Login OK");
-			int allo = client.allo((int)total);
-			Log.d(getClass().getSimpleName(), "++ " + "FTP Allocating bytes. Result: " + allo);			
-			Log.d(getClass().getSimpleName(), "++ " + "FTP About to run storing command");
-
-			OutputStream out =  client.storeFileStream(pathFileOutput);
-			Log.d(getClass().getSimpleName(), "++ " + "FTP About to start sending");
-            int i;                     
-            while ((i = fileStream.read(buffer, 0, buffer.length)) != -1)
-            {
-               out.write( buffer, 0, i );
-               sent += i;
-               Log.d(getClass().getSimpleName(), "++ " + "FTP Uploaded Bytes: "+ sent + " of " + total);
-            }           
-            if (total == sent)
-            	return true;            	
-            return false;
-
-			//return client.storeFile(pathFileOutput, fileStream);
-
-		} catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "++ " + "FTP " + e.getMessage(), e);
-			return false;
-		}finally{
-			try {
-				Log.d(getClass().getSimpleName(), "++ " + "FTP About to disconnect");
-				client.disconnect();
-				Log.d(getClass().getSimpleName(), "++ " + "FTP Disconnected");
-			} catch (IOException e) {
-				Log.e(getClass().getSimpleName(), "++ " + "FTP " + e.getMessage(), e);
 			}
 		}
-
-		try {
-			return upload(server, user, pass, pathFileOutput, pathFileInput);
-		} catch (Exception e) {
-			Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-			return false;
-		}
-		 */
 	}
 
 

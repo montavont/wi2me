@@ -52,7 +52,7 @@ import telecom.wi2meRecherche.controller.ApplicationService.ServiceBinder;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper;
+import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.web.WebService;
 import telecom.wi2meCore.model.Logger.TraceString;
 import telecom.wi2meCore.model.entities.CellularConnectionData;
@@ -66,6 +66,7 @@ import telecom.wi2meCore.controller.services.StatusService;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.annotation.SuppressLint;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -134,20 +135,18 @@ public class Wi2MeRecherche extends Activity
 
 
 	ListView localizationView;
-	ListView wifiDataView;
 	ListView wifiView;
-	ListView cellDataView;
 	ListView cellView;
 	TextView traceView;
 
 	MenuItem menuItemStart;
 	MenuItem menuItemStop;
 
-    	public TraceString logTrace = null;
+   	public TraceString logTrace = null;
 	long cell_start_time = 0;
-    	long wifi_start_time = 0;
+   	long wifi_start_time = 0;
 	boolean wifi_start=false;
-    	boolean cell_start=false;
+   	boolean cell_start=false;
 	int lastBytesTransferred = 0;
 
 	public CellularConnectionEvent mCellConnectionEvent = null;
@@ -162,14 +161,13 @@ public class Wi2MeRecherche extends Activity
 
 	/** Called when the activity is first created./ */
 	@Override
+	@SuppressLint("HardwareIds") // We actually want to store the hardware ID
 	public void onCreate(Bundle savedInstanceState)
 	{
-    		Log.d(getClass().getSimpleName(), "?? " + "Running onCreate");
 	        super.onCreate(savedInstanceState);
         	setContentView(R.layout.mainscreen);
 	        currentActivity = this;
 
-        	//wifi = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         	wifi = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
 	        deviceId = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         	packageName = this.getPackageName();
@@ -250,7 +248,7 @@ public class Wi2MeRecherche extends Activity
 				case MENU_START:
 					if ((Boolean)binder.parameters.getParameter(Parameter.USE_GPS_POSITION))
 					{
-						if (!binder.getServices().getLocation().isGPSEnabled() || !binder.getServices().getLocation().isNetworkLocationEnabled())
+						if (!binder.getServices().getLocation().isGPSEnabled() || (!binder.getServices().getLocation().isNetworkLocationEnabled() && binder.getServices().getCell().isDataTransferringEnabled()))
 						{
 							openLocationSettings();
 							break;
@@ -278,7 +276,7 @@ public class Wi2MeRecherche extends Activity
 					break;
 
 				case MENU_EXPORT_RESULTS:
-						if (!DatabaseHelper.databaseFileExists(packageName)){//if we do not have traces there is nothing to upload
+						if (!TextTraceHelper.dataAvailable()){//if we do not have traces there is nothing to upload
 							Toast.makeText(context, getResources().getString(R.string.NOTHING_TO_UPLOAD_MESSAGE), Toast.LENGTH_LONG).show();
 							break;
 						}
@@ -400,7 +398,7 @@ public class Wi2MeRecherche extends Activity
 	{
 		final boolean upload = uploadDB;
 
-		final String compressedFileName = DatabaseHelper.DATABASE_NAME +"_"+ deviceId +"_"+ Calendar.getInstance().getTimeInMillis() + ".db.gz";
+		final String compressedFileName = TextTraceHelper.TRACEFILE_NAME +"_"+ deviceId +"_"+ Calendar.getInstance().getTimeInMillis() + ".csv.gz";
 		final String compressedFilePath = Environment.getExternalStorageDirectory() + "/" + compressedFileName;
 
 		//Only check if we intend to upload
@@ -421,7 +419,7 @@ public class Wi2MeRecherche extends Activity
 			@Override
 			public void run()
 			{
-				if (compressFile(Environment.getDataDirectory() + "/data/" + packageName + "/databases/" + DatabaseHelper.DATABASE_NAME, compressedFilePath))
+				if (compressFile(Environment.getDataDirectory() + "/data/" + packageName + "/databases/" + TextTraceHelper.TRACEFILE_NAME, compressedFilePath))
 				{
 					if (upload)
 						msg = FTPDatabaseUpload(compressedFilePath, compressedFileName);
@@ -433,13 +431,10 @@ public class Wi2MeRecherche extends Activity
 					msg = getResources().getString(R.string.ERROR_COMPRESSING_DATABASE);
 				}
 
-				Log.d(getClass().getSimpleName(), "++ " + "DATABASE About to be reset");
 				//erase the content of this already sent (or not) database
-				DatabaseHelper.resetDatabase(packageName);
-				Log.d(getClass().getSimpleName(), "++ " + "DATABASE Reset OK");
+				TextTraceHelper.getTextTraceHelper().resetTables();
 
-
-		       		runOnUiThread(new Runnable()
+	       		runOnUiThread(new Runnable()
 				{
 					@Override
 					public void run() {
@@ -625,34 +620,28 @@ public class Wi2MeRecherche extends Activity
 	}
 
     public void onBackPressed(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onBackPressed");
     	exit();
     }
 
     public void onStart(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onStart");
     	super.onStart();
     }
 
     public void onStop(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onStop");
     	super.onStop();
     }
 
     public void onRestart(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onRestart");
     	super.onRestart();
     }
 
     public void onPause(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onPause");
     	super.onPause();
     	unbind();
     }
 
     public void onResume(){
 
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onResume");
     	super.onResume();
 	bind();
 	updateInfo(); //TKE IHM empty bug ?
@@ -660,7 +649,6 @@ public class Wi2MeRecherche extends Activity
     }
 
     public void onDestroy(){
-    	Log.d(getClass().getSimpleName(), "?? " + "Running onDestroy");
     	super.onDestroy();
     	if (!binder.isRunning()){
     		stopService();
@@ -935,6 +923,9 @@ public class Wi2MeRecherche extends Activity
 
 			traceView = (TextView) findViewById(R.id.trace);
 			traceView.setText(logTrace.content.toString());
+			TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
+			ListView dataView = (ListView) findViewById(R.id.gridViewConnection);
+			TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
 
 			if (mCellConnectionEvent != null)
 			{
@@ -947,7 +938,6 @@ public class Wi2MeRecherche extends Activity
 
 				adapterCell.notifyDataSetChanged();
 
-				TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
 				cellStatus.setText(mCellConnectionEvent.getEvent());
 				mCellConnectionEvent = null;
 			}
@@ -971,8 +961,7 @@ public class Wi2MeRecherche extends Activity
 				}
 
 
-				cellDataView = (ListView) findViewById(R.id.gridViewConnection);
-				myListAdapter adapterCellData = (myListAdapter) cellDataView.getAdapter();
+				myListAdapter adapterCellData = (myListAdapter) dataView.getAdapter();
 				adapterCellData.setData("IP address", mCellConnectionData.getConnectionData().getIp());
 				adapterCellData.setData("Elapsed time (ms)", String.valueOf(mCellConnectionData.getTimestamp()-cell_start_time));
 				adapterCellData.setData("Retries", "-");
@@ -991,8 +980,7 @@ public class Wi2MeRecherche extends Activity
 
 				adapterCell2.notifyDataSetChanged();
 
-				TextView cellStatus2=(TextView) findViewById(R.id.CellStatus);
-				cellStatus2.setText(mCellConnectionData.toString());
+				cellStatus.setText(mCellConnectionData.toString());
 				mCellConnectionData = null;
 			}
 			if (mWifiConnectionEvent != null)
@@ -1008,7 +996,6 @@ public class Wi2MeRecherche extends Activity
 
 				wifiAdapter1.notifyDataSetChanged();
 
-				TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
 				wifiStatus.setText(mWifiConnectionEvent.getEvent());
 
 				mWifiConnectionEvent = null;
@@ -1016,7 +1003,6 @@ public class Wi2MeRecherche extends Activity
 			}
 			if (mWifiConnectionData != null)
 			{
-				wifiDataView = (ListView) findViewById(R.id.gridViewConnection);
 
 				if (mWifiConnectionData.getConnectionData().getType().contains("START")||mWifiConnectionData.getConnectionData().getBytesTransferred() < lastBytesTransferred){
 					wifi_start_time=mWifiConnectionData.getTimestamp();
@@ -1027,7 +1013,7 @@ public class Wi2MeRecherche extends Activity
 					wifi_start_time=mWifiConnectionData.getTimestamp();
 				}
 
-				myListAdapter adapterWifiData = (myListAdapter) wifiDataView.getAdapter();
+				myListAdapter adapterWifiData = (myListAdapter) dataView.getAdapter();
 				adapterWifiData.setData("IP address", mWifiConnectionData.getConnectionData().getIp());
 				adapterWifiData.setData("Elapsed time (ms)", String.valueOf(mWifiConnectionData.getTimestamp()-wifi_start_time));
 				adapterWifiData.setData("Retries", String.valueOf(mWifiConnectionData.getConnectionData().getRetries()));
@@ -1052,7 +1038,6 @@ public class Wi2MeRecherche extends Activity
 				adapterWifi.setData("Channel", String.valueOf(mWifiConnectionData.getConnectedTo().getChannel()));
 				adapterWifi.setData("BSSID", mWifiConnectionData.getConnectedTo().getBSSID());
 				adapterWifi.setData("Rate (Mbps)", String.valueOf(mWifiConnectionData.getConnectedTo().getLinkSpeed()));
-				TextView wifiStatus2=(TextView) findViewById(R.id.wifiStatus);
 				adapterWifi.notifyDataSetChanged();
 				lastBytesTransferred = mWifiConnectionData.getConnectionData().getBytesTransferred();
 				mWifiConnectionData = null;
@@ -1157,7 +1142,7 @@ public class Wi2MeRecherche extends Activity
 		TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
 		cellStatus.setText("");
 
-		wifiDataView = (ListView) findViewById(R.id.gridViewConnection);
+		ListView wifiDataView = (ListView) findViewById(R.id.gridViewConnection);
 		ArrayList<HashMap<String, String>> connectionTraceList = new ArrayList<HashMap<String, String>>();
 		HashMap<String, String> connectionTraceItem = new HashMap<String, String>();
 		connectionTraceItem.put("traceItem", "IP address");
