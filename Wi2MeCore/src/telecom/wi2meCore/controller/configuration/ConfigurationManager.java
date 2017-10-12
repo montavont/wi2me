@@ -29,18 +29,18 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter; 
+import java.io.OutputStreamWriter;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry; 
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import telecom.wi2meCore.model.entities.User;
 import telecom.wi2meCore.model.parameters.IParameterManager;
-import telecom.wi2meCore.model.parameters.LooperCommand; 
+import telecom.wi2meCore.model.parameters.LooperCommand;
 import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meCore.controller.configuration.CommunityNetworks;
 import telecom.wi2meCore.controller.services.communityNetworks.ICommunityNetworkService;
@@ -51,21 +51,21 @@ import telecom.wi2meCore.model.CryptoUtils;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.Environment;
-import android.util.JsonReader; 
-import android.util.JsonWriter; 
+import android.util.JsonReader;
+import android.util.JsonWriter;
 import android.util.Log;
 import android.widget.Toast;
 
 
 
-/**This class loads the parameters stored in the files. 
+/**This class loads the parameters stored in the files.
  * @author XXX + Gilles Vidal
  */
 public class ConfigurationManager
 {
 
 	public static String REMOTE_UPLOAD_DIRECTORY;
-	public static String SERVER_IP; 
+	public static String SERVER_IP;
 	public static String CONNECTION_CHECK_URL;
 	public static String COMMAND_FILE;
 
@@ -87,7 +87,7 @@ public class ConfigurationManager
 	public static final String AP_GRADE_FILE = "apgrades.conf.txt";
 	public static final String COMMUNITY_ACCOUNTS_FILE = "communityaccounts.conf.txt";
 	public static final Boolean TRIAL = false;
-	public static final int MAX_TRACES = 60000; 
+	public static final int MAX_TRACES = 60000;
 	public static final String ASSET_COMMAND_LOOPS = "commandLoops";
 
 	private enum ObjectType{
@@ -95,8 +95,8 @@ public class ConfigurationManager
 		Integer,
 		Float
 	}
-	
-	/**Parses the given object into the given type. 
+
+	/**Parses the given object into the given type.
 	 * @param object
 	 * @param type
 	 * @return Parsed Object
@@ -110,10 +110,10 @@ public class ConfigurationManager
 			case Integer:
 				return Integer.parseInt(object);
 			case Float:
-				return Float.parseFloat(object);	
+				return Float.parseFloat(object);
 			default:
 				return null;
-			}			
+			}
 		}
 		catch(RuntimeException e)
 		{
@@ -124,7 +124,7 @@ public class ConfigurationManager
 
 	}
 
-	/**Gives the loaded configuration 
+	/**Gives the loaded configuration
 	 * @return String
 	 * @throws Exception
 	 */
@@ -146,7 +146,7 @@ public class ConfigurationManager
 			if (!strLine.contains("PASSWORD"))
 			{
 				// Print the content on the console
-				ret += strLine + "|";				
+				ret += strLine + "|";
 			}
 
 		}
@@ -206,7 +206,7 @@ public class ConfigurationManager
 				}
 				out.write(ret);
 				out.close();
-			}	
+			}
 
 			//**********************************************************************************************************************************************\\
 			//We take the parameters from the files.
@@ -225,14 +225,14 @@ public class ConfigurationManager
 			try{
 				//*************************************************************************************************************************************************
 				type=1; //File CONFIG_FILE
-				
+
 				REMOTE_UPLOAD_DIRECTORY=props.getProperty(Parameter.REMOTE_UPLOAD_DIRECTORY.name()).toString();
 				SERVER_IP=props.getProperty(Parameter.SERVER_IP.name()).toString();
 				CONNECTION_CHECK_URL=props.getProperty(Parameter.CONNECTION_CHECK_URL.name()).toString();
-	
+
 
 				parameters.setParameter(Parameter.MONITORED_INTERFACES, new ArrayList<String>(Arrays.asList(props.getProperty(Parameter.MONITORED_INTERFACES.name()).split(ARRAY_SEP))));
-				
+
 				parameters.setParameter(Parameter.FIRST_FIX_WAITING, tryParse(props.getProperty(Parameter.FIRST_FIX_WAITING.name()), ObjectType.Boolean));
 				parameters.setParameter(Parameter.CELL_CONNECTION_DELAY, tryParse(props.getProperty(Parameter.CELL_CONNECTION_DELAY.name()), ObjectType.Integer));
 				parameters.setParameter(Parameter.WIFI_SCAN_INTERVAL, tryParse(props.getProperty(Parameter.WIFI_SCAN_INTERVAL.name()), ObjectType.Integer));
@@ -257,16 +257,16 @@ public class ConfigurationManager
 				parameters.setParameter(Parameter.PING_SERVER_IP, SERVER_IP);
 				parameters.setParameter(Parameter.LOCK_NETWORK, tryParse(props.getProperty(Parameter.LOCK_NETWORK.name()), ObjectType.Boolean));
 				parameters.setParameter(Parameter.STORAGE_TYPE, tryParse(props.getProperty(Parameter.STORAGE_TYPE.name()), ObjectType.Integer));
-			
+
 
 				COMMAND_FILE = props.getProperty(Parameter.COMMAND_FILE.name());
 				parameters.setParameter(Parameter.COMMAND_FILE, COMMAND_FILE);
-	
+
 
 				//*************************************************************************************************************************************************
-				type=2;//File COMMUNITY_ACCOUNTS_FILE	  
-				List<CommunityNetworks> communityNets = new ArrayList<CommunityNetworks>();	
-				List<User> users = new ArrayList<User>();  
+				type=2;//File COMMUNITY_ACCOUNTS_FILE
+				List<CommunityNetworks> communityNets = new ArrayList<CommunityNetworks>();
+				List<User> users = new ArrayList<User>();
 				String KEY_FILE;
 				String decryptedPwd;
 
@@ -300,9 +300,9 @@ public class ConfigurationManager
 					}
 				}
 				parameters.setParameter(Parameter.AP_GRADE_MAP, apGradeMap);
-				
+
 				loadingSuccessful=true;
-				
+
 			}
 			catch (RuntimeException e)
 			{
@@ -332,30 +332,34 @@ public class ConfigurationManager
 
 
 
-			
+
 		//If there is no config dir, create it and load the built in configs along.
 		File dir = new File(Environment.getExternalStorageDirectory() + WI2ME_DIRECTORY + JSON_COMMAND_DIRECTORY);
 		if (!dir.exists())
 		{
-
 			dir.mkdir();
-			try
+		}
+
+		try
+		{
+			String[] fileList = ControllerServices.getInstance().getAssets().list( ASSET_COMMAND_LOOPS);
+			for (String path : fileList)
 			{
-				String[] fileList = ControllerServices.getInstance().getAssets().list( ASSET_COMMAND_LOOPS);
-				for (String path : fileList)
+				File assetFile = new File(path);
+				File outFile = new File(dir.getPath() + "/" + assetFile.getName());
+				if(!outFile.exists())
 				{
-					File f = new File(path);
 					List<LooperCommand> commands = readCommandFile(ControllerServices.getInstance().getAssets().getStream(ASSET_COMMAND_LOOPS + "/" + path));
 					if (commands.size() > 0)
 					{
-						saveCommandFile(commands, dir.getPath() + "/" + f.getName());
+						saveCommandFile(commands, outFile.getPath());
 					}
 				}
 			}
-			catch (IOException e )
-			{
-				Log.e("ConfigurationManager", "++ " + "IOException trying to list default configs " +e.getMessage());
-			}
+		}
+		catch (IOException e )
+		{
+			Log.e("ConfigurationManager", "++ " + "IOException trying to list default configs " +e.getMessage());
 		}
 	}
 
@@ -366,7 +370,7 @@ public class ConfigurationManager
 		try
 		{
 			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-			
+
 			reader.beginObject();
 			while (reader.hasNext())
 			{
@@ -397,7 +401,7 @@ public class ConfigurationManager
 							{
 								commandParam.parameters.put(reader.nextName(), reader.nextString());
 							}
-							reader.endObject();	
+							reader.endObject();
 						}
 						else
 						{
@@ -418,7 +422,7 @@ public class ConfigurationManager
 		{
 			Log.e("ConfigurationManager", "++ " + "IOException trying to access configuration file: " +e.getMessage());
 		}
-	
+
 		return retval;
 
 	}
@@ -427,11 +431,11 @@ public class ConfigurationManager
 	{
 		try
 		{
-			
+
 		    	JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"));
 			writer.setIndent("  ");
 			writer.beginObject();
-					
+
 			for (LooperCommand command : commands)
 			{
 				if (command.name.length() > 0)
@@ -439,7 +443,7 @@ public class ConfigurationManager
 					writer.name("command");
 					writer.beginObject();
 					writer.name("name").value(command.name);
-				
+
 					if (command.module.length() > 0)
 					{
 						writer.name("module").value(command.module);
