@@ -1,24 +1,24 @@
 {
-	"command":{
-		"name":"WifiCleanerCommand"
-	},
-	"command":{
-		"name":"WifiScanner"
-	},
-	"command":{
-		"module":"wi2meRecherche",
-		"name":"WifiBestRssiSelector",
-		"params":{
-			"bssid_file":""
-		}
-	},
-	"command":{
-		"module":"wi2meRecherche",
-		"name":"WifiCommandPoppingStayConnected",
-		"params":{
+	"wifi":{
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
+		},
+		"command":{
+			"module":"telecom.wi2meRecherche.model.wifiCommands.WifiBestRssiSelector",
+			"params":{
+				"bssid_file":""
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meRecherche.model.wifiCommands.WifiCommandPoppingStayConnected",
+			"params":{
 				"iface":"wlan0",
 				"min_rssi":"-85",
 				"max_fail":"5"
 			}
+		}
 	}
-}       
+}

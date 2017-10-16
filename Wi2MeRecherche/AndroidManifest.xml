@@ -15,7 +15,7 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_UPDATES" />
-    <uses-sdk android:minSdkVersion="11"/>
+    <uses-sdk android:minSdkVersion="18"/>
 
     <application android:label="Wi2Me-Research"
 		android:allowBackup="true">

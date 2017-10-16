@@ -60,6 +60,8 @@ public class WifiCommandPoppingStayConnected extends WirelessNetworkCommand
 
 	public WifiCommandPoppingStayConnected(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.iface = params.get(IFACE_KEY);
 		this.minRssi = Integer.parseInt(params.get(MIN_RSSI_KEY));
 		this.maxFailures = Integer.parseInt(params.get(MAX_FAILURES_KEY));

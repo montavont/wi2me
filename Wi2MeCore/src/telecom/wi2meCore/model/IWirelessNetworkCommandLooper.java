@@ -19,14 +19,16 @@
 
 package telecom.wi2meCore.model;
 
+import java.util.List;
+
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.Flag;
 import telecom.wi2meCore.model.WirelessNetworkCommand;
 
 public interface IWirelessNetworkCommandLooper {
-	
+
 	/**
-	 * Initializes all commands within the looper. 
+	 * Initializes all commands within the looper.
 	 * @param parameters the parameters for the commands to initialize
 	 */
 	void initializeCommands(IParameterManager parameters);
@@ -35,18 +37,23 @@ public interface IWirelessNetworkCommandLooper {
 	 * @param parameters the parameters for the commands to finalize
 	 */
 	void finalizeCommands(IParameterManager parameters);
-	
+
 	/**
 	 * Appends a command to the looper.
 	 * @param command to be appended
 	 */
 	void addCommand(WirelessNetworkCommand command);
-	
+
+	/**
+	 * Get the looper's commands
+	 */
+	List<WirelessNetworkCommand> getCommands();
+
 	/**
 	 * Stops looping the commands
 	 */
 	void breakLoop();
-	
+
 	/**
 	 * Loops the commands one after another until the passed Flag is deactivated.
 	 * @param parameters The parameters needed by the commands. A Flag is also needed within the parameters to inform the looper when to stop working

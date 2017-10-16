@@ -52,17 +52,19 @@ import android.util.Log;
 
 
 public class WifiBestRssiSelector extends WirelessNetworkCommand{
-	
+
 	private static final String SYNCHRONIZATION = "WIFI_CELL_SYNCHRONIZATION_FINISHED";
 	private static final String CONNECTING_TIMEOUT = "TIMEOUT";
-	
+
 	private IParameterManager parameters;
 	private String bssidRestrictionPath = "";
 
 	private static final String BSSID_RESTRICTION_PATH_KEY = "bssid_file";
-	
+
 	public WifiBestRssiSelector(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		if (params.containsKey(BSSID_RESTRICTION_PATH_KEY))
 		{
 			this.bssidRestrictionPath = params.get(BSSID_RESTRICTION_PATH_KEY);
@@ -85,7 +87,7 @@ public class WifiBestRssiSelector extends WirelessNetworkCommand{
 	public void finalizeCommand(IParameterManager parameters)
 	{
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void run(IParameterManager parameters)
@@ -95,14 +97,14 @@ public class WifiBestRssiSelector extends WirelessNetworkCommand{
 		Boolean connected = false;
 
 		File restrictFile = new File(bssidRestrictionPath);
-		ArrayList<String> restrictedBssids = new ArrayList<String>();	
+		ArrayList<String> restrictedBssids = new ArrayList<String>();
 
 		try
 		{
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(restrictFile)));
-			String line;	
+			String line;
 			while ((line = bufferedReader.readLine()) != null)
-			{	
+			{
 	    			restrictedBssids.add(line);
 			}
 		}
@@ -114,7 +116,7 @@ public class WifiBestRssiSelector extends WirelessNetworkCommand{
 		{
 			Log.e(getClass().getSimpleName(), "++ Error reading bssid restriction file " + bssidRestrictionPath);
 		}
-		
+
 		if (resultsObj != null && thresholdObj != null)
 		{
 			int trsh = (Integer)thresholdObj;
@@ -123,15 +125,15 @@ public class WifiBestRssiSelector extends WirelessNetworkCommand{
 			Collections.sort(results, new APComparator());
 			Log.d(getClass().getSimpleName(), "++ " + results.toString());
 			for (ScanResult r : results)
-			{		
+			{
 				if (r.level >= trsh)
-				{			
+				{
 
 						//We inform that we will attempt to connect (this helps synchronization with the cell thread)
-						parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, true);			
+						parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, true);
 						if (restrictedBssids.size() == 0 || restrictedBssids.contains(r.BSSID))
 						{
-								
+
 							connected = true;
 							//We keep a reference of the AP we are connected to
 							parameters.setParameter(Parameter.WIFI_CONNECTED_TO_AP, r);

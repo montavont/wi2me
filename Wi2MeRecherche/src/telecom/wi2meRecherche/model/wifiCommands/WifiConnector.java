@@ -20,14 +20,14 @@
 package telecom.wi2meRecherche.model.wifiCommands;
 
 import java.io.BufferedReader;
-import java.io.File; 
-import java.io.FileInputStream; 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.List;
 
 import telecom.wi2meCore.controller.configuration.CommunityNetworks;
@@ -57,20 +57,22 @@ import android.util.Log;
 
 
 public class WifiConnector extends WirelessNetworkCommand{
-	
+
 	private static final String SYNCHRONIZATION = "WIFI_CELL_SYNCHRONIZATION_FINISHED";
 	private static final String CONNECTING_TIMEOUT = "TIMEOUT";
-	
+
 	private ScanResult connectionTo = null;
 	private WifiConnectionEventMonitor connectionEventMonitor;
 	private IParameterManager parameters;
-	
+
 	private static final String BSSID_RESTRICTION_PATH_KEY = "bssid_file";
 
 	private String bssidRestrictionPath = "";
-	
+
 	public WifiConnector(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		if (params.containsKey(BSSID_RESTRICTION_PATH_KEY))
 		{
 			this.bssidRestrictionPath = params.get(BSSID_RESTRICTION_PATH_KEY);
@@ -92,7 +94,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 	public void finalizeCommand(IParameterManager parameters)
 	{
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void run(IParameterManager parameters)
@@ -102,18 +104,18 @@ public class WifiConnector extends WirelessNetworkCommand{
 		Object thresholdObj = parameters.getParameter(Parameter.WIFI_THRESHOLD);
 		Boolean connected = false;
 		ICommunityNetworkService communityService = ControllerServices.getInstance().getCommunity();
-	
+
 		ArrayList<String> restrictedBssids = new ArrayList<String>();
-		
+
 		if (this.bssidRestrictionPath.length() > 0)
 		{
 			File restrictFile = new File(this.bssidRestrictionPath);
 			try
 			{
 				BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(new FileInputStream(restrictFile)));
-				String line;	
+				String line;
 				while ((line = bufferedReader.readLine()) != null)
-				{	
+				{
 		    			restrictedBssids.add(line);
 				}
 			}
@@ -139,13 +141,13 @@ public class WifiConnector extends WirelessNetworkCommand{
 				sortResultsBySignalLevelAndCommunityNetworks(results, comNets);
 				Log.d(getClass().getSimpleName(), "++ " + results.toString());
 				for (ScanResult r : results)
-				{		
+				{
 					if (r.level >= trsh)
-					{			
+					{
 						//Check if it is an opened network, if it is Community Network, it will be one of the first in the list
 						if (r.capabilities.equals("")||r.capabilities.equals("[ESS]")) //this means it is an open network
 						{
-							if (!(Boolean)parameters.getParameter(Parameter.CONNECT_TO_OPEN_NETWORKS))	
+							if (!(Boolean)parameters.getParameter(Parameter.CONNECT_TO_OPEN_NETWORKS))
 							{
 								//If open networks are not enabled, connect only to community networks
 								if (!communityService.isCommunityNetwork(r.SSID, comNets))
@@ -153,30 +155,11 @@ public class WifiConnector extends WirelessNetworkCommand{
 									//we break because all CNs are first in the list, so when we find one that is not there is no need to continue
 									break;
 								}
-								
+
 							}
 
-
-							//We inform that we will attempt to connect (this helps synchronization with the cell thread)
-							parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, true);			
-							if ((Boolean)parameters.getParameter(Parameter.CELL_CONNECTED) || (Boolean)parameters.getParameter(Parameter.CELL_CONNECTING))
-							{
-								//If the cell connection means that it is transferring, we must interrupt that, if not, only wait for the cell to be disconnected
-								if ((Boolean)parameters.getParameter(Parameter.CELL_TRANSFERRING))
-								{
-									//We interrupt to cancel the transfer
-									ControllerServices.getInstance().getSync().syncCellThread(true);
-								}
-								else
-								{
-									//We do not interrupt, just wait for disconnection, because activating the WIFI_CONNECTION_ATTEMPT will make commands not work and that will release disconnection
-									ControllerServices.getInstance().getSync().syncCellThread(false);
-								}
-								//now we can make sure that the cell network is disconnected, and it should not attempt to connect while the WIFI_CONNECTION_ATTEMPT parameter is in true
-								//we log the synchronization event
-								Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), SYNCHRONIZATION));
-							}
-
+							//We inform that we will attempt to connect
+							parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, true);
 
 							if (restrictedBssids.size() == 0 || restrictedBssids.contains(r.BSSID))
 							{
@@ -188,17 +171,17 @@ public class WifiConnector extends WirelessNetworkCommand{
 									if ((Boolean)parameters.getParameter(Parameter.NOTIFY_WHEN_WIFI_CONNECTED))
 									{
 										notifyConnection();
-									}											
+									}
 									break;
 								}
-							} 
-	
+							}
+
 						}
 
 						if (connected)
 						{
 							break;
-						}						
+						}
 					}
 				}
 
@@ -207,7 +190,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 			{
 				Log.d(getClass().getSimpleName(), "++ "+"Connecting Timeout", e);
 				//We must forget the network not to connect later
-				ControllerServices.getInstance().getWifi().cleanNetworks();				
+				ControllerServices.getInstance().getWifi().cleanNetworks();
 				//Log the timeout event
 				WifiAP connectionToWifiAP = WifiAP.getWifiAPFromScanResult(connectionTo);
 				WifiConnectionEvent timeoutEvent = WifiConnectionEvent.getNewWifiConnectionEvent(TraceManager.getTrace(), CONNECTING_TIMEOUT+"("+ TimeoutConstants.WIFI_CONNECTING_TIMEOUT +"ms)", connectionToWifiAP);
@@ -223,7 +206,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 				ControllerServices.getInstance().getWifi().cleanNetworks();
 				// If connection is interrupted, we finish here
 				connected = false;
-			} 
+			}
 		}
 		parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, connected);
 		parameters.setParameter(Parameter.WIFI_CONNECTED, connected);
@@ -237,7 +220,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 			List<ScanResult> results, List<CommunityNetworks> comNets) {
 		Collections.sort(results, new APComparator(comNets));
 	}
-	
+
 	private class APComparator implements Comparator<ScanResult>{
 		private List<CommunityNetworks> comNets;
 		ICommunityNetworkService communityService = ControllerServices.getInstance().getCommunity();
@@ -245,7 +228,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 		public APComparator(List<CommunityNetworks> comNets){
 			this.comNets = comNets;
 		}
-		
+
 
 		@Override
 		public int compare(ScanResult res1, ScanResult res2) {
@@ -255,54 +238,54 @@ public class WifiConnector extends WirelessNetworkCommand{
 				return res2.level - res1.level; //the order is inverted, as we need the higher (signal level) first
 			}else{
 				if (isCNres2){ //if this is a community network, this has more priority, so return positive value cause of the inverted order
-					return 1;					
+					return 1;
 				}else{
 					if (isCNres1){
 						return -1;
 					}else{//in this case none of them is CN
 						return res2.level - res1.level;
 					}
-					
+
 				}
 			}
 		}
-		
+
 	}
-	
-	
+
+
 	//ublic boolean connectTo(ScanResult ap, IWifiConnectionEventReceiver conEvRec) throws TimeoutException, InterruptedException{
 	public boolean connectTo(ScanResult ap) throws TimeoutException, InterruptedException{
 		connectionTo = ap;//we assign the ap which we want to connect to
 		return ControllerServices.getInstance().getWifi().connect(getWifiConfigurationFromScanResult(ap), ap);
 	}
-	
+
 	private static WifiConfiguration getWifiConfigurationFromScanResult(ScanResult result){
-	    	WifiConfiguration wifiConfig = new WifiConfiguration(); 
+	    	WifiConfiguration wifiConfig = new WifiConfiguration();
 	    	wifiConfig.SSID = "\"" + result.SSID + "\"";
-	        wifiConfig.BSSID = result.BSSID; 
+	        wifiConfig.BSSID = result.BSSID;
 	        wifiConfig.priority = 1;
-	        wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP); 
-	        wifiConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN); 
-	        wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE); 
+	        wifiConfig.allowedGroupCiphers.set(WifiConfiguration.GroupCipher.TKIP);
+	        wifiConfig.allowedAuthAlgorithms.set(WifiConfiguration.AuthAlgorithm.OPEN);
+	        wifiConfig.allowedKeyManagement.set(WifiConfiguration.KeyMgmt.NONE);
 	        return wifiConfig;
 	}
-	
+
 	private class WifiConnectionEventMonitor implements IWifiConnectionEventReceiver
 	{
 
 		@Override
-		public void receiveEvent(String event) {			
+		public void receiveEvent(String event) {
 			String extraInfo = "";
 			WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 			//If we have connection info, we use it for the AP information. If we are not connected we should not use it, as it may have erroneous info
 			if (info != null && ControllerServices.getInstance().getWifi().isConnected()){
-				extraInfo = "(BSSID:" + info.getBSSID() + "-SSID:" + info.getSSID() + "-IP:" + Utils.intToIp(info.getIpAddress()) + "-DG:" + Utils.intToIp(ControllerServices.getInstance().getWifi().getDhcpInfo().gateway) + ")" ;				
+				extraInfo = "(BSSID:" + info.getBSSID() + "-SSID:" + info.getSSID() + "-IP:" + Utils.intToIp(info.getIpAddress()) + "-DG:" + Utils.intToIp(ControllerServices.getInstance().getWifi().getDhcpInfo().gateway) + ")" ;
 
 			}
-			Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(),"WIFI_CONNECTION_MONITOR:" + event+extraInfo)); 
+			Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(),"WIFI_CONNECTION_MONITOR:" + event+extraInfo));
 
 		}
-		
+
 	}
 
 }

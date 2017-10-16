@@ -1,88 +1,86 @@
 {
-	"command":{
-		"name":"WifiCleanerCommand"
-	},
-	"command":{
-		"name":"WifiScanner"
-	},
-	"command":{
-		"module":"wi2meRecherche",
-		"name":"WifiConnector",
-		"params":{
-			"bssid_file":""
-		}
-	},
-	"command":{
-		"name":"CommunityNetworkConnector"
-	},
-	"command":{
-		"name":"WifiUploader",
-		"params":{
-				"server":"192.108.119.26",
-				"script":"/cgi-bin/upload.cgi",
-				"size":"512000"
-		}
-	},
-	"command":{
-		"name":"WifiUploader",
-		"params":{
-				"server":"192.108.119.26",
-				"script":"/cgi-bin/upload.cgi",
-				"size":"1000000"
-		}
-	},
-	"command":{
-		"name":"WifiUploader",
-		"params":{
-				"server":"192.108.119.26",
-				"script":"/cgi-bin/upload.cgi",
-				"size":"2512000"
-		}
-	},
-	"command":{
-		"name":"WifiDownloader",
-		"params":{
-				"server":"192.108.119.26",
-				"path":"/mnt/vg1/volume1/wi2me/10240000",
-				"size":"1024000"
-		}
-	},
-	"command":{
-		"name":"WifiDownloader",
-		"params":{
+	"wifi":{
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
+		},
+		"command":{
+			"module":"telecom.wi2meRecherche.model.wifiCommands.WifiConnector",
+			"params":{
+				"bssid_file":""
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.CommunityNetworkConnector"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiUploader",
+			"params":{
+					"server":"192.108.119.26",
+					"script":"/cgi-bin/upload.cgi",
+					"size":"512000"
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiUploader",
+			"params":{
+					"server":"192.108.119.26",
+					"script":"/cgi-bin/upload.cgi",
+					"size":"1000000"
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiUploader",
+			"params":{
+					"server":"192.108.119.26",
+					"script":"/cgi-bin/upload.cgi",
+					"size":"2512000"
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiDownloader",
+			"params":{
+					"server":"192.108.119.26",
+					"path":"/mnt/vg1/volume1/wi2me/10240000",
+					"size":"1024000"
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiDownloader",
+			"params":{
 				"server":"192.108.119.26",
 				"path":"/mnt/vg1/volume1/wi2me/102400000",
 				"size":"102400000"
+			}
 		}
 	},
-	"command":{
-		"family":"cellCommands",
-		"name":"CellCleanerCommand"
-	},
-	"command":{
-		"family":"cellCommands",
-		"name":"CellScanner"
-	},
-	"command":{
-		"family":"cellCommands",
-		"name":"CellConnector"
-	},
-	"command":{
-		"family":"cellCommands",
-		"name":"CellUploader",
-		"params":{
+	"cell":{
+		"command":{
+			"module":"telecom.wi2meCore.model.cellCommands.CellCleanerCommand"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.cellCommands.CellScanner"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.cellCommands.CellConnector"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.cellCommands.CellUploader",
+			"params":{
 				"server":"192.108.119.26",
 				"script":"/cgi-bin/upload.cgi",
 				"size":"2512000"
-		}
-	},
-	"command":{
-		"family":"cellCommands",
-		"name":"CellDownloader",
-		"params":{
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.cellCommands.CellDownloader",
+			"params":{
 				"server":"192.108.119.26",
 				"path":"/mnt/vg1/volume1/wi2me/10240000",
 				"size":"10240000"
+			}
 		}
 	}
 }

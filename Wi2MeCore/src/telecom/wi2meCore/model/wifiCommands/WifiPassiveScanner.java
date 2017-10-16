@@ -52,9 +52,11 @@ public class WifiPassiveScanner extends WirelessNetworkCommand
 
 	public WifiPassiveScanner(HashMap<String, String> params) 
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 
 	}
-	
+
 	@Override
 	public void initializeCommand(IParameterManager parameters)
 	{
@@ -71,21 +73,21 @@ public class WifiPassiveScanner extends WirelessNetworkCommand
 	public void run(IParameterManager parameters)
 	{
 		int scanInterval = (Integer) parameters.getParameter(Parameter.WIFI_SCAN_INTERVAL);
-	
+
 		long lastScanTimestamp = ControllerServices.getInstance().getWifi().getScanResultTimestamp();
-	
+
 		if (lastScanTimestamp != this.scanTimestamp)
 		{
 			this.scanTimestamp = lastScanTimestamp;
 			List<WifiAP> APs = new ArrayList<WifiAP>();
 			List<ScanResult> scanResultList = ControllerServices.getInstance().getWifi().getScanResults();
-			
+
 			for (ScanResult r : scanResultList)
 			{
 				APs.add(WifiAP.getWifiAPFromScanResult(r));
 			}
 
-			
+
 			WifiScanResult wifiScanResult = WifiScanResult.getNewWifiScanResult(TraceManager.getTrace(), APs);
 			parameters.setParameter(Parameter.WIFI_SCAN_RESULT, scanResultList);
 			Logger.getInstance().log(wifiScanResult);
@@ -95,7 +97,7 @@ public class WifiPassiveScanner extends WirelessNetworkCommand
 		try
 		{
 			Thread.sleep(scanInterval);
-		
+
 		} catch (InterruptedException e) {
 			// if we are interrupted, we leave
 			Log.d(getClass().getSimpleName(), "++ "+"Post Passive Scanning wait Interrupted", e);
@@ -103,4 +105,5 @@ public class WifiPassiveScanner extends WirelessNetworkCommand
 
 	}
 
-}	
+}
+

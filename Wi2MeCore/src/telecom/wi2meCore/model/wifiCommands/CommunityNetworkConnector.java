@@ -51,17 +51,23 @@ import android.util.Log;
  *
  */
 public class CommunityNetworkConnector extends WirelessNetworkCommand{
-	
+
 	private static final String CONNECTING_TIMEOUT = "TIMEOUT";
 	private static final String INTERRUPTED = "INTERRUPTED";
-	
+
 	private ScanResult connectedTo = null;
 	private ICNConnectionEventReceiver receiver;
 	private String usernameToConnect;
 	private ICommunityNetworkService communityService = ControllerServices.getInstance().getCommunity();
-	
-	public CommunityNetworkConnector() { }
-	public CommunityNetworkConnector(HashMap<String, String> params) { }
+
+	public CommunityNetworkConnector() {
+		m_params = new HashMap<String, String>();
+		m_subclassName = getClass().getCanonicalName();
+	}
+	public CommunityNetworkConnector(HashMap<String, String> params) {
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
+	}
 
 	@Override
 	public void initializeCommand(IParameterManager parameters) {
@@ -75,17 +81,17 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 
 	@Override
 	public void run(IParameterManager parameters) {
-		Boolean connected = false;	
+		Boolean connected = false;
 		if ((Boolean)parameters.getParameter(Parameter.WIFI_CONNECTED))
 		{
 			if (ControllerServices.getInstance().getWifi().isConnectedToAP()){ //We check we are actually connected
 				//To change the status of the application in Wi2MeUser
 				StatusService.getInstance().changeStatus("Hotspot Authentication...");
-				
+
 				Object connectedToObj = parameters.getParameter(Parameter.WIFI_CONNECTED_TO_AP);
 				Object comNetsObj = parameters.getParameter(Parameter.COMMUNITY_NETWORKS);
 				Object usersObj = parameters.getParameter(Parameter.COMMUNITY_NETWORK_USERS);
-				if (connectedToObj != null){	
+				if (connectedToObj != null){
 					ScanResult connectedTo = (ScanResult) connectedToObj;
 					//check if we are connected to a community network, if not we are in an open one
 					if (comNetsObj != null){
@@ -95,30 +101,30 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 							//if it is a community network, do the hard work of authenticating
 							if (usersObj != null)
 							{
-								try {									
+								try {
 									@SuppressWarnings("unchecked")
 									List<User> users = (List<User>) usersObj;
 									for (User user : users){
 										if (connectedTo.SSID.matches(communityService.getRegExp(user.getCommunityNetwork()))){
 											connected = connectToCommunityNetwork(user, connectedTo, receiver);
-										}							
-									}						
+										}
+									}
 								} catch (TimeoutException e) {
 									Log.d(getClass().getSimpleName(), "++ "+"Connecting to Community Network Timeout", e);
 									//in this case we want the connection not to take place later
 									communityService.stopCommunityNetworkConnection();
-									
+
 									receiver.receiveConnectionEvent(CONNECTING_TIMEOUT+"("+ TimeoutConstants.COMMUNITY_NETWORK_CONNECTION_TIMEOUT +"ms)");
 									connected = false;
-			
+
 								} catch (InterruptedException e) {
 									Log.d(getClass().getSimpleName(), "++ "+"Connecting to Community Network Interrupted", e);
 									//in this case we want the connection not to take place later
 									communityService.stopCommunityNetworkConnection();
-									
+
 									receiver.receiveConnectionEvent(INTERRUPTED);
 									connected = false;
-			
+
 								}
 							}
 						}else{
@@ -126,14 +132,14 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 							connected = true;
 						}
 					}
-					
+
 				}
 			}
 
 		}
 		parameters.setParameter(Parameter.COMMUNITY_NETWORK_CONNECTED, connected);
 	}
-	
+
 	public boolean connectToCommunityNetwork(User user, ScanResult apConnectedTo, ICNConnectionEventReceiver rec) throws TimeoutException, InterruptedException{
 		connectedTo = apConnectedTo;
 		usernameToConnect = user.getName();
@@ -141,7 +147,7 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 
 		return communityService.connectToCommunityNetwork(rec, user.getName(), user.getPassword(), communityService.getAuthenticationRoutine(user.getCommunityNetwork(), user.getName(), user.getPassword()));
 	}
-	
+
 	private class CNConnectionEventReceiver implements ICNConnectionEventReceiver{
 
 		@Override
@@ -157,9 +163,9 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 						WifiAP.getWifiAPFromScanResult(connectedTo), usernameToConnect);
 			}
 			Logger.getInstance().log(connectionEvent);
-			
+
 		}
-		
+
 	}
 
 }

@@ -1,5 +1,7 @@
 {
-  "command": {
-    "name": "WifiPassiveScanner"
-  },
+	"wifi":{
+  		"command": {
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiPassiveScanner"
+	  	}
+	}
 }

@@ -45,18 +45,20 @@ import android.util.Log;
  *
  */
 public class CellDownloader extends WirelessNetworkCommand{
-	
+
 	private String host;
 	private String filePath;
 	private long length;
 	private List<CellInfo> tested;
-		
+
 	private static String SERVER_KEY = "server";
 	private static String PATH_KEY = "path";
 	private static String LENGTH_KEY = "size";
 
 	public CellDownloader(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.host = params.get(SERVER_KEY);
 		this.filePath = params.get(PATH_KEY);
 		this.length = Integer.parseInt(params.get(LENGTH_KEY));
@@ -84,7 +86,7 @@ public class CellDownloader extends WirelessNetworkCommand{
 						// we will try to transfer only if we should continue. If not it is because an error happened with another transfer, and we should not run and let the cleaner command work
 						if (ControllerServices.getInstance().getCell().isDataNetworkConnected()){
 							downloadReceiver = new CellBytesTransferedReceiver(true);
-							canDownload = true;						
+							canDownload = true;
 						}
 					}
 				}
@@ -93,7 +95,7 @@ public class CellDownloader extends WirelessNetworkCommand{
 				CellInfo cell = ControllerServices.getInstance().getCell().getLastScannedCell();
 				try {
 					cell = ControllerServices.getInstance().getCell().getLastScannedCell();
-					parameters.setParameter(Parameter.CELL_TRANSFERRING, true);					
+					parameters.setParameter(Parameter.CELL_TRANSFERRING, true);
 					if (download(downloadReceiver, String.valueOf(cell.cid), cell.operatorName)){
 						if (cell.equals(ControllerServices.getInstance().getCell().getLastScannedCell())){
 							//We add the cell to the tested ones, only if it did not change in the middle of the download
@@ -118,7 +120,7 @@ public class CellDownloader extends WirelessNetworkCommand{
 				}
 			}
 	}
-	
+
 	public boolean download(IBytesTransferredReceiver rec, String ap, String network) throws DownloadingInterruptedException, DownloadingFailException, TimeoutException {
 		return ControllerServices.getInstance().getWeb().downloadFile(host, filePath, rec, length, TimeoutConstants.CELL_DOWNLOAD_CONNECT_TIMEOUT, TimeoutConstants.CELL_DOWNLOAD_SOCKET_TIMEOUT, Timers.CELL_DOWNLOAD_RECEIVER_CALL_TIMER, ap, network);
 	}
@@ -126,6 +128,6 @@ public class CellDownloader extends WirelessNetworkCommand{
 	public boolean wasTested(CellInfo cell) {
 		return tested.contains(cell);
 	}
-	
-	
+
+
 }

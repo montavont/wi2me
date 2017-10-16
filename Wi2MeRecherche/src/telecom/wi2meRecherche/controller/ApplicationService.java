@@ -41,12 +41,11 @@ import telecom.wi2meRecherche.R;
 import telecom.wi2meRecherche.Wi2MeRecherche;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.controller.services.AssetServices;
-import telecom.wi2meCore.controller.services.CellThreadContainer;
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.controller.services.IControllerServices;
 import telecom.wi2meCore.controller.services.NotificationServices;
-import telecom.wi2meCore.controller.services.ThreadSynchronizingService;
 import telecom.wi2meCore.controller.services.TimeService;
+import telecom.wi2meCore.controller.services.ble.BLEService;
 import telecom.wi2meCore.controller.services.cell.CellService;
 import telecom.wi2meCore.controller.services.communityNetworks.CommunityNetworkService;
 import telecom.wi2meCore.controller.services.move.MoveService;
@@ -91,16 +90,13 @@ import android.widget.Toast;
 public class ApplicationService extends Service {
 
 	private static String ASSETS_FILES_DIRECTORY = "files/";
-
     HashMap<String, IWirelessNetworkCommandLooper> WirelessLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
     HashMap<String, Thread> WirelessThreads = new HashMap<String, Thread>();
-
 
 	IParameterManager parameters;
 	Flag wifiWorkingFlag;
 	Flag cellWorkingFlag;
 	int startId;
-	CellThreadContainer cellThreadContainer;
 	String configuration;
 	Context context;
 	boolean wasCellularConnected;
@@ -113,13 +109,11 @@ public class ApplicationService extends Service {
 	// We use it on Notification start, and to cancel it.
 	private int NOTIFICATION = 0;
 
-
 	@Override
 	public void onCreate()
 	{
     		super.onCreate();
 
-    		cellThreadContainer = new CellThreadContainer();
     		context = this;
 
     		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -139,10 +133,10 @@ public class ApplicationService extends Service {
 								new WifiService(this),
 								new BatteryService(this),
 								new LocationService(this),
-					        		new ThreadSynchronizingService(cellThreadContainer),
 								new AssetServices(this),
 								new NotificationServices(this),
-								new CommunityNetworkService(this)
+								new CommunityNetworkService(this),
+							new BLEService(this)
 								);
 
     			ConfigurationManager.loadParameters(context, parameters);
@@ -192,10 +186,6 @@ public class ApplicationService extends Service {
 		{
 			IWirelessNetworkCommandLooper looper = WirelessLoopers.get(looperKey);
 			WirelessThreads.put(looperKey, new WirelessLooperThread(looper));
-			if (looperKey.equals("cellCommands"))
-			{
-				cellThreadContainer.cellThread = WirelessThreads.get(looperKey);
-			}
 		}
 
 
@@ -406,7 +396,7 @@ public class ApplicationService extends Service {
 		    wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
 	        cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
 
-			if (wifiWorkingFlag.isActive())
+			/*if (wifiWorkingFlag.isActive())
 			{
 				WirelessLoopers.put("wifiCommands", new WirelessNetworkCommandLooper());
 			}
@@ -414,89 +404,90 @@ public class ApplicationService extends Service {
 			{
 				WirelessLoopers.put("cellCommands", new WirelessNetworkCommandLooper());
 			}
+			TODO remove *WorkingFlags, up until pref page
+			*/
+
+
 
 			try
 			{
+				WirelessLoopers = ConfigurationManager.readCommandFile(new FileInputStream((String)parameters.getParameter(Parameter.COMMAND_FILE)));
+				/*
 				JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream((String)parameters.getParameter(Parameter.COMMAND_FILE))));
 				reader.beginObject();
 				while (reader.hasNext())
 				{
-					String topKey = reader.nextName();
-					if (topKey.equals("command"))
+					String LooperName = reader.nextName();
+					reader.beginObject();
+					while (reader.hasNext())
 					{
-						reader.beginObject();
-						String commandType = "";
-						String commandModule = "wi2meCore";
-						String commandFamily = "wifiCommands";
-						HashMap<String, String> commandParams = new HashMap<String, String>();
-						while (reader.hasNext())
+						String looperContentKey = reader.nextName();
+						if (looperContentKey.equals("command"))
 						{
-							String key = reader.nextName();
-							if (key.equals("name"))
+							String commandModule = "";
+							HashMap<String, String> commandParams = new HashMap<String, String>();
+							while (reader.hasNext())
 							{
-         							commandType = reader.nextString();
-							}
-							else if (key.equals("family"))
-							{
-								commandFamily = reader.nextString();
-							}
-							else if (key.equals("module"))
-							{
-         							commandModule = reader.nextString();
-							}
-       							else if (key.equals("params"))
-							{
-								reader.beginObject();
-								while (reader.hasNext())
+								String key = reader.nextName();
+								if (key.equals("module"))
 								{
-									commandParams.put(reader.nextName(), reader.nextString());
+         								commandModule = reader.nextString();
 								}
-								reader.endObject();
-							}
-							else
-							{
-								reader.skipValue();
-							}
-						}
-						reader.endObject();
-						try
-						{
-							if (commandType.length() > 0)
-							{
-								String className = "telecom." + commandModule + ".model." + commandFamily + "." + commandType;
-								Class<?> clazz = Class.forName(className);
-								Constructor<?> ctor = clazz.getConstructor(HashMap.class);
-
-								if (WirelessLoopers.containsKey(commandFamily))
+	       						else if (key.equals("params"))
 								{
-									WirelessLoopers.get(commandFamily).addCommand((WirelessNetworkCommand) ctor.newInstance(new Object[] {commandParams}));
+									reader.beginObject();
+									while (reader.hasNext())
+									{
+										commandParams.put(reader.nextName(), reader.nextString());
+									}
+									reader.endObject();
+								}
+								else
+								{
+									reader.skipValue();
 								}
 							}
-						}
-						catch (ClassNotFoundException e)
-						{
-    							Log.e(getClass().getSimpleName(), "++ " + "ClassNotFoundException parsing json configuration file: "+e.getMessage());
-						}
-						catch (NoSuchMethodException e)
-						{
-    							Log.e(getClass().getSimpleName(), "++ " + "NoSuchMethodException parsing json configuration file: "+e.getMessage());
-						}
-						catch (InstantiationException e)
-						{
-    							Log.e(getClass().getSimpleName(), "++ " + "InstantiationException parsing json configuration file: "+e.getMessage());
-						}
-						catch (IllegalAccessException e)
-						{
-    							Log.e(getClass().getSimpleName(), "++ " + "IllegalAccessException parsing json configuration file: "+e.getMessage());
-						}
-						catch (java.lang.reflect.InvocationTargetException e)
-						{
+							reader.endObject();
+							try
+							{
+								if (commandModule.length() > 0 && LooperName.length() > 0)
+								{
+									Class<?> clazz = Class.forName(commandModule);
+									Constructor<?> ctor = clazz.getConstructor(HashMap.class);
+									if (!WirelessLoopers.containsKey(LooperName))
+									{
+										WirelessLoopers.put(LooperName, new WirelessNetworkCommandLooper());
+									}
+									WirelessLoopers.get(LooperName).addCommand((WirelessNetworkCommand) ctor.newInstance(new Object[] {commandParams}));
+								}
+							}
+							catch (ClassNotFoundException e)
+							{
+    								Log.e(getClass().getSimpleName(), "++ " + "ClassNotFoundException parsing json configuration file: "+e.getMessage());
+							}
+							catch (NoSuchMethodException e)
+							{
+    								Log.e(getClass().getSimpleName(), "++ " + "NoSuchMethodException parsing json configuration file: "+e.getMessage());
+							}
+							catch (InstantiationException e)
+							{
+    								Log.e(getClass().getSimpleName(), "++ " + "InstantiationException parsing json configuration file: "+e.getMessage());
+							}
+							catch (IllegalAccessException e)
+							{
+    								Log.e(getClass().getSimpleName(), "++ " + "IllegalAccessException parsing json configuration file: "+e.getMessage());
+							}
+							catch (java.lang.reflect.InvocationTargetException e)
+							{
     							Log.e(getClass().getSimpleName(), "++ " + "InvocationTargetException parsing json configuration file: "+e.getMessage());
-							e.printStackTrace();
+								e.printStackTrace();
+							}
 						}
 					}
+					reader.endObject();
 				}
 				reader.endObject();
+				*/
 			}
 			catch (java.io.FileNotFoundException e )
 			{
@@ -508,7 +499,6 @@ public class ApplicationService extends Service {
     				Log.e(getClass().getSimpleName(), "++ " + "IOException trying to access command file file: " +e.getMessage());
 				return;
 			}
-
 
 			for (IWirelessNetworkCommandLooper looper:WirelessLoopers.values())
 			{

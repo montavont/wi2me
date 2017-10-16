@@ -19,7 +19,10 @@
 
 package telecom.wi2meCore.model;
 
+import java.util.HashMap;
+
 import telecom.wi2meCore.model.parameters.IParameterManager;
+
 
 /**
  * Class to extend to create a wireless command.
@@ -28,21 +31,34 @@ import telecom.wi2meCore.model.parameters.IParameterManager;
  */
 public abstract class WirelessNetworkCommand {
 
+	protected HashMap<String, String> m_params;
+	protected String m_subclassName;
+
 	/**
 	 * Initialize the commands. Usually allows the command to store the parameters.
 	 * @param parameters
 	 */
 	public abstract void initializeCommand(IParameterManager parameters);
-	
+
 	/**
 	 * Finalizes the command.
 	 * @param parameters
 	 */
 	public abstract void finalizeCommand(IParameterManager parameters);
-	
+
 	/**
 	 * Does what the command has to do. Is launched by the looper.
 	 * @param parameters
 	 */
 	public abstract void run(IParameterManager parameters);
+
+	public HashMap<String, String> getParameters()
+	{
+		return m_params;
+	}
+
+	public String getSubclassName()
+	{
+		return m_subclassName;
+	}
 }

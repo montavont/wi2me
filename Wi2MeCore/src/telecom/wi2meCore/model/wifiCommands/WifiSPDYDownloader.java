@@ -52,9 +52,11 @@ public class WifiSPDYDownloader extends WirelessNetworkCommand
 
 	private String url;
 	private String tag;
-		
+
 	public WifiSPDYDownloader(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.url = params.get(URL_KEY);
 		this.tag = params.get(TAG_KEY);
 	}
@@ -89,7 +91,7 @@ public class WifiSPDYDownloader extends WirelessNetworkCommand
 							receiver = new WifiBytesTransferedReceiver(Utils.TYPE_DOWNLOAD, parameters);
 						}
 					}
-				}	
+				}
 
 				ControllerServices.getInstance().getWeb().downloadWebPageWSpdy(url, WebService.Route.WIFI, receiver, tag);
 			}

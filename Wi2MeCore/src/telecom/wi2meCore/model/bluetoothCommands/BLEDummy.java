@@ -17,40 +17,55 @@
  * along with Wi2Me.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package telecom.wi2meCore.model.cellCommands;
-
-import android.os.Build;
-
-import telecom.wi2meCore.controller.services.ControllerServices;
-import telecom.wi2meCore.model.CleanerCommand;
-import telecom.wi2meCore.model.parameters.IParameterManager;
+package telecom.wi2meCore.model.bluetoothCommands;
 
 import java.util.HashMap;
 
+import telecom.wi2meCore.controller.services.ControllerServices;
+import telecom.wi2meCore.model.Logger;
+import telecom.wi2meCore.model.TraceManager;
+import telecom.wi2meCore.model.WirelessNetworkCommand;
+import telecom.wi2meCore.model.parameters.IParameterManager;
+import telecom.wi2meCore.model.parameters.Parameter;
+
+import android.util.Log;
+
 /**
- * Wireless network command used to connect to a cell tower.
- * Forces the cell Service to perform a disconnection
+ * Bluetooth low energy command used to send a GATT inquiry to a device.
  * @author XXX
  *
  */
-public class CellCleanerCommand extends CleanerCommand
-{
+public class BLEDummy extends WirelessNetworkCommand{
 
-	public CellCleanerCommand() {
-		m_params = new HashMap<String, String>();
-		m_subclassName = getClass().getCanonicalName();
-	}
-	public CellCleanerCommand(HashMap<String, String> params)
+	public BLEDummy(HashMap<String, String> params)
 	{
 		m_params = params;
 		m_subclassName = getClass().getCanonicalName();
 	}
 
-	public void clean(IParameterManager parameters)
-	{
-		/*---CLEAN EVERYTHING TO START AGAIN---*/
-		//the only thing we need is to ensure that the cellular connection is over
-		ControllerServices.getInstance().getCell().disconnectOrDie();
-		/*------*/
+	@Override
+	public void initializeCommand(IParameterManager parameters) {
+		// DO NOTHING
 	}
+
+	@Override
+	public void finalizeCommand(IParameterManager parameters) {
+		// DO NOTHING
+	}
+
+	@Override
+	public void run(IParameterManager parameters) {
+		Log.d(getClass().getSimpleName(), "Yay, we is of hellfest !");
+
+		ControllerServices.getInstance().getBLE().writeCharacteristic();
+
+		try{
+			Thread.sleep(10000);
+		}
+		catch (InterruptedException e)
+		{
+		}
+	}
+
+
 }

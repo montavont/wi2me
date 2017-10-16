@@ -22,6 +22,7 @@ package telecom.wi2meCore.model;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 import android.util.Log;
+import java.util.HashMap;
 
 /**
  * This command is generic, and is used to clean the features of either wifi or cellular connections before starting the loop all over again.
@@ -36,13 +37,8 @@ import android.util.Log;
 
 public abstract class CleanerCommand extends WirelessNetworkCommand
 {
-	
+
 	private static final int FIRST_FIX_WAITING_TIME = 3000;
-
-	public CleanerCommand()
-	{
-
-	}
 
 	@Override
 	public void initializeCommand(IParameterManager parameters) {
@@ -59,10 +55,10 @@ public abstract class CleanerCommand extends WirelessNetworkCommand
 	{
 		//first we clean
 		clean(parameters);
-		
+
 		//then we flush the log
 		Logger.getInstance().flush();
-		
+
 		//now check for first fix to continue
 		 if ((Boolean)parameters.getParameter(Parameter.FIRST_FIX_WAITING)){
 			//Check if a first fix has been obtained by the trace so everything is ready to run the following commands
@@ -76,7 +72,7 @@ public abstract class CleanerCommand extends WirelessNetworkCommand
 			}
 		}
 	}
-	
+
 	/**
 	 * Cleans the data of the concerned network interface.
 	 * Used to reset all data at the beginning of each loop.

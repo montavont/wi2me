@@ -51,12 +51,12 @@ import android.util.Log;
  *
  */
 public class WifiUploader extends WirelessNetworkCommand{
-	
+
 	private String server;
 	private String script;
 	private String lastTestedBSSID = "";
 	private byte[] file = null;
-			
+
 	private static String DATA_DIR = "upload_files/";
 
 	private static String SERVER_KEY = "server";
@@ -65,6 +65,8 @@ public class WifiUploader extends WirelessNetworkCommand{
 
 	public WifiUploader(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.server = params.get(SERVER_KEY);
 		this.script = params.get(SCRIPT_KEY);
 		try
@@ -105,19 +107,19 @@ public class WifiUploader extends WirelessNetworkCommand{
 				if ((Boolean)connectedObj){
 					if (ControllerServices.getInstance().getWifi().isConnected() && info != null){
 						uploadReceiver = new WifiBytesTransferedReceiver(Utils.TYPE_UPLOAD, parameters);
-						canUpload = true;						
+						canUpload = true;
 					}
 				}
 			}
 			if (canUpload){
-				try {					
+				try {
 					if (upload(uploadReceiver)){
 						WifiInfo current = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 						if (current != null){
 							if (info.getBSSID().equals(current.getBSSID())){
 								//We keep the bssid, only if it did not change in the middle of the upload
 								lastTestedBSSID = info.getBSSID();
-							}							
+							}
 						}
 					}
 				} catch (UploadingInterruptedException e) {
@@ -138,12 +140,12 @@ public class WifiUploader extends WirelessNetworkCommand{
 
 		}
 	}
-		
+
 	public boolean upload(IBytesTransferredReceiver rec) throws UploadingInterruptedException, UploadingFailException, TimeoutException{
 		Log.d(getClass().getSimpleName(), "++ "+ "LENGTH: " + file.length);
 		return ControllerServices.getInstance().getWeb().uploadFile(server, script, rec, file, TimeoutConstants.WIFI_UPLOAD_CONNECT_TIMEOUT, TimeoutConstants.WIFI_UPLOAD_SOCKET_TIMEOUT, Timers.WIFI_UPLOAD_RECEIVER_CALL_TIMER);
 	}
-	
+
 	public boolean isLastTested(String bssid){
 		return lastTestedBSSID.equals(bssid);
 	}

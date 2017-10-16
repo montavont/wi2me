@@ -21,8 +21,8 @@ package telecom.wi2meCore.controller.services;
 
 import telecom.wi2meCore.controller.services.IAssetServices;
 import telecom.wi2meCore.controller.services.INotificationServices;
-import telecom.wi2meCore.controller.services.IThreadSynchronizingService;
 import telecom.wi2meCore.controller.services.ITimeService;
+import telecom.wi2meCore.controller.services.ble.IBLEService;
 import telecom.wi2meCore.controller.services.cell.ICellService;
 import telecom.wi2meCore.controller.services.communityNetworks.ICommunityNetworkService;
 import telecom.wi2meCore.controller.services.move.IMoveService;
@@ -38,57 +38,57 @@ import telecom.wi2meCore.controller.services.wifi.IWifiService;
  */
 public interface IControllerServices {
 
-	/**Gives the assets service 
+	/**Gives the assets service
 	 * @return IAssetServices
 	 */
 	IAssetServices getAssets();
 
-	/**Gives the thread synchronizing service 
-	 * @return IThreadSynchronizingService
-	 */
-	IThreadSynchronizingService getSync();
-
-	/**Gives the time service 
+	/**Gives the time service
 	 * @return ITimeService
 	 */
 	ITimeService getTime();
 
-	/**Gives the cell service 
+	/**Gives the cell service
 	 * @return ICellService
 	 */
 	ICellService getCell();
 
-	/**Gives the move service 
+	/**Gives the move service
 	 * @return IMoveService
 	 */
 	IMoveService getMove();
 
-	/**Gives the web service 
+	/**Gives the web service
 	 * @return IWebService
 	 */
 	IWebService getWeb();
 
-	/**Gives the wifi service 
+	/**Gives the wifi service
 	 * @return IWifiService
 	 */
 	IWifiService getWifi();
 
-	/**Gives the battery service 
+	/**Gives the ble service
+	 * @return IBLEService
+	 */
+	IBLEService getBLE();
+
+	/**Gives the battery service
 	 * @return IBatteryService
 	 */
 	IBatteryService getBattery();
 
-	/**Gives the location service 
+	/**Gives the location service
 	 * @return ILocationService
 	 */
 	ILocationService getLocation();
-	
-	/**Gives the notification services 
+
+	/**Gives the notification services
 	 * @return INotificationServices
 	 */
 	INotificationServices getNotification();
 
-	/**Gives the communityNetworks services 
+	/**Gives the communityNetworks services
 	 * @return ICommunityNetworkService
 	 */
 	ICommunityNetworkService getCommunity();

@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.HashSet;
@@ -45,6 +46,9 @@ import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meCore.model.parameters.LooperCommand;
 import telecom.wi2meRecherche.controller.ApplicationService;
 import telecom.wi2meRecherche.controller.ApplicationService.ServiceBinder;
+import telecom.wi2meCore.model.WirelessNetworkCommand;
+import telecom.wi2meCore.model.IWirelessNetworkCommandLooper;
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -116,7 +120,8 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 	ServiceBinder binder;
 	ServiceConnection serviceConnection;
 
-	private List<LooperCommand> LooperCommands = new ArrayList<LooperCommand>();
+	//private List<LooperCommand> LooperCommands = new ArrayList<LooperCommand>();
+	private HashMap<String, IWirelessNetworkCommandLooper> loopers;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -709,7 +714,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		{
 			this.index = commandIndex;
 				mData = new ArrayList();
-				mData.addAll(LooperCommands.get(index).parameters.entrySet());
+				//mData.addAll(LooperCommands.get(index).parameters.entrySet());
 		}
 
 		@Override
@@ -752,7 +757,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		try
 		{
 			String commandFilePath = readProperties("COMMAND_FILE");
-			LooperCommands = ConfigurationManager.readCommandFile(new FileInputStream(commandFilePath));
+			loopers = ConfigurationManager.readCommandFile(new FileInputStream(commandFilePath));
 		}
 		catch (java.io.IOException e)
 		{
@@ -768,88 +773,93 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		PreferenceScreen screen = this.getPreferenceScreen();
 
 		commandLoopCategory.removeAll();
-		for (int i = 0; i < LooperCommands.size(); i++)
+
+		/*for (String looperName : loopers.keySet())
 		{
-			final int ii = i;
-
-			final LooperCommand commandParam = LooperCommands.get(i);
-
-			Preference commandPref = new Preference(screen.getContext());
-			commandPref.setKey("command_" + i);
-			commandPref.setTitle(commandParam.name);
-			if (commandParam.parameters.size() > 0)
+			List <WirelessNetworkCommand> looperCommands = loopers.get(looperName).getCommands();
+			for (int i = 0; i < looperCommands.size(); i++)
 			{
-				commandPref.setSummary(commandParam.parameters.toString());
-			}
+				final int ii = i;
 
-			commandPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-			{
+				final LooperCommand commandParam = looperCommands.get(i);
 
-				@Override
-				public boolean onPreferenceClick(Preference p)
+				Preference commandPref = new Preference(screen.getContext());
+				commandPref.setKey("command_" + i);
+				commandPref.setTitle(commandParam.name);
+				if (commandParam.parameters.size() > 0)
+				{
+					commandPref.setSummary(commandParam.parameters.toString());
+				}
+
+				commandPref.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
 				{
 
-					CommandParamsAdapter adapter = new CommandParamsAdapter(ii);
-					final ListView paramView = new ListView(current);
-					paramView.setAdapter(adapter);
-
-					AlertDialog.Builder builder = new AlertDialog.Builder(current);
-					builder.setTitle("Edit " + commandParam.name +" Parameters");
-					builder.setView(paramView);
-
-					builder.setNegativeButton("Cancel", new OnClickListener()
+					@Override
+					public boolean onPreferenceClick(Preference p)
 					{
 
-						@Override
-						public void onClick(DialogInterface arg0, int arg1)
+						CommandParamsAdapter adapter = new CommandParamsAdapter(ii);
+						final ListView paramView = new ListView(current);
+						paramView.setAdapter(adapter);
+
+						AlertDialog.Builder builder = new AlertDialog.Builder(current);
+						builder.setTitle("Edit " + commandParam.name +" Parameters");
+						builder.setView(paramView);
+
+						builder.setNegativeButton("Cancel", new OnClickListener()
 						{
 
-						}
-					});
+							@Override
+							public void onClick(DialogInterface arg0, int arg1)
+							{
 
-					builder.setPositiveButton("Save", new OnClickListener()
-					{
+							}
+						});
 
-						@Override
-						public void onClick(DialogInterface arg0, int arg1)
+						builder.setPositiveButton("Save", new OnClickListener()
 						{
-							int count = paramView.getAdapter().getCount();
-							for (int j = 0; j < count; j++)
+
+							@Override
+							public void onClick(DialogInterface arg0, int arg1)
 							{
-								View lineView = paramView.getChildAt(j);
-								String pKey = ((TextView)lineView.findViewById(R.id.cpam_text1)).getText().toString();
-								String pVal = ((TextView)lineView.findViewById(R.id.cpam_text2)).getText().toString();
-								LooperCommands.get(ii).parameters.put(pKey, pVal);
+								int count = paramView.getAdapter().getCount();
+								for (int j = 0; j < count; j++)
+								{
+									View lineView = paramView.getChildAt(j);
+									String pKey = ((TextView)lineView.findViewById(R.id.cpam_text1)).getText().toString();
+									String pVal = ((TextView)lineView.findViewById(R.id.cpam_text2)).getText().toString();
+									//looperCommands.get(ii).parameters.put(pKey, pVal); TODO fix update
+								}
+								refreshWirelessCommands();
+								try
+								{
+									String commandFilePath = readProperties("COMMAND_FILE");
+									//ConfigurationManager.saveCommandFile(LooperCommands, commandFilePath); TODO FIX update
+								}
+								catch (java.io.IOException e)
+								{
+									Log.e(getClass().getSimpleName(), "++ " + "IOException trying to save command: " +e.getMessage());
+								}
+
 							}
-							refreshWirelessCommands();
-							try
-							{
-								String commandFilePath = readProperties("COMMAND_FILE");
-								ConfigurationManager.saveCommandFile(LooperCommands, commandFilePath);
-							}
-							catch (java.io.IOException e)
-							{
-								Log.e(getClass().getSimpleName(), "++ " + "IOException trying to save command: " +e.getMessage());
-							}
-
-						}
-					});
+						});
 
 
-					AlertDialog dialog = builder.create();
+						AlertDialog dialog = builder.create();
 
-					dialog.show();
+						dialog.show();
 
 
-					dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE  | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
-					dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
+						dialog.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE  | WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM);
+						dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
 
-					return true;
+						return true;
 
-				}
-			});
-			commandLoopCategory.addPreference(commandPref);
-		}
+					}
+				});
+				commandLoopCategory.addPreference(commandPref);
+			}
+		}*/ //TODO TKE temporary disablement
 	}
 
 

@@ -45,24 +45,26 @@ import telecom.wi2meCore.model.parameters.Parameter;
  *
  */
 public class Pinger extends WirelessNetworkCommand{
-	
+
 	private String lastTestedBSSID = "";
 	private boolean gateway;
-	
+
 	private static String GATEWAY_KEY = "gateway";
 
 	public Pinger(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.gateway = Boolean.valueOf(params.get(GATEWAY_KEY));
 
 	}
 
 	@Override
-	public void initializeCommand(IParameterManager parameters) {		
+	public void initializeCommand(IParameterManager parameters) {
 	}
 
 	@Override
-	public void finalizeCommand(IParameterManager parameters) {		
+	public void finalizeCommand(IParameterManager parameters) {
 	}
 
 	@Override
@@ -89,7 +91,7 @@ public class Pinger extends WirelessNetworkCommand{
 					PingInfo pingInfo = ping(ip, (Float)parameters.getParameter(Parameter.PING_DEADLINE),
 											(Integer)parameters.getParameter(Parameter.PING_PACKETS),
 											(Float)parameters.getParameter(Parameter.PING_INTERVAL));
-					
+
 					WifiInfo current = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 					if (current != null){
 						if (info.getBSSID().equals(current.getBSSID())){
@@ -97,13 +99,13 @@ public class Pinger extends WirelessNetworkCommand{
 							lastTestedBSSID = info.getBSSID();
 						}
 					}
-					
+
 					WifiPing wifiPing = WifiPing.getNewWifiPing(TraceManager.getTrace(), pingInfo.ip, 
 							pingInfo.sent, pingInfo.received, pingInfo.rttMin, pingInfo.rttMax, 
 							pingInfo.rttAvg, pingInfo.rttMdev, WifiAP.getNewWifiAP(info.getBSSID(), info.getSSID(), info.getRssi(), WifiAP.frequencyToChannel(connectedTo.frequency), connectedTo.capabilities, info.getLinkSpeed()));
-	
+
 					Logger.getInstance().log(wifiPing);
-					
+
 				} catch (IOException e) {
 					// finish here, log nothing
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
@@ -113,13 +115,13 @@ public class Pinger extends WirelessNetworkCommand{
 				} catch (RuntimeException e) {
 					// UNEXPECTED! finish here
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				}				
+				}
 			}
-			
+
 		}
 
 	}
-	
+
 	public PingInfo ping(String ip, float deadline, int packets, float interval) throws IOException, InterruptedException{
 		return ControllerServices.getInstance().getWifi().ping(ip, deadline, packets, interval);
 	}
