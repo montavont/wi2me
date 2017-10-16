@@ -54,11 +54,13 @@ public class WifiWebPageDownloader extends WirelessNetworkCommand
 
 	private String url;
 	private int numThreads;
-	private String tag;	
+	private String tag;
 
 	public WifiWebPageDownloader(HashMap<String, String> params)
 	{
 
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.url = params.get(URL_KEY);
 		this.numThreads = Integer.parseInt(params.get(THREADS_KEY));
 		this.tag = params.get(TAG_KEY);
@@ -86,7 +88,7 @@ public class WifiWebPageDownloader extends WirelessNetworkCommand
 	{
 		WifiBytesTransferedReceiver receiver = null;
 		WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
-	
+
 		if (url.length() > 0 && (Boolean)parameters.getParameter(Parameter.COMMUNITY_NETWORK_CONNECTED))
 		{
 			if (ControllerServices.getInstance().getWifi().isConnected())
@@ -103,7 +105,7 @@ public class WifiWebPageDownloader extends WirelessNetworkCommand
 							receiver = new WifiBytesTransferedReceiver(Utils.TYPE_DOWNLOAD, parameters);
 						}
 					}
-				}	
+				}
 
 				ControllerServices.getInstance().getWeb().downloadWebPage(url, WebService.Route.WIFI, numThreads, receiver, tag);
 			}

@@ -17,11 +17,11 @@
  * along with Wi2Me.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package telecom.wi2meCore.controller.services;
+package telecom.wi2meCore.controller.services.ble;
 
-/**Contains the cell thread. 
- * @author XXX
- */
-public class CellThreadContainer {
-	public Thread cellThread;
+public interface IBLEService {
+
+	void finalizeService();
+
+	public boolean writeCharacteristic();
 }

@@ -45,18 +45,20 @@ import java.util.HashMap;
  *
  */
 public class WifiDownloader extends WirelessNetworkCommand{
-	
+
 	private String server;
 	private String filePath;
 	private long length;
 	private String lastTestedBSSID = "";
-		
+
 	private static String SERVER_KEY = "server";
 	private static String PATH_KEY = "path";
 	private static String LENGTH_KEY = "size";
 
 	public WifiDownloader(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.server = params.get(SERVER_KEY);
 		this.filePath = params.get(PATH_KEY);
 		this.length = Integer.parseInt(params.get(LENGTH_KEY));
@@ -84,13 +86,13 @@ public class WifiDownloader extends WirelessNetworkCommand{
 				if ((Boolean)connectedObj){
 					if (ControllerServices.getInstance().getWifi().isConnected() && info != null){
 						downloadReceiver = new WifiBytesTransferedReceiver(Utils.TYPE_DOWNLOAD, parameters); 
-						canDownload = true;						
+						canDownload = true;
 					}
 
 				}
-			}				
+			}
 			if (canDownload){
-				try {					
+				try {
 					WifiInfo current = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 					if (download(downloadReceiver, current.getBSSID(), current.getSSID())){
 						//if download was complete and successful
@@ -106,7 +108,7 @@ public class WifiDownloader extends WirelessNetworkCommand{
 						// We will simulate disconnection of community network, so that the following pings, uploads and downloads won't take place, and the cleaner will disconnect the network properly
 						parameters.setParameter(Parameter.COMMUNITY_NETWORK_CONNECTED, false);
 					}
-					
+
 				} catch (DownloadingInterruptedException e) {
 					// If we are interrupted, just finish execution
 					Log.d(getClass().getSimpleName()+"-INTERRUPTED", "++ "+e.getMessage(), e);
@@ -124,12 +126,12 @@ public class WifiDownloader extends WirelessNetworkCommand{
 			}
 		}
 	}
-	
+
 	public boolean download(IBytesTransferredReceiver rec, String bssid, String ssid) throws DownloadingInterruptedException, DownloadingFailException, TimeoutException {
-		
+
 		return ControllerServices.getInstance().getWeb().downloadFile(server, filePath, rec, length, TimeoutConstants.WIFI_DOWNLOAD_CONNECT_TIMEOUT, TimeoutConstants.WIFI_DOWNLOAD_SOCKET_TIMEOUT, Timers.WIFI_DOWNLOAD_RECEIVER_CALL_TIMER, bssid, ssid);
 	}
-	
+
 	public boolean isLastTested(String bssid){
 		return lastTestedBSSID.equals(bssid);
 	}

@@ -32,14 +32,9 @@ import android.util.Log;
 
 
 public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLooper{
-	
+
 	private List<WirelessNetworkCommand> commands;
 	private boolean running = true;
-	
-	/*public WirelessNetworkCommandLooper(CleanerCommand cleaner){
-		commands = new ArrayList<WirelessNetworkCommand>();
-		commands.add(cleaner);
-	}*/
 
 	public WirelessNetworkCommandLooper()
 	{
@@ -47,7 +42,8 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 	}
 
 	@Override
-	public void initializeCommands(IParameterManager parameters) {
+	public void initializeCommands(IParameterManager parameters)
+	{
 		for(WirelessNetworkCommand c : commands){
 			c.initializeCommand(parameters);
 		}
@@ -68,6 +64,12 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 	}
 
 	@Override
+	public List<WirelessNetworkCommand> getCommands()
+	{
+		return commands;
+	}
+
+	@Override
 	public void breakLoop()
 	{
 		this.running = false;
@@ -78,15 +80,22 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 	public void loop(IParameterManager parameters)
 	{
 		int index = 0;
-		while (running)
+		if (commands.size() > 0)
 		{
-			commands.get(index).run(parameters);
-			++index;
-			index = index % commands.size();//this restarts the index (in 0) when it reaches the last possible index 
-
+			while (running)
+			{
+				commands.get(index).run(parameters);
+				++index;
+				index = index % commands.size();//this restarts the index (in 0) when it reaches the last possible index
+			}
+			//we flush it before finishing cause it probably has some logs left to persist
+			Logger.getInstance().flush();
 		}
-		//we flush it before finishing cause it probably has some logs left to persist
-		Logger.getInstance().flush();
+		else
+		{
+			Log.e(getClass().getSimpleName(), "Disabling empty looper.");
+			running = false;
+		}
 	}
 
 }

@@ -36,44 +36,44 @@ import android.os.PowerManager;
  *
  */
 public class MoveService implements IMoveService {
-	
+
 	private static final float TIME_CONSTANT = 100;
 	private static final double ACCELERATION_THRESHOLD = 0.000001; 
 	private static final long TIME_BETWEEN_DETECTIONS = 500; //In milliseconds. Time between one detection of acceleration over the threshold, and the next, to consider movement.
-	
+
 	private SensorManager sensorManager;
 	private AccelerometerListener accListener;
 	private PowerManager.WakeLock wl;
 	private ITimeService timeService;
 	private MoveLock moveLock;
-	
+
 	//this is the time when we detected acceleration higher than the threshold, but not necessarily a movement
 	private long lastDetectedMovementTimestamp;
-	
+
 	private long lastMeasureReceivedTimestamp;
 	private double x;
 	private double y;
 	private double z;
 	private float[] gravity = new float[3];
-		
+
 	private long lastMovementTimestamp;
-	
+
 	public MoveService(Context context, ITimeService timeService){
 		this.timeService = timeService;
 		lastMovementTimestamp = timeService.getCurrentTimeInMilliseconds();
 		lastMeasureReceivedTimestamp=timeService.getCurrentTimeInMilliseconds();
 		lastDetectedMovementTimestamp=timeService.getCurrentTimeInMilliseconds();
-				
+
 		accListener = new AccelerometerListener();
-		sensorManager=(SensorManager) context.getSystemService(Context.SENSOR_SERVICE);		
+		sensorManager=(SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
 		sensorManager.registerListener(accListener, sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
-				
+
     	//acquire wakeLock for the accelerometer to broadcast results continuously
     	PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
     	wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, this.getClass().getSimpleName() + "-WakeLock");
     	wl.acquire();
 	}
-	
+
 	private void initializeLock() {
 		moveLock = new MoveLock();
 		moveLock.lock.lock();
@@ -87,7 +87,7 @@ public class MoveService implements IMoveService {
 		wl.release();
 		sensorManager.unregisterListener(accListener);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.IMoveService#isMoving()
 	 */
@@ -97,7 +97,7 @@ public class MoveService implements IMoveService {
 			return isMovingNotSynchronized();
 		}
 	}
-	
+
 	private boolean isMovingNotSynchronized() {
 		boolean ret = false;
 		double acc= modAdditionAcc();
@@ -109,10 +109,10 @@ public class MoveService implements IMoveService {
 		}
 		return ret;
 	}
-	
-	private double modAdditionAcc() {		
+
+	private double modAdditionAcc() {
 		return Math.abs(x)+Math.abs(y)+Math.abs(z);
-			
+
 	}
 
 	/* (non-Javadoc)
@@ -122,9 +122,9 @@ public class MoveService implements IMoveService {
 	public MoveLock getMovingLock(){
 		synchronized (this) {
 			return moveLock;
-		}		
+		}
 	}
-	
+
 	private void releaseLock() {
 		//keep a reference
 		MoveLock myMoveLock = moveLock;
@@ -133,27 +133,27 @@ public class MoveService implements IMoveService {
 		if (myMoveLock != null)
 			//unlock current threads
 			myMoveLock.lock.unlock();
-	}	
-	
+	}
+
 	public long getLastMovementTimestamp(){
 		synchronized (this) {
 			return lastMovementTimestamp;
 		}
 	}
-	
+
 	public class MoveLock implements IMoveLock{
 		private Lock lock;
 		private MoveLock(){
 			lock = new ReentrantLock();
 		}
-		
+
 		public void waitForMovement() throws InterruptedException{
 			lock.lockInterruptibly();
 			lock.unlock();
 		}
-		
+
 	}
-	
+
 	private class AccelerometerListener implements SensorEventListener{
 
 		@Override
@@ -166,28 +166,28 @@ public class MoveService implements IMoveService {
 				//Log.d("SENSOR CHANGED", "Received");
 				if (moveLock == null)
 					releaseLock();
-							
-				long now = event.timestamp;				
+
+				long now = event.timestamp;
 				long delta= now-lastMeasureReceivedTimestamp;
 				lastMeasureReceivedTimestamp = now;
-				
+
 				float alpha = (float)((float)TIME_CONSTANT/(float)(TIME_CONSTANT+delta));
-		
+
 			    gravity[0] = alpha * gravity[0] + (1.0f - alpha) * event.values[0];
 			    gravity[1] = alpha * gravity[1] + (1.0f - alpha) * event.values[1];
 			    gravity[2] = alpha * gravity[2] + (1.0f - alpha) * event.values[2];
-		
+
 			    synchronized (this) {
 					 x = event.values[0] - gravity[0];
 					 y = event.values[1] - gravity[1];
 					 z = event.values[2] - gravity[2];
-					 
+
 					 if (isMovingNotSynchronized()){
 						 releaseLock();
 						 lastMovementTimestamp = timeService.getCurrentTimeInMilliseconds();
 					 }
-				}			
-			
+				}
+
 			}
 
 		}
@@ -196,7 +196,7 @@ public class MoveService implements IMoveService {
 
 	@Override
 	public void resetLastMovementTimestamp() {
-		lastMovementTimestamp = timeService.getCurrentTimeInMilliseconds();		
+		lastMovementTimestamp = timeService.getCurrentTimeInMilliseconds();
 	}
 
 }

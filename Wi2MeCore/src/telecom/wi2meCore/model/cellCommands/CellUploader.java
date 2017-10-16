@@ -51,22 +51,24 @@ import android.util.Log;
  *
  */
 public class CellUploader extends WirelessNetworkCommand{
-	
+
 	private String server;
 	private String script;
 	private List<CellInfo> tested;
 	private byte[] file;
-	
+
 	private static String DATA_DIR = "upload_files/";
 
 	private static String SERVER_KEY = "server";
 	private static String SCRIPT_KEY = "script";
 	private static String SIZE_KEY = "size";
 
-		
+
 	public CellUploader(HashMap<String, String> params)
 	{
 
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.server = params.get(SERVER_KEY);
 		this.script = params.get(SCRIPT_KEY);
 		try
@@ -106,7 +108,7 @@ public class CellUploader extends WirelessNetworkCommand{
 						// we will try to transfer only if we should continue. If not it is because an error happened with another transfer, and we should not run and let the cleaner command work
 						if (ControllerServices.getInstance().getCell().isDataNetworkConnected()){
 							uploadReceiver = new CellBytesTransferedReceiver(false);
-							canUpload = true;						
+							canUpload = true;
 						}
 					}
 				}
@@ -136,12 +138,12 @@ public class CellUploader extends WirelessNetworkCommand{
 					parameters.setParameter(Parameter.CELL_CONTINUE_TRANSFERRING, false);
 				} finally{
 					parameters.setParameter(Parameter.CELL_TRANSFERRING, false);
-				}			
+				}
 			}
 
-		
+
 	}
-		
+
 	public boolean upload(IBytesTransferredReceiver rec) throws UploadingInterruptedException, UploadingFailException, TimeoutException{
 		return ControllerServices.getInstance().getWeb().uploadFile(server, script, rec, file, TimeoutConstants.CELL_UPLOAD_CONNECT_TIMEOUT, TimeoutConstants.CELL_UPLOAD_SOCKET_TIMEOUT, Timers.CELL_UPLOAD_RECEIVER_CALL_TIMER);
 	}

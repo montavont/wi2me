@@ -46,13 +46,19 @@ import android.util.Log;
  *
  */
 public class WifiScanner extends WirelessNetworkCommand{
-	
+
 	private static final String WIFI_OFF = "WIFI_OFF (Device Steady - Wifi interface off)";
 	private static final String WIFI_ON = "WIFI_ON (Device Moving - Wifi interface on)";
 
-	public WifiScanner() { }
-	public WifiScanner(HashMap<String, String> params) { }
-	
+	public WifiScanner() {
+		m_params = new HashMap<String, String>();
+		m_subclassName = getClass().getCanonicalName();
+	}
+	public WifiScanner(HashMap<String, String> params) {
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
+	}
+
 	@Override
 	public void initializeCommand(IParameterManager parameters) {
 		// DO NOTHING
@@ -67,7 +73,7 @@ public class WifiScanner extends WirelessNetworkCommand{
 	public void run(IParameterManager parameters) {
 		//To change the status of the application in Wi2MeUser
 		StatusService.getInstance().changeStatus("Scanning...");
-		
+
 		int scanInterval = (Integer) parameters.getParameter(Parameter.WIFI_SCAN_INTERVAL);
 		int maxTimeSteady = (Integer) parameters.getParameter(Parameter.NOT_MOVING_TIME);
 		try {
@@ -80,12 +86,12 @@ public class WifiScanner extends WirelessNetworkCommand{
 					//If we cannot enable the wifi interface we are unable to continue
 					throw new RuntimeException("FATAL ERROR: Wifi cannot be enabled, unable to continue");
 				}
-			}					
-			
+			}
+
 			Thread.sleep(scanInterval);
 
 			try{
-				List<ScanResult> results = this.scan();		
+				List<ScanResult> results = this.scan();
 				if (results != null)
 				{
 					WifiScanResult wifiScanResult = WifiScanResult.getNewWifiScanResult(TraceManager.getTrace(), getAPs(results));
@@ -102,7 +108,7 @@ public class WifiScanner extends WirelessNetworkCommand{
 			Log.d(getClass().getSimpleName(), "++ "+"Scanning Interrupted", e);
 		}
 	}
-	
+
 	private List<WifiAP> getAPs(List<ScanResult> results) {
 		List<WifiAP> ret = new ArrayList<WifiAP>();
 		for (ScanResult r : results){
@@ -114,5 +120,5 @@ public class WifiScanner extends WirelessNetworkCommand{
 	public List<ScanResult> scan() throws TimeoutException, InterruptedException{
 		return ControllerServices.getInstance().getWifi().scanSynchronously();
 	}
-	
+
 }

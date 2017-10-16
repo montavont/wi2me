@@ -66,12 +66,18 @@ public class WifiStayConnected extends WirelessNetworkCommand{
 	private long lastConnectivityCheckTimestamp = 0;
 	private boolean firstTimeNotification=true;
 
-	public WifiStayConnected(){}
-	public WifiStayConnected(HashMap<String, String> params){}
+	public WifiStayConnected() {
+		m_params = new HashMap<String, String>();
+		m_subclassName = getClass().getCanonicalName();
+	}
+	public WifiStayConnected(HashMap<String, String> params){
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
+		}
 
 	@Override
 	public void initializeCommand(IParameterManager parameters) {
-		this.parameters = parameters;		
+		this.parameters = parameters;
 	}
 
 	@Override
@@ -196,7 +202,7 @@ public class WifiStayConnected extends WirelessNetworkCommand{
 		StatusService.getInstance().changeStatus("Connected");
 		if (firstTimeNotification&&(Boolean)parameters.getParameter(Parameter.NOTIFY_WHEN_WIFI_CONNECTED)){
 			notifyConnection();
-		}	
+		}
 		//We don't notify every time, but only on the first check of connectivity.
 		firstTimeNotification=false;
 		return true;

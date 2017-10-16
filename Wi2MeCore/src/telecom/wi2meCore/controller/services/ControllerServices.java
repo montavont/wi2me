@@ -21,8 +21,8 @@ package telecom.wi2meCore.controller.services;
 
 import telecom.wi2meCore.controller.services.IAssetServices;
 import telecom.wi2meCore.controller.services.INotificationServices;
-import telecom.wi2meCore.controller.services.IThreadSynchronizingService;
 import telecom.wi2meCore.controller.services.ITimeService;
+import telecom.wi2meCore.controller.services.ble.IBLEService;
 import telecom.wi2meCore.controller.services.cell.ICellService;
 import telecom.wi2meCore.controller.services.communityNetworks.ICommunityNetworkService;
 import telecom.wi2meCore.controller.services.move.IMoveService;
@@ -37,34 +37,29 @@ import telecom.wi2meCore.controller.services.wifi.IWifiService;
  * @author XXX
  */
 public class ControllerServices implements IControllerServices {
-	
+
 	private static final String NULL_INSTANCE = "The service needs to be initialized first.";
-	
+
 	private ITimeService time;
+	private IBLEService ble;
 	private ICellService cell;
 	private IMoveService move;
 	private IWebService web;
 	private IWifiService wifi;
 	private IBatteryService battery;
 	private ILocationService location;
-	private IThreadSynchronizingService sync;
 	private IAssetServices assets;
 	private INotificationServices notification;
-	private ICommunityNetworkService community; 
-	
+	private ICommunityNetworkService community;
+
 	@Override
 	public INotificationServices getNotification() {
 		return notification;
 	}
-	
+
 	@Override
 	public IAssetServices getAssets() {
 		return assets;
-	}
-
-	@Override
-	public IThreadSynchronizingService getSync() {
-		return sync;
 	}
 
 	@Override
@@ -88,6 +83,11 @@ public class ControllerServices implements IControllerServices {
 	}
 
 	@Override
+	public IBLEService getBLE() {
+		return ble;
+	}
+
+	@Override
 	public IWifiService getWifi() {
 		return wifi;
 	}
@@ -108,14 +108,14 @@ public class ControllerServices implements IControllerServices {
 	}
 
 	private static ControllerServices instance;
-	
+
 	/**
 	 * The constructor is private.
 	 */
 	private ControllerServices(){
-		
+
 	}
-	
+
 	/**
 	 * Initialize the instance of ControllerServices and links all the services to it.
 	 * @param time
@@ -125,13 +125,12 @@ public class ControllerServices implements IControllerServices {
 	 * @param wifi
 	 * @param battery
 	 * @param location
-	 * @param sync
 	 * @param assets
 	 * @param notification
-	 * @param community 
+	 * @param community
 	 */
 	public static void initializeServices(ITimeService time, ICellService cell, IMoveService move, IWebService web, IWifiService wifi,
-			IBatteryService battery, ILocationService location, IThreadSynchronizingService sync, IAssetServices assets, INotificationServices notification, ICommunityNetworkService community){
+			IBatteryService battery, ILocationService location, IAssetServices assets, INotificationServices notification, ICommunityNetworkService community, IBLEService ble){
 		instance = new ControllerServices();
 		instance.time = time;
 		instance.cell = cell;
@@ -140,12 +139,12 @@ public class ControllerServices implements IControllerServices {
 		instance.wifi = wifi;
 		instance.battery = battery;
 		instance.location = location;
-		instance.sync = sync;
 		instance.assets = assets;
 		instance.notification = notification;
 		instance.community = community;
+		instance.ble = ble;
 	}
-	
+
 	/**
 	 * Gives the only instance of ControllerServices.
 	 * If it doesn't exist, it throws an exception (IllegalStateException).
@@ -166,7 +165,7 @@ public class ControllerServices implements IControllerServices {
 			instance.move.finalizeService();
 			instance.wifi.finalizeService();
 			instance.battery.finalizeService();
-			instance.location.finalizeService();			
+			instance.location.finalizeService();
 		}
 		instance = null;
 	}

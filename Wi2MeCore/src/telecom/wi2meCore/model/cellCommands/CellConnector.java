@@ -19,6 +19,8 @@
 
 package telecom.wi2meCore.model.cellCommands;
 
+
+import java.util.HashMap;
 import telecom.wi2meCore.controller.configuration.TimeoutConstants;
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.controller.services.cell.CellInfo;
@@ -51,11 +53,21 @@ public class CellConnector extends WirelessNetworkCommand{
 	private IParameterManager parameters;
 	private ICellularConnectionEventReceiver connectionEventReceiver;
 
+	public CellConnector() {
+		m_params = new HashMap<String, String>();
+		m_subclassName = getClass().getCanonicalName();
+	}
+	public CellConnector(HashMap<String, String> params)
+	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
+	}
+
 	@Override
 	public void initializeCommand(IParameterManager parameters) {
 		this.parameters = parameters;
 		this.connectionEventReceiver = new CellularConnectionEventReceiver();
-		ControllerServices.getInstance().getCell().registerDisconnectionReceiver(connectionEventReceiver);		
+		ControllerServices.getInstance().getCell().registerDisconnectionReceiver(connectionEventReceiver);
 	}
 
 	@Override
@@ -64,7 +76,7 @@ public class CellConnector extends WirelessNetworkCommand{
 	}
 
 	@Override
-	public void run(IParameterManager parameters) {	
+	public void run(IParameterManager parameters) {
 		if (!(Boolean)parameters.getParameter(Parameter.CONNECT_CELLULAR))
 			return; //if we are not meant to connect, we don't
 		CellInfo lastScannedCell = ControllerServices.getInstance().getCell().getLastScannedCell();
@@ -90,7 +102,7 @@ public class CellConnector extends WirelessNetworkCommand{
 
 					//we check that the cell did not change again to the previous one while we slept
 					if (!lastScannedCell.equals(ControllerServices.getInstance().getCell().getLastScannedCell()))
-						return;	
+						return;
 
 					//now we will try to connect, but just in case we check for a wifi attempt, as we have been sleeping
 					if ((Boolean)parameters.getParameter(Parameter.WIFI_CONNECTION_ATTEMPT))
@@ -98,7 +110,7 @@ public class CellConnector extends WirelessNetworkCommand{
 					else{
 						//Inform about the connection attempt
 						parameters.setParameter(Parameter.CELL_CONNECTION_ATTEMPT, true);
-						parameters.setParameter(Parameter.CELL_CONNECTING, true);						
+						parameters.setParameter(Parameter.CELL_CONNECTING, true);
 					}
 
 					connectionEventReceiver.receiveEvent(CONNECTING);
@@ -120,7 +132,7 @@ public class CellConnector extends WirelessNetworkCommand{
 						// If connection is interrupted, we finish here
 						connected = false;
 					}
-				}			
+				}
 			}
 			parameters.setParameter(Parameter.CELL_CONNECTION_ATTEMPT, connected);
 			parameters.setParameter(Parameter.CELL_CONNECTED, connected);
@@ -157,10 +169,10 @@ public class CellConnector extends WirelessNetworkCommand{
 					if (event.equals(DISCONNECTED)){
 						parameters.setParameter(Parameter.CELL_TRANSFERRING, false);
 						parameters.setParameter(Parameter.CELL_CONNECTING, false);
-						parameters.setParameter(Parameter.CELL_CONNECTED, false);	
+						parameters.setParameter(Parameter.CELL_CONNECTED, false);
 						parameters.setParameter(Parameter.CELL_CONTINUE_TRANSFERRING, false);
 						parameters.setParameter(Parameter.CELL_CONNECTION_ATTEMPT, false);
-					}				
+					}
 				}
 			}
 		}

@@ -38,7 +38,7 @@ import android.util.Log;
  */
 
 public class ShellPoppingCommand extends WirelessNetworkCommand{
-	
+
 
 
 	private static String COMMAND_KEY = "command";
@@ -47,6 +47,8 @@ public class ShellPoppingCommand extends WirelessNetworkCommand{
 
 	public ShellPoppingCommand(HashMap<String, String> params)
 	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
 		this.command = params.get(COMMAND_KEY);
 	}
 
@@ -68,7 +70,7 @@ public class ShellPoppingCommand extends WirelessNetworkCommand{
 		{
 			Process process = Runtime.getRuntime().exec("su");
 			osw = new OutputStreamWriter(process.getOutputStream());
-			String line;	
+			String line;
 
 			osw.write(command);
 			osw.flush();
@@ -79,5 +81,5 @@ public class ShellPoppingCommand extends WirelessNetworkCommand{
 			Log.e(getClass().getSimpleName(), "Error popping command : " + command + " "+ e.getMessage(), e);
 		}
 	}
-	
+
 }

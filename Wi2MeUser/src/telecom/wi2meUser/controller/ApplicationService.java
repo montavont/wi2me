@@ -32,12 +32,11 @@ import telecom.wi2meUser.R;
 import telecom.wi2meUser.Wi2MeUserActivity;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.controller.services.AssetServices;
-import telecom.wi2meCore.controller.services.CellThreadContainer;
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.controller.services.IControllerServices;
 import telecom.wi2meCore.controller.services.NotificationServices;
-import telecom.wi2meCore.controller.services.ThreadSynchronizingService;
 import telecom.wi2meCore.controller.services.TimeService;
+import telecom.wi2meCore.controller.services.ble.BLEService;
 import telecom.wi2meCore.controller.services.cell.CellService;
 import telecom.wi2meCore.controller.services.communityNetworks.CommunityNetworkService;
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
@@ -101,7 +100,6 @@ public class ApplicationService  extends Service {
 	Flag wifiWorkingFlag;
 	Flag cellWorkingFlag;
 	int startId;
-	CellThreadContainer cellThreadContainer;
 	String configuration;
 	Context context;
 	boolean wasCellularConnected;
@@ -123,7 +121,6 @@ public class ApplicationService  extends Service {
 
 		super.onCreate();
 
-		cellThreadContainer = new CellThreadContainer();
 		context = this;
 
 		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
@@ -141,10 +138,10 @@ public class ApplicationService  extends Service {
 							new WifiService(this),
 							new BatteryService(this),
 							new LocationService(this),
-							new ThreadSynchronizingService(cellThreadContainer),
 							new AssetServices(this),
 							new NotificationServices(this),
-							new CommunityNetworkService(this)
+							new CommunityNetworkService(this),
+							new BLEService(this)
 );
 
 		//binder also keeps the last info of the log
@@ -185,7 +182,6 @@ public class ApplicationService  extends Service {
 				cellCommandLooper.loop(parameters);
 			}
 		};
-		cellThreadContainer.cellThread = cellThread;
 
 		Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), "STARTING.CONFIGURATION:" + configuration));
 

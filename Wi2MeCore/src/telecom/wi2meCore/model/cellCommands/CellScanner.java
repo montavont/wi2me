@@ -44,8 +44,14 @@ import android.util.Log;
  */
 public class CellScanner extends WirelessNetworkCommand{
 
-	public CellScanner() { }
-	public CellScanner(HashMap<String, String> params) { }
+	public CellScanner() {
+		m_params = new HashMap<String, String>();
+		m_subclassName = getClass().getCanonicalName();
+	}
+	public CellScanner(HashMap<String, String> params) { 
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
+		}
 
 
 	@Override
@@ -60,26 +66,26 @@ public class CellScanner extends WirelessNetworkCommand{
 	public void run(IParameterManager parameters) {
 		CellInfo cellInfo = null;
 		List<Cell> scannedCells = new ArrayList<Cell>();
-		
+
 		try {
 			parameters.setParameter(Parameter.CELL_SCANNING, true);
 			cellInfo = readBeacon();
 			parameters.setParameter(Parameter.CELL_SCANNING, false);
 			Cell cell = Cell.getNewCellFromCellInfo(cellInfo);//current cell
 			scannedCells.add(cell);
-			for (NeighboringCellInfo n : cellInfo.neighbors){				
+			for (NeighboringCellInfo n : cellInfo.neighbors){
 				scannedCells.add(Cell.getNewCell(null, null, CellInfo.getNetworkType(n.getNetworkType()), null, n.getCid(), n.getLac(), CellInfo.getLeveldBm(n.getRssi()), false));
 			}
 			CellularScanResult result = CellularScanResult.getNewCellularScanResult(TraceManager.getTrace(), scannedCells);
 			Logger.getInstance().log(result);
-			
+
 		} catch (InterruptedException e) {
 			parameters.setParameter(Parameter.CELL_SCANNING, false);
 			// if we are interrupted, we finish this scan
 			Log.d(getClass().getSimpleName(), "++ "+"Scanning Interrupted", e);
 		}
 	}
-	
+
 	public CellInfo readBeacon() throws InterruptedException{
 		return ControllerServices.getInstance().getCell().scan();
 	}

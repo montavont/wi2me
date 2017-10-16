@@ -1,0 +1,7 @@
+{
+	"ble":{
+		"command":{
+			"module":"telecom.wi2meCore.model.bluetoothCommands.BLEDummy"
+		}
+	}
+}

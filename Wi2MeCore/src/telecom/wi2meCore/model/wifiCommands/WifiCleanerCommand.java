@@ -20,7 +20,6 @@
 package telecom.wi2meCore.model.wifiCommands;
 
 import java.util.HashMap;
-
 import android.util.Log;
 
 import telecom.wi2meCore.controller.services.ControllerServices;
@@ -44,8 +43,15 @@ import telecom.wi2meCore.model.entities.ExternalEvent;
 public class WifiCleanerCommand extends CleanerCommand{
 	private static final String WIFI_CONNECTION_FINISHED_EVENT = "WIFI_DISCONNECTED";
 
-	public WifiCleanerCommand() { }
-	public WifiCleanerCommand(HashMap<String, String> params) { }
+	public WifiCleanerCommand() {
+		m_params = new HashMap<String, String>();
+		m_subclassName = getClass().getCanonicalName();
+	}
+	public WifiCleanerCommand(HashMap<String, String> params)
+	{
+		m_params = params;
+		m_subclassName = getClass().getCanonicalName();
+	}
 
 	@Override
 	public void clean(IParameterManager parameters){
@@ -116,10 +122,5 @@ public class WifiCleanerCommand extends CleanerCommand{
 
 		parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, false); //wifi connection attempt is over
 		Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), WIFI_CONNECTION_FINISHED_EVENT));
-		//We interrupt the cell thread if it is scanning, so that the connector can decide if to try new connection (with current cell) or not
-		if ((Boolean)parameters.getParameter(Parameter.CELL_SCANNING))
-			ControllerServices.getInstance().getSync().interruptCellThread();
-		/*------*/
-
 	}
 }

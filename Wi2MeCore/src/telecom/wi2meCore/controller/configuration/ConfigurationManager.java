@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.Constructor;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import telecom.wi2meCore.model.entities.User;
+import telecom.wi2meCore.model.IWirelessNetworkCommandLooper;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.LooperCommand;
 import telecom.wi2meCore.model.parameters.Parameter;
@@ -46,6 +48,8 @@ import telecom.wi2meCore.controller.configuration.CommunityNetworks;
 import telecom.wi2meCore.controller.services.communityNetworks.ICommunityNetworkService;
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.model.CryptoUtils;
+import telecom.wi2meCore.model.WirelessNetworkCommandLooper;
+import telecom.wi2meCore.model.WirelessNetworkCommand;
 
 
 import android.content.Context;
@@ -349,10 +353,10 @@ public class ConfigurationManager
 				File outFile = new File(dir.getPath() + "/" + assetFile.getName());
 				if(!outFile.exists())
 				{
-					List<LooperCommand> commands = readCommandFile(ControllerServices.getInstance().getAssets().getStream(ASSET_COMMAND_LOOPS + "/" + path));
-					if (commands.size() > 0)
+    				HashMap<String, IWirelessNetworkCommandLooper> loopers = readCommandFile(ControllerServices.getInstance().getAssets().getStream(ASSET_COMMAND_LOOPS + "/" + path));
+					if (loopers.size() > 0)
 					{
-						saveCommandFile(commands, outFile.getPath());
+						saveCommandFile(loopers, outFile.getPath());
 					}
 				}
 			}
@@ -364,42 +368,39 @@ public class ConfigurationManager
 	}
 
 
-	public static List<LooperCommand> readCommandFile(InputStream stream)
+    public static HashMap<String, IWirelessNetworkCommandLooper> readCommandFile(InputStream stream) throws IOException
 	{
-		List<LooperCommand> retval = new ArrayList<LooperCommand>();
-		try
+    	HashMap<String, IWirelessNetworkCommandLooper> retval = new HashMap<String, IWirelessNetworkCommandLooper>();
+		JsonReader reader = new JsonReader(new InputStreamReader(stream));
+		reader.beginObject();
+		while (reader.hasNext())
 		{
-			JsonReader reader = new JsonReader(new InputStreamReader(stream));
-
+			String LooperName = reader.nextName();
+    		Log.d("ConfigurationManager", "++ " + " Hellfest  " + LooperName);
 			reader.beginObject();
 			while (reader.hasNext())
 			{
-				String topKey = reader.nextName();
-				if (topKey.equals("command"))
+				String looperContentKey = reader.nextName();
+				if (looperContentKey.equals("command"))
 				{
+					String commandModule = "";
+					HashMap<String, String> commandParams = new HashMap<String, String>();
 					reader.beginObject();
-					LooperCommand commandParam = new LooperCommand();
 					while (reader.hasNext())
 					{
 						String key = reader.nextName();
-						if (key.equals("name"))
+    					Log.d("ConfigurationManager", "++ " + " Hellfest  12 " + key);
+						if (key.equals("module"))
 						{
-		 						commandParam.name = reader.nextString();
+         						commandModule = reader.nextString();
+    							Log.d("ConfigurationManager", "++ " + " Hellfest  13 " + commandModule);
 						}
-						else if (key.equals("family"))
-						{
-							commandParam.family = reader.nextString();
-						}
-						else if (key.equals("module"))
-						{
-		 						commandParam.module = reader.nextString();
-						}
-	   						else if (key.equals("params"))
+       					else if (key.equals("params"))
 						{
 							reader.beginObject();
 							while (reader.hasNext())
 							{
-								commandParam.parameters.put(reader.nextName(), reader.nextString());
+								commandParams.put(reader.nextName(), reader.nextString());
 							}
 							reader.endObject();
 						}
@@ -409,54 +410,77 @@ public class ConfigurationManager
 						}
 					}
 					reader.endObject();
-					if (commandParam.name.length() > 0)
+					try
 					{
-						retval.add(commandParam);
+						if (commandModule.length() > 0 && LooperName.length() > 0)
+						{
+							Class<?> clazz = Class.forName(commandModule);
+							Constructor<?> ctor = clazz.getConstructor(HashMap.class);
+							if (!retval.containsKey(LooperName))
+							{
+								retval.put(LooperName, new WirelessNetworkCommandLooper());
+							}
+							retval.get(LooperName).addCommand((WirelessNetworkCommand) ctor.newInstance(new Object[] {commandParams}));
+						}
+					}
+					catch (ClassNotFoundException e)
+					{
+    						Log.e("ConfigurationManager", "++ " + "ClassNotFoundException parsing json configuration file: "+e.getMessage());
+					}
+					catch (NoSuchMethodException e)
+					{
+    						Log.e("ConfigurationManager", "++ " + "NoSuchMethodException parsing json configuration file: "+e.getMessage());
+					}
+					catch (InstantiationException e)
+					{
+    						Log.e("ConfigurationManager", "++ " + "InstantiationException parsing json configuration file: "+e.getMessage());
+					}
+					catch (IllegalAccessException e)
+					{
+    						Log.e("ConfigurationManager", "++ " + "IllegalAccessException parsing json configuration file: "+e.getMessage());
+					}
+					catch (java.lang.reflect.InvocationTargetException e)
+					{
+    					Log.e("ConfigurationManager", "++ " + "InvocationTargetException parsing json configuration file: "+e.getMessage());
+						e.printStackTrace();
 					}
 				}
 			}
 			reader.endObject();
-			reader.close();
 		}
-		catch (IOException e )
-		{
-			Log.e("ConfigurationManager", "++ " + "IOException trying to access configuration file: " +e.getMessage());
-		}
+		reader.endObject();
 
 		return retval;
 
 	}
 
-	public static void saveCommandFile(List<LooperCommand> commands, String path)
+	public static void saveCommandFile(HashMap<String, IWirelessNetworkCommandLooper> loopers, String path) throws IOException
 	{
 		try
 		{
 
-		    	JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"));
+	    	JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"));
 			writer.setIndent("  ");
 			writer.beginObject();
 
-			for (LooperCommand command : commands)
+			for (String looperName : loopers.keySet())
 			{
-				if (command.name.length() > 0)
+				writer.name(looperName);
+				writer.beginObject();
+				for (WirelessNetworkCommand command : loopers.get(looperName).getCommands())
 				{
+
+					HashMap<String, String> parameters = command.getParameters();
+					String module = command.getSubclassName();
+
 					writer.name("command");
 					writer.beginObject();
-					writer.name("name").value(command.name);
-
-					if (command.module.length() > 0)
-					{
-						writer.name("module").value(command.module);
-					}
-					if (command.family.length() > 0)
-					{
-						writer.name("family").value(command.family);
-					}
-					if (command.parameters.size() > 0)
+					writer.name("module").value(module);
+					if (parameters.size() > 0)
 					{
 						writer.name("params");
 						writer.beginObject();
-						for (Entry<String, String> param : command.parameters.entrySet())
+						for (Entry<String, String> param : parameters.entrySet())
 						{
 							writer.name(param.getKey()).value(param.getValue());
 						}
@@ -464,6 +488,7 @@ public class ConfigurationManager
 					}
 					writer.endObject();
 				}
+				writer.endObject();
 			}
 			writer.endObject();
 			writer.close();
