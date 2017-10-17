@@ -19,11 +19,11 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 import telecom.wi2meCore.model.entities.WifiAP;
 
 public class WifiPing extends Trace{
-	
+
 	public static final String TABLE_NAME = "WifiPing";
 	public static final String IP = "pingedIp";
 	public static final String SENT = "packetsSent";
@@ -32,7 +32,7 @@ public class WifiPing extends Trace{
 	public static final String RTT_MAX = "rttMax";
 	public static final String RTT_AVG = "rttAvg";
 	public static final String RTT_MDEV = "rttMdev";
-	
+
 	private String ip;
 	private int sent;
 	private int received;
@@ -54,7 +54,7 @@ public class WifiPing extends Trace{
 		this.rttMdev = rttMdev;
 		this.connectionTo = connectionTo;
 	}
-	
+
 
 	public String getPingedIp() {
 		return ip;
@@ -83,11 +83,11 @@ public class WifiPing extends Trace{
 	public float getRttMdev() {
 		return rttMdev;
 	}
-	
+
 	public WifiAP getConnectionTo() {
 		return connectionTo;
 	}
-	
+
 	public static WifiPing getNewWifiPing(Trace trace, String ip, int sent, int received, float rttMin, float rttMax,
 			float rttAvg, float rttMdev, WifiAP connectionTo){
 		return new WifiPing(trace, ip, sent, received, rttMin, rttMax, rttAvg, rttMdev, connectionTo);
@@ -99,7 +99,7 @@ public class WifiPing extends Trace{
 	}
 
 	private static final String SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "WIFI_PING:" + ip + SEPARATOR + sent + SEPARATOR + received + SEPARATOR
 		 + rttMin + SEPARATOR  + rttMax + SEPARATOR + rttAvg + SEPARATOR + rttMdev + SEPARATOR + connectionTo.toString();

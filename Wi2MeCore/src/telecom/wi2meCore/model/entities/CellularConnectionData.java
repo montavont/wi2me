@@ -19,14 +19,14 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 import telecom.wi2meCore.model.entities.Cell;
 
 
 public class CellularConnectionData extends Trace{
-	
+
 	public static final String TABLE_NAME = "CellularConnectionData";
-	
+
 	private Cell connectedTo;
 	private ConnectionData connectionData;
 
@@ -39,17 +39,17 @@ public class CellularConnectionData extends Trace{
 	public Cell getConnectedTo() {
 		return connectedTo;
 	}
-	
+
 	public ConnectionData getConnectionData() {
 		return connectionData;
 	}
-		
+
 	public static CellularConnectionData getNewCellularConnectionData(Trace trace, Cell connectedTo, ConnectionData connectionData){
 		return new CellularConnectionData(trace, connectedTo, connectionData);
 	}
-	
+
 	private static final String SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "CELL_CONNECTION_DATA:" + connectionData.toString() + SEPARATOR + connectedTo.toString();
 	}

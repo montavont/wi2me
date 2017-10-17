@@ -85,8 +85,6 @@ import android.util.JsonReader;
 import android.util.Log;
 import android.widget.Toast;
 
-
-
 public class ApplicationService extends Service {
 
 	private static String ASSETS_FILES_DIRECTORY = "files/";
@@ -121,6 +119,8 @@ public class ApplicationService extends Service {
     		parameters = ParameterFactory.getNewParameterManager();
 
     		binder = new ServiceBinder(parameters);
+
+			TextTraceHelper.initialize(context);
 
     		//binder also keeps the last info of the log
     		Logger.getInstance().addObserver(binder);
@@ -182,13 +182,14 @@ public class ApplicationService extends Service {
 
 	private void startThreads()
 	{
+
+		ControllerServices.getInstance().getLocation().monitorLocation();
+
 		for (String looperKey:WirelessLoopers.keySet())
 		{
 			IWirelessNetworkCommandLooper looper = WirelessLoopers.get(looperKey);
 			WirelessThreads.put(looperKey, new WirelessLooperThread(looper));
 		}
-
-
 
 		try
 		{
@@ -268,8 +269,7 @@ public class ApplicationService extends Service {
 
 	private void stopThreads()
 	{
-		//Stop
-	    	//we also interrupt what is being done, as it may be sleeping to scan, or downloading something
+		ControllerServices.getInstance().getLocation().unMonitorLocation();
 
 		for (String looperKey:WirelessLoopers.keySet())
 		{
@@ -316,12 +316,13 @@ public class ApplicationService extends Service {
     private void showNotification() {
 
         // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(R.drawable.icon, "Wi2Me service running",
-                System.currentTimeMillis());
+        Notification notification = new Notification(R.drawable.icon, "Wi2Me service running", System.currentTimeMillis());
+		notification.category = Notification.CATEGORY_SERVICE;
 
         // The PendingIntent to launch our activity if the user selects this notification
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 new Intent(this, Wi2MeRecherche.class), 0);
+		notification.contentIntent = contentIntent;
 
         // Set the info for the views that show in the notification panel.
         //notification.setLatestEventInfo(this, "Wi2Me Xplorer", "Select to open application", contentIntent);
@@ -392,7 +393,6 @@ public class ApplicationService extends Service {
 
 		public void start()
 		{
-			TextTraceHelper.initialize(context);
 		    wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
 	        cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
 
@@ -412,82 +412,6 @@ public class ApplicationService extends Service {
 			try
 			{
 				WirelessLoopers = ConfigurationManager.readCommandFile(new FileInputStream((String)parameters.getParameter(Parameter.COMMAND_FILE)));
-				/*
-				JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream((String)parameters.getParameter(Parameter.COMMAND_FILE))));
-				reader.beginObject();
-				while (reader.hasNext())
-				{
-					String LooperName = reader.nextName();
-					reader.beginObject();
-					while (reader.hasNext())
-					{
-						String looperContentKey = reader.nextName();
-						if (looperContentKey.equals("command"))
-						{
-							String commandModule = "";
-							HashMap<String, String> commandParams = new HashMap<String, String>();
-							while (reader.hasNext())
-							{
-								String key = reader.nextName();
-								if (key.equals("module"))
-								{
-         								commandModule = reader.nextString();
-								}
-	       						else if (key.equals("params"))
-								{
-									reader.beginObject();
-									while (reader.hasNext())
-									{
-										commandParams.put(reader.nextName(), reader.nextString());
-									}
-									reader.endObject();
-								}
-								else
-								{
-									reader.skipValue();
-								}
-							}
-							reader.endObject();
-							try
-							{
-								if (commandModule.length() > 0 && LooperName.length() > 0)
-								{
-									Class<?> clazz = Class.forName(commandModule);
-									Constructor<?> ctor = clazz.getConstructor(HashMap.class);
-									if (!WirelessLoopers.containsKey(LooperName))
-									{
-										WirelessLoopers.put(LooperName, new WirelessNetworkCommandLooper());
-									}
-									WirelessLoopers.get(LooperName).addCommand((WirelessNetworkCommand) ctor.newInstance(new Object[] {commandParams}));
-								}
-							}
-							catch (ClassNotFoundException e)
-							{
-    								Log.e(getClass().getSimpleName(), "++ " + "ClassNotFoundException parsing json configuration file: "+e.getMessage());
-							}
-							catch (NoSuchMethodException e)
-							{
-    								Log.e(getClass().getSimpleName(), "++ " + "NoSuchMethodException parsing json configuration file: "+e.getMessage());
-							}
-							catch (InstantiationException e)
-							{
-    								Log.e(getClass().getSimpleName(), "++ " + "InstantiationException parsing json configuration file: "+e.getMessage());
-							}
-							catch (IllegalAccessException e)
-							{
-    								Log.e(getClass().getSimpleName(), "++ " + "IllegalAccessException parsing json configuration file: "+e.getMessage());
-							}
-							catch (java.lang.reflect.InvocationTargetException e)
-							{
-    							Log.e(getClass().getSimpleName(), "++ " + "InvocationTargetException parsing json configuration file: "+e.getMessage());
-								e.printStackTrace();
-							}
-						}
-					}
-					reader.endObject();
-				}
-				reader.endObject();
-				*/
 			}
 			catch (java.io.FileNotFoundException e )
 			{

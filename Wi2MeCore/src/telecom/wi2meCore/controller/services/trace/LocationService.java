@@ -23,11 +23,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
+
+import telecom.wi2meCore.model.Logger;
+import telecom.wi2meCore.model.TraceManager;
+import telecom.wi2meCore.model.entities.LocationEvent;
+import telecom.wi2meCore.model.entities.Trace;
+import telecom.wi2meCore.controller.services.ControllerServices;
+
 
 public class LocationService implements ILocationService{
 
@@ -35,73 +43,53 @@ public class LocationService implements ILocationService{
 	private static final int MAX_METERS = 0;
 
 	private LocationManager locationManager;
-	private List<LocationListener> locationListeners;
+	private ServiceLocationListener listener;
+	private Context context;
+	private Location currentLocation;
 
 	public LocationService(Context context){
 		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		locationListeners = new ArrayList<LocationListener>();
-	}
-
-	@Override
-	public void registerLocationReceiver(ILocationReceiver receiver, int timeInterval, int maxMeters) {
-		synchronized (this){
-			LocationListener listener = new ServiceLocationListener(receiver);
-			locationListeners.add(listener);
-			locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, timeInterval, maxMeters, listener);
-		}
-	}
-
-	@Override
-	public void registerLocationReceiver(ILocationReceiver receiver) {
-		registerLocationReceiver(receiver, TIME_INTERVAL, MAX_METERS);
+		listener = new ServiceLocationListener();
+		context = context;
 	}
 
 
 	@Override
-	public void registerNetworkLocationReceiver(ILocationReceiver receiver) {
-		synchronized (this){
-			LocationListener listener = new ServiceLocationListener(receiver);
-			locationListeners.add(listener);
+	public void monitorLocation()
+	{
+		Criteria criteria = new Criteria();
+		criteria.setAccuracy(Criteria.ACCURACY_FINE);
+		criteria.setAltitudeRequired(true);
+		criteria.setSpeedRequired(true);
 
-			if (locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER))
-			{
-				locationManager.requestLocationUpdates( LocationManager.NETWORK_PROVIDER, TIME_INTERVAL, MAX_METERS, listener);
-			}
-			else
-			{
-				locationManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, TIME_INTERVAL, MAX_METERS, listener);
-			}
-		}
+		locationManager.requestLocationUpdates( TIME_INTERVAL, MAX_METERS, criteria, listener, null);
+
 	}
 
 	@Override
-	public void unregisterLocationReceiver(ILocationReceiver receiver) {
-		synchronized (this){
-			try{
-				int index = locationListeners.indexOf(new ServiceLocationListener(receiver));
-				if (index != -1){ //listener found
-					LocationListener toUnregister = locationListeners.remove(index);
-					locationManager.removeUpdates(toUnregister);
-				}else{
-					Log.w(getClass().getSimpleName(), "++ "+"Location Listener to unregister, not registered.");
-				}
-
-	    	}catch(Exception e){
-	    		Log.e("Location", "Unregistering Location Receiver " + e.getMessage(), e);
-	    	}
-		}
-
+	public void unMonitorLocation()
+	{
+		locationManager.removeUpdates(listener);
 	}
-
 
 	@Override
 	public void finalizeService() {
-		//if there is any listener that was forgotten to remove, this will do
-		for (LocationListener l : this.locationListeners){
-			locationManager.removeUpdates(l);
-		}
+		unMonitorLocation();
 	}
 
+	@Override
+	public synchronized Location getLocation()
+	{
+		return currentLocation;
+	}
+
+	@Override
+	public void setLocation(Location location)
+	{
+		synchronized(this){
+			currentLocation = location;
+		}
+	}
 
 	@Override
 	public boolean isGPSEnabled() {
@@ -115,30 +103,15 @@ public class LocationService implements ILocationService{
 
 	private class ServiceLocationListener implements LocationListener {
 
-		private ILocationReceiver receiver;
-
-		public ServiceLocationListener(ILocationReceiver receiver){
-			this.receiver = receiver;
-		}
-
-		@Override
-		public boolean equals(Object o) {
-			ServiceLocationListener other = (ServiceLocationListener) o;
-			return receiver == other.receiver;
+		public ServiceLocationListener(){//ILocationReceiver receiver){
+			//this.receiver = receiver;
 		}
 
 		@Override
 		public void onLocationChanged(Location location) {
-			/*
-			  double alt = location.getAltitude();
-	          double lat = location.getLatitude();
-	          double lng = location.getLongitude();
-	          float speed = location.getSpeed();
-	          float acc = location.getAccuracy();
-	          float bear = location.getBearing();
-	          String prov = location.getProvider();
-	          */
-	          this.receiver.receiveLocation(location);
+
+			  Logger.getInstance().log(LocationEvent.getNewLocationEvent(TraceManager.getTrace() ,location));
+			  ControllerServices.getInstance().getLocation().setLocation(location);
 		}
 
 		@Override

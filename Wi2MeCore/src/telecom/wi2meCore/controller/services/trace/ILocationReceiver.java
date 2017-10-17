@@ -22,7 +22,7 @@ package telecom.wi2meCore.controller.services.trace;
 import android.location.Location;
 
 public interface ILocationReceiver {
-	
+
 	public void receiveLocation(Location location);
 
 }

@@ -19,15 +19,15 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 import telecom.wi2meCore.model.entities.WifiAP;
 
 
 public class WifiConnectionEvent extends Trace{
-	
+
 	public static final String TABLE_NAME = "WifiConnectionEvent";
 	public static final String EVENT = "event";
-	
+
 	private String event;
 	private WifiAP connectionTo;
 
@@ -36,7 +36,7 @@ public class WifiConnectionEvent extends Trace{
 		this.event = event;
 		this.connectionTo = connectionTo;
 	}
-	
+
 	public String getEvent() {
 		return event;
 	}
@@ -44,7 +44,7 @@ public class WifiConnectionEvent extends Trace{
 	public WifiAP getConnectionTo() {
 		return connectionTo;
 	}
-	
+
 	public static WifiConnectionEvent getNewWifiConnectionEvent(Trace trace, String event, WifiAP connectionTo)
 	{
 		WifiConnectionEvent retval = null;
@@ -54,9 +54,9 @@ public class WifiConnectionEvent extends Trace{
 		}
 		return retval;
 	}
-	
+
 	private static final String AP_SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "WIFI_CONN_EVENT:" + event + AP_SEPARATOR + connectionTo.toString();
 	}

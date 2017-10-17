@@ -29,13 +29,13 @@ import java.util.concurrent.Semaphore;
 import java.util.Date;
 import java.util.List;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper;
 import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.persistance.ITraceIterator;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.model.entities.Trace;
 import android.os.Environment;
 import android.util.Log;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 
 public class Logger extends ILogger
@@ -97,9 +97,9 @@ public class Logger extends ILogger
 				case WIFI_SNIFFER_DATA:
 				case WIFI_CONNECTION_INFO:
 				case BYTES_PER_UID:
-					Log.e(getClass().getSimpleName(), "++ " + "TTRTT trace file scanrRes in ");
-
 					type = Type.WIFI;
+				case LOCATION_EVENT:
+					type = Type.LOC;
 					break;
 			}
 			this.setChanged();
@@ -147,7 +147,6 @@ public class Logger extends ILogger
 				@Override
 				public void run()
 				{
-					//DatabaseHelper.getDatabaseHelper().saveAllTraces(toRegister);
 					TextTraceHelper.getTextTraceHelper().saveAllTraces(toRegister);
 					toRegister.clear();
 					dbSema.release();
@@ -159,7 +158,8 @@ public class Logger extends ILogger
 
 	public enum Type{
 		CELL,
-		WIFI
+		WIFI,
+		LOC,
 	}
 
 	public class TraceString{

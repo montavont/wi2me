@@ -53,7 +53,7 @@ import org.jibble.simpleftp.SimpleFTP;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.controller.services.StatusService;
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper;
+import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.wifi.APStatusService;
 import telecom.wi2meCore.model.Logger.TraceString;
 import telecom.wi2meCore.model.entities.CommunityNetworkConnectionEvent;
@@ -334,20 +334,10 @@ public class Wi2MeUserActivity extends Activity {
 
 	/** Function called when MenuItem Upload is chosen*/
 	private void exportDatabase() {
-		if (!DatabaseHelper.databaseFileExists(packageName)){//if we do not have traces there is nothing to upload
+		if (!TextTraceHelper.dataAvailable()){//if we do not have traces there is nothing to upload
 			Toast.makeText(context, NOTHING_TO_UPLOAD_MESSAGE, Toast.LENGTH_LONG).show();
 			return;
 		}
-		/*Log.d(getClass().getSimpleName(), "++ " + "Droidwall option run");
-		if (isDroidwallEnabled()){// must be disabled
-			enableOrDisableDroidwall(false);
-			return;
-		}*/
-		/*if (!checkWifiConnection()){
-			//wifi.setWifiEnabled(false); //let the user turn it on with wifi settings
-			openWifiSettings();
-			return;
-		}*/
 		runExport();
 	}
 
@@ -363,7 +353,7 @@ public class Wi2MeUserActivity extends Activity {
 			String msg;
 			public void run(){
 				/*msg = Logger.exportDatabaseToTextFile();*/
-				String compressedFileName = DatabaseHelper.DATABASE_NAME +"_"+ deviceId +"_"+ Calendar.getInstance().getTimeInMillis() + ".db.gz";
+				String compressedFileName = TextTraceHelper.TRACEFILE_NAME +"_"+ deviceId +"_"+ Calendar.getInstance().getTimeInMillis() + ".db.gz";
 
 				String directory = Environment.getExternalStorageDirectory() +  ConfigurationManager.WI2ME_DIRECTORY+"traces";
 
@@ -377,7 +367,7 @@ public class Wi2MeUserActivity extends Activity {
 
 				boolean successful = compressFile(Environment.getDataDirectory() +
 						"/data/" + packageName + "/databases/" +
-						DatabaseHelper.DATABASE_NAME, compressedFilePath);
+						TextTraceHelper.TRACEFILE_NAME, compressedFilePath);
 				if (successful){
 					msg = "Database compression successful!";
 					if (sendFileFTP(compressedFilePath, ConfigurationManager.REMOTE_UPLOAD_DIRECTORY + compressedFileName,
@@ -387,20 +377,11 @@ public class Wi2MeUserActivity extends Activity {
 						//erase the temporary compressed file
 
 						File fileUpload = new File(compressedFilePath);
-						/*
-						if (fileUpload.exists()){
-							fileUpload.delete();
-						}
-						 */
 
-
-						if (!DatabaseHelper.isInitialized()){
-							DatabaseHelper.initialize(context);
-						}
 						Log.d(getClass().getSimpleName(), "++ " + "DATABASE About to reset tables");
-						DatabaseHelper.getDatabaseHelper().resetTables();
+						TextTraceHelper.getTextTraceHelper().resetTables();
 						Log.d(getClass().getSimpleName(), "++ " + "DATABASE New tables ready");
-						DatabaseHelper.getDatabaseHelper().closeDatabase();
+						TextTraceHelper.getTextTraceHelper().closeDatabase();
 						Log.d(getClass().getSimpleName(), "++ " + "DATABASE closed");
 
 
@@ -411,7 +392,7 @@ public class Wi2MeUserActivity extends Activity {
 
 					Log.d(getClass().getSimpleName(), "++ " + "DATABASE About to be reset");
 					//erase the content of this already sent (or not) database
-					DatabaseHelper.resetDatabase(packageName);
+					TextTraceHelper.getTextTraceHelper().resetTables();
 					Log.d(getClass().getSimpleName(), "++ " + "DATABASE Reset OK");
 
 				}else{

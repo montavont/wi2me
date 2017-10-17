@@ -19,14 +19,14 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 import telecom.wi2meCore.model.entities.WifiAP;
 
 
 public class WifiConnectionData extends Trace{
-	
+
 	public static final String TABLE_NAME = "WifiConnectionData";
-	
+
 	private WifiAP connectedTo;
 	private ConnectionData connectionData;
 
@@ -35,21 +35,21 @@ public class WifiConnectionData extends Trace{
 		this.connectedTo = connectedTo;
 		this.connectionData = connectionData;
 	}
-	
+
 	public ConnectionData getConnectionData(){
 		return connectionData;
 	}
-	
+
 	public WifiAP getConnectedTo() {
 		return connectedTo;
 	}
-	
+
 	public static WifiConnectionData getNewWifiConnectionData(Trace trace, WifiAP connectedTo, ConnectionData connectionData){
 		return new WifiConnectionData(trace, connectedTo, connectionData);
 	}
-	
+
 	private static final String SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "WIFI_CONNECTION_DATA:" + connectionData.toString() + SEPARATOR + connectedTo.toString();
 	}

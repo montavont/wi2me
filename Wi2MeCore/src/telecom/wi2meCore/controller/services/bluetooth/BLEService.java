@@ -122,7 +122,7 @@ public class BLEService implements IBLEService{
 
 
 	@Override
-	public boolean writeCharacteristic()
+	public boolean writeCharacteristic(String charValue)
 	{
 
 		durtyBool = false;
@@ -148,23 +148,18 @@ public class BLEService implements IBLEService{
 			}
 		}
 
-        //BluetoothGattService service = new BluetoothGattService(UUID_LOPY, BluetoothGattService.SERVICE_TYPE_PRIMARY);
         BluetoothGattService service = mBluetoothGatt.getService(UUID_LOPY);
-        Log.d("BLE Dummy", "  serve size "  + mBluetoothGatt.getServices().size());
         if (service == null) {
             Log.e("BLE Dummy", "service not found!");
             return false;
         }
-        Log.d("BLE Dummy", "chararctetts size "  + service.getCharacteristics().size());
         BluetoothGattCharacteristic charac = service.getCharacteristic(UUID_CHARACTERISTIC);
         if (charac == null) {
             Log.e("BLE Dummy", "char not found!");
             return false;
         }
 
-        byte[] value = new byte[1];
-        value[0] = (byte) (21 & 0xFF);
-        charac.setValue(value);
+        charac.setValue(charValue);
         boolean status = mBluetoothGatt.writeCharacteristic(charac);
         return status;
 	}

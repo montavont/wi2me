@@ -19,35 +19,35 @@
 
 package telecom.wi2meCore.model.entities;
 
+import android.location.Location;
+
 import telecom.wi2meCore.model.entities.Trace.TraceType;
 
+public class LocationEvent extends Trace{
 
-public class ExternalEvent extends Trace{
+	public static final String TABLE_NAME = "LocationEvent";
+	private Location location;
 
-	public static final String TABLE_NAME = "ExternalEvent";
-	public static final String EVENT = "event";
-
-	private String event;
-
-	protected ExternalEvent(Trace trace, String event){
+	protected LocationEvent(Trace trace, Location location){
 		Trace.copy(trace, this);
-		this.event = event;
+		this.location = location;
 	}
 
-	public String getEvent() {
-		return event;
+	public Location getLocation() {
+		return location;
 	}
 
-	public static ExternalEvent getNewExternalEvent(Trace trace, String event){
-		return new ExternalEvent(trace, event);
+	public static LocationEvent getNewLocationEvent(Trace trace, Location location){
+		return new LocationEvent(trace, location);
 	}
 
 	public String toString(){
-		return super.toString() + "EXTERNAL_EVENT:" + event;
+		return super.toString() + "LOCATION_EVENT:" + location.toString();
 	}
 
 	@Override
 	public TraceType getStoringType() {
-		return TraceType.EXTERNAL_EVENT;
+		return TraceType.LOCATION_EVENT;
 	}
+
 }

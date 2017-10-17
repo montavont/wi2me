@@ -19,7 +19,7 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 import telecom.wi2meCore.model.Logger;
 
@@ -35,7 +35,7 @@ public class BytesperUid extends Trace{
 	private int uid;
 	private long txBytes;
 	private long rxBytes;
-	
+
 
 	protected BytesperUid(Trace trace, long sniffSequence, int uid, long txBytes, long rxBytes){
 		Trace.copy(trace, this);
@@ -44,29 +44,29 @@ public class BytesperUid extends Trace{
 		this.txBytes = txBytes;
 		this.rxBytes = rxBytes;
 	}
-	
+
 	public long getSniffSequence() {
 		return sniffSequence;
 	}
-	
+
 	public int getUid(){
 		return uid;
 	}
-	
+
 	public long getTxBytes() {
 		return txBytes;
 	}
-	
+
 	public long getRxBytes() {
 		return rxBytes;
 	}
-		
+
 	public static BytesperUid getNewBytesperUid(Trace trace, long sniffSequence, int uid, long txBytes, long rxBytes){
 		return new BytesperUid(trace, sniffSequence, uid, txBytes, rxBytes);
 	}
-	
+
 	private static final String SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "BYTES_PER_UID:" + sniffSequence + SEPARATOR + uid + SEPARATOR + txBytes + SEPARATOR + rxBytes;
 	}

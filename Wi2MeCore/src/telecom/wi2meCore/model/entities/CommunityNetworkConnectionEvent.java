@@ -19,16 +19,16 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 import telecom.wi2meCore.model.entities.WifiAP;
 
 
-public class CommunityNetworkConnectionEvent extends Trace{	
+public class CommunityNetworkConnectionEvent extends Trace{
 
 	public static final String TABLE_NAME = "CommunityNetworkConnectionEvent";
 	public static final String EVENT = "event";
 	public static final String USERNAME = "username";
-	
+
 	private String event;
 	private WifiAP connectedTo;
 	private String username;
@@ -39,11 +39,11 @@ public class CommunityNetworkConnectionEvent extends Trace{
 		this.connectedTo = connectedTo;
 		this.username = username;
 	}
-	
+
 	public String getUsername() {
 		return username;
 	}
-	
+
 	public String getEvent() {
 		return event;
 	}
@@ -51,13 +51,13 @@ public class CommunityNetworkConnectionEvent extends Trace{
 	public WifiAP getConnectedTo() {
 		return connectedTo;
 	}
-	
+
 	public static CommunityNetworkConnectionEvent getNewCommunityNetworkConnectionEvent(Trace trace, String event, WifiAP connectionTo, String username){
 		return new CommunityNetworkConnectionEvent(trace, event, connectionTo, username);
 	}
-	
+
 	private static final String AP_SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "CN_CONN_EVENT:" + event + AP_SEPARATOR + username + AP_SEPARATOR + connectedTo.toString();
 	}
