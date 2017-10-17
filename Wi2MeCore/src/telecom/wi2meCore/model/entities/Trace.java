@@ -19,8 +19,8 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
 
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 /**
  * This class represents the Trace itself. Stores information about the environment (time, positioning and battery life), and this is the parent of all other entities.
@@ -29,12 +29,28 @@ import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceTyp
  *
  */
 public abstract class Trace {
-	
+
+	public static enum TraceType{
+        WIFI_SCAN_RESULT,
+        WIFI_CONNECTION_EVENT,
+        COMMUNITY_NETWORK_CONNECTION_EVENT,
+        WIFI_CONNECTION_DATA,
+        WIFI_SNIFFER_DATA,
+        WIFI_CONNECTION_INFO,
+        BYTES_PER_UID,
+        CELL_SCAN_RESULT,
+        CELL_CONNECTION_EVENT,
+        CELL_CONNECTION_DATA,
+        EXTERNAL_EVENT,
+        WIFI_PING,
+		LOCATION_EVENT,
+	};
+
 	/**
 	 * Constants for the Database
 	 */
 	public static final String TRACE_REFERENCE = Trace.TABLE_NAME + "Id";
-	
+
     public static final String TABLE_NAME = "Trace";
     public static final String TIMESTAMP = "timestamp";
     public static final String ALTITUDE = "altitude";
@@ -46,7 +62,7 @@ public abstract class Trace {
     public static final String PROVIDER = "provider";
     public static final String BATT_LEVEL = "batteryLevel";
     public static final String TYPE = "type";
-    
+
 	protected long timestamp;
 	protected double latitude;
 	protected double longitude;
@@ -55,7 +71,7 @@ public abstract class Trace {
 	protected float speed;
 	protected float bearing;
 	protected String provider;
-	protected int batteryLevel;	
+	protected int batteryLevel;
 
 	public double getLatitude() {
 		return latitude;
@@ -88,14 +104,9 @@ public abstract class Trace {
 	public int getBatteryLevel() {
 		return batteryLevel;
 	}
-	/*
-	public String toString(){
-		return "Time:" + timestamp + "_Alt:" + altitude + "_Lon:" + longitude + "_Bat:" + batteryLevel;
-	}
-	*/
-	
+
 	public abstract TraceType getStoringType();
-	
+
 	/**
 	 * Copies the attributes of the Trace from to the Trace to
 	 */
@@ -108,18 +119,18 @@ public abstract class Trace {
 		to.bearing = from.bearing;
 		to.provider = from.provider;
 		to.batteryLevel = from.batteryLevel;
-		to.timestamp = from.timestamp;	
+		to.timestamp = from.timestamp;
 	}
-	
+
 	private static final String SEPARATOR = ";";
-	
+
 	/**
 	 * The toString method is redefined so that traces can be easily printed
 	 */
 	public String toString(){
 		return "TRACE:" + timestamp + SEPARATOR + altitude + SEPARATOR + longitude + SEPARATOR + latitude + SEPARATOR + accuracy + SEPARATOR + bearing + SEPARATOR + speed + SEPARATOR + provider + SEPARATOR + batteryLevel + SEPARATOR+SEPARATOR;
 	}
-	
+
 
 
 }

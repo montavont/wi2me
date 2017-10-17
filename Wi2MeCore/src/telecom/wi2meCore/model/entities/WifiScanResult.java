@@ -20,16 +20,16 @@ package telecom.wi2meCore.model.entities;
 
 import java.util.List;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 import telecom.wi2meCore.model.entities.WifiAP;
 
 
 public class WifiScanResult extends Trace {
-	
+
 	public static final String TABLE_NAME = "WifiScanResult";
-	
+
 	private List<WifiAP> results;
-	
+
 	protected WifiScanResult(Trace trace, List<WifiAP> results){
 		Trace.copy(trace, this);
 		this.results = results;
@@ -38,15 +38,15 @@ public class WifiScanResult extends Trace {
 	public List<WifiAP> getResults() {
 		return results;
 	}
-	
+
 	public static WifiScanResult getNewWifiScanResult(Trace trace, List<WifiAP> results){
 		return new WifiScanResult(trace, results);
 	}
-	
+
 	public String toString(){
 		return super.toString() + "WIFI_SCAN_RESULT:" + getAPsAsString();
 	}
-	
+
 	private static final String WIFI_AP_SEPARATOR = "-";
 
 	private String getAPsAsString() {

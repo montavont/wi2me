@@ -19,13 +19,13 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 public class WifiSnifferData extends Trace{
 
 	public static final String TABLE_NAME = "WifiSnifferData";
 	public static final String SNIFF_SEQUENCE = "SniffSequence";
-	
+
 	private WifiAP connectedTo;
 	private SnifferData snifferData;
 	private long sniffSequence;
@@ -36,25 +36,25 @@ public class WifiSnifferData extends Trace{
 		this.snifferData = snifferData;
 		this.sniffSequence = sniffSequence;
 	}
-	
+
 	public SnifferData getSnifferData(){
 		return snifferData;
 	}
-	
+
 	public WifiAP getConnectedTo() {
 		return connectedTo;
 	}
-	
+
 	public long getSniffSequence() {
 		return sniffSequence;
 	}
-	
+
 	public static WifiSnifferData getNewWifiSnifferData(Trace trace, WifiAP connectedTo, SnifferData snifferData, long sniffSequence){
 		return new WifiSnifferData(trace, connectedTo, snifferData, sniffSequence);
 	}
-	
+
 	private static final String SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "WIFI_SNIFFER_DATA:" + snifferData.toString() + SEPARATOR + connectedTo.toString() + SEPARATOR + sniffSequence;
 	}

@@ -28,6 +28,7 @@ import telecom.wi2meCore.model.WirelessNetworkCommand;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 
+import android.location.Location;
 import android.util.Log;
 
 /**
@@ -57,7 +58,14 @@ public class BLEDummy extends WirelessNetworkCommand{
 	public void run(IParameterManager parameters) {
 		Log.d(getClass().getSimpleName(), "Yay, we is of hellfest !");
 
-		ControllerServices.getInstance().getBLE().writeCharacteristic();
+		Location location  = ControllerServices.getInstance().getLocation().getLocation();
+		if (location != null)
+		{
+
+			String charValue = String.format("%f %f", location.getLatitude(), location.getLongitude());
+
+			ControllerServices.getInstance().getBLE().writeCharacteristic(charValue);
+		}
 
 		try{
 			Thread.sleep(10000);

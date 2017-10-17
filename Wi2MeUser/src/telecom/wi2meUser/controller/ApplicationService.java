@@ -41,7 +41,7 @@ import telecom.wi2meCore.controller.services.cell.CellService;
 import telecom.wi2meCore.controller.services.communityNetworks.CommunityNetworkService;
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
 import telecom.wi2meCore.controller.services.move.MoveService;
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper;
+import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.trace.BatteryService;
 import telecom.wi2meCore.controller.services.trace.IBatteryLevelReceiver;
 import telecom.wi2meCore.controller.services.trace.LocationService;
@@ -129,6 +129,7 @@ public class ApplicationService  extends Service {
 
 		binder = new ServiceBinder(parameters);
 
+		TextTraceHelper.initialize(context);
 
 		ControllerServices.initializeServices(new TimeService(),
 							new CellService(this),
@@ -171,6 +172,9 @@ public class ApplicationService  extends Service {
 	}
 
 	private void startThreads() {
+
+		ControllerServices.getInstance().getLocation().monitorLocation();
+
 		wifiThread = new Thread(){
 			public void run(){
 				wifiCommandLooper.loop(parameters);
@@ -228,35 +232,18 @@ public class ApplicationService  extends Service {
 		if (wasCellularConnected){
 			//disable wifi if connected
 			ControllerServices.getInstance().getWifi().disableAsync();
-			/*
-	    	try {
-				ControllerServices.getInstance().getCell().connect();
-			} catch (TimeoutException e) {
-				// If it fails to connect, we are unlucky
-				Log.e(getClass().getSimpleName(), e.getMessage(), e);
-				Toast.makeText(context, "Could not re-enable cellular network connection", Toast.LENGTH_LONG);
-			} catch (InterruptedException e) {
-				// Should never be interrupted
-				Log.e(getClass().getSimpleName(), e.getMessage(), e);
-			}    	*/
 			//enable cellular connection
 			ControllerServices.getInstance().getCell().connectAsync();
 		}
 
 		ControllerServices.finalizeServices();
-		/*
-    	if (DatabaseHelper.isInitialized())
-    		DatabaseHelper.getDatabaseHelper().closeDatabase();
-		 */
 
 
 		super.onDestroy();
 	}
 
 	private void stopThreads() {
-		//Stop
-		//we also interrupt what is being done, as it may be sleeping to scan, or downloading something
-
+		ControllerServices.getInstance().getLocation().unMonitorLocation();
 
 
 		if (cellWorkingFlag != null){
@@ -401,7 +388,6 @@ public class ApplicationService  extends Service {
 
 			cellCommandLooper.initializeCommands(parameters);
 
-			DatabaseHelper.initialize(context);
 			wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
 			cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
 
@@ -440,8 +426,7 @@ public class ApplicationService  extends Service {
 
 			stopForeground(true);
 
-			if (DatabaseHelper.isInitialized())
-				DatabaseHelper.getDatabaseHelper().closeDatabase();
+			TextTraceHelper.getTextTraceHelper().closeDatabase();
 			setRunning(false);
 		}
 

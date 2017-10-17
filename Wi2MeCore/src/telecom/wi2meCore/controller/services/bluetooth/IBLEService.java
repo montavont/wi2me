@@ -23,5 +23,5 @@ public interface IBLEService {
 
 	void finalizeService();
 
-	public boolean writeCharacteristic();
+	public boolean writeCharacteristic(String charvalue);
 }

@@ -74,6 +74,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ResolveInfo;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.Location;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
@@ -156,7 +157,7 @@ public class Wi2MeRecherche extends Activity
 
 	private Handler refreshHandler = new Handler();
 	private Runnable refreshTask;
-	private static final long UI_REFRESH_PERIOD = 50;
+	private static final long UI_REFRESH_PERIOD = 500;
 	private boolean refreshUI = true;
 
 	/** Called when the activity is first created./ */
@@ -912,11 +913,15 @@ public class Wi2MeRecherche extends Activity
 
 		if (logTrace != null)
 		{
-			localizationAdapter.setData("Provider/Accuracy (m)", logTrace.content.getProvider()+"/"+String.valueOf(logTrace.content.getAccuracy()));
-			localizationAdapter.setData("Latitude", String.valueOf(logTrace.content.getLatitude()));
-			localizationAdapter.setData("Longitude", String.valueOf(logTrace.content.getLongitude()));
-			localizationAdapter.setData("Timestamp (ms)", String.valueOf(logTrace.content.getTimestamp()));
-			localizationAdapter.setData("Speed (m/s)", String.valueOf(logTrace.content.getSpeed()));
+			Location location = ControllerServices.getInstance().getLocation().getLocation();
+			if (location != null)
+			{
+				localizationAdapter.setData("Provider/Accuracy (m)", location.getProvider()+"/"+String.valueOf(location.getAccuracy()));
+				localizationAdapter.setData("Latitude", String.valueOf(location.getLatitude()));
+				localizationAdapter.setData("Longitude", String.valueOf(location.getLongitude()));
+				//localizationAdapter.setData("Timestamp (ms)", String.valueOf(location.getTimestamp()));
+				localizationAdapter.setData("Speed (m/s)", String.valueOf(location.getSpeed()));
+			}
 			localizationAdapter.setData("Battery Level", String.valueOf(logTrace.content.getBatteryLevel())+"%");
 
 			localizationAdapter.notifyDataSetChanged();

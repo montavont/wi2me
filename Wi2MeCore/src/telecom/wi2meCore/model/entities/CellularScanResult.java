@@ -21,14 +21,14 @@ package telecom.wi2meCore.model.entities;
 
 import java.util.List;
 import telecom.wi2meCore.model.entities.Cell;
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 public class CellularScanResult extends Trace{
-	
+
 	public static final String TABLE_NAME = "CellularScanResult";
-	
+
 	private List<Cell> results;
-	
+
 	protected CellularScanResult(Trace trace, List<Cell> results){
 		Trace.copy(trace, this);
 		this.results = results;
@@ -37,15 +37,15 @@ public class CellularScanResult extends Trace{
 	public List<Cell> getResults() {
 		return results;
 	}
-	
+
 	public static CellularScanResult getNewCellularScanResult(Trace trace, List<Cell> results){
 		return new CellularScanResult(trace, results);
 	}
-	
+
 	public String toString(){
 		return super.toString() + "CELL_SCAN_RESULT:" + getCellsAsString();
 	}
-	
+
 	private static final String CELL_SEPARATOR = "-";
 
 	private String getCellsAsString() {

@@ -19,15 +19,15 @@
 
 package telecom.wi2meCore.model.entities;
 
-import telecom.wi2meCore.controller.services.persistance.DatabaseHelper.TraceType;
 import telecom.wi2meCore.model.entities.Cell;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 
 public class CellularConnectionEvent extends Trace{
 
 	public static final String TABLE_NAME = "CellularConnectionEvent";
 	public static final String EVENT = "event";
-	
+
 	private String event;
 	private Cell connectionTo;
 
@@ -36,7 +36,7 @@ public class CellularConnectionEvent extends Trace{
 		this.event = event;
 		this.connectionTo = connectionTo;
 	}
-	
+
 	public String getEvent() {
 		return event;
 	}
@@ -44,13 +44,13 @@ public class CellularConnectionEvent extends Trace{
 	public Cell getConnectionTo() {
 		return connectionTo;
 	}
-	
+
 	public static CellularConnectionEvent getNewCellularConnectionEvent(Trace trace, String event, Cell connectionTo){
 		return new CellularConnectionEvent(trace, event, connectionTo);
 	}
-	
+
 	private static final String AP_SEPARATOR = "-";
-	
+
 	public String toString(){
 		return super.toString() + "CELL_CONN_EVENT:" + event + AP_SEPARATOR + connectionTo.toString();
 	}

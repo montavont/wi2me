@@ -20,6 +20,7 @@
 package telecom.wi2meCore.controller.services.persistance;
 
 import android.content.Context;
+import android.location.Location;
 import android.os.Environment;
 import android.util.Log;
 
@@ -164,7 +165,7 @@ public class TextTraceHelper implements ITraceDatabase
 				ArrayList<String> trace_strings = new ArrayList<String>();
 				trace_str_prefix += trace.getTimestamp();
 				trace_str_prefix += CSV_SEP;
-				trace_str_prefix += trace.getAltitude();
+				/*trace_str_prefix += trace.getAltitude();
 				trace_str_prefix += CSV_SEP;
 				trace_str_prefix += trace.getLongitude();
 				trace_str_prefix += CSV_SEP;
@@ -177,7 +178,7 @@ public class TextTraceHelper implements ITraceDatabase
 				trace_str_prefix += trace.getBearing();
 				trace_str_prefix += CSV_SEP;
 				trace_str_prefix += trace.getProvider();
-				trace_str_prefix += CSV_SEP;
+				trace_str_prefix += CSV_SEP;*/
 				trace_str_prefix += trace.getBatteryLevel();
 				trace_str_prefix += CSV_SEP;
 				trace_str_prefix += trace.getStoringType();
@@ -341,6 +342,23 @@ public class TextTraceHelper implements ITraceDatabase
 							externalEvent.getEvent()
 						);
 						break;
+					case LOCATION_EVENT:
+						Location location = ((LocationEvent) trace).getLocation();
+						trace_strings.add(
+	           				location.getProvider()
+							+ CSV_SEP
+							+ location.getAltitude()
+							+ CSV_SEP
+	 				        + location.getLatitude()
+							+ CSV_SEP
+			    	       	+ location.getLongitude()
+							+ CSV_SEP
+	        				+ location.getSpeed()
+							+ CSV_SEP
+					        + location.getAccuracy()
+							+ CSV_SEP
+					        + location.getBearing()
+						);
 				}
 
 				try

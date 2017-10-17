@@ -19,13 +19,14 @@
 
 package telecom.wi2meCore.controller.services.trace;
 
-public interface ILocationService {
+import android.location.Location;
 
-	public void registerLocationReceiver(ILocationReceiver receiver, int timeInterval, int maxMeters);
-	public void registerLocationReceiver(ILocationReceiver receiver);
-	public void unregisterLocationReceiver(ILocationReceiver receiver);
+public interface ILocationService {
+	public void monitorLocation();
+	public void unMonitorLocation();
 	public void finalizeService();
 	public boolean isGPSEnabled();	
-	public void registerNetworkLocationReceiver(ILocationReceiver receiver);
 	public boolean isNetworkLocationEnabled();
+	public Location getLocation();
+	public void setLocation(Location location);
 }
