@@ -28,7 +28,6 @@ import telecom.wi2meCore.model.WirelessNetworkCommand;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 
-import android.location.Location;
 import android.util.Log;
 
 /**
@@ -36,12 +35,29 @@ import android.util.Log;
  * @author XXX
  *
  */
-public class BLEDummy extends WirelessNetworkCommand{
+public class BLEReadCharacteristicCommand extends WirelessNetworkCommand{
 
-	public BLEDummy(HashMap<String, String> params)
+	private String deviceAddress;
+	private String serviceUUID;
+	private String characteristicUUID;
+	private int backOffOnNull = -1;
+
+	private final String DEVICE_ADDRESS_KEY = "device_address";
+	private final String SERVICE_UUID_KEY = "service_uuid";
+	private final String CHARACTERISTIC_UUID_KEY = "characteristic_uuid";
+	private final String BACKOFF_ON_NULL_KEY = "backoff_on_null";
+
+	public BLEReadCharacteristicCommand(HashMap<String, String> params)
 	{
 		m_params = params;
 		m_subclassName = getClass().getCanonicalName();
+		this.deviceAddress = params.get(DEVICE_ADDRESS_KEY);
+		this.serviceUUID = params.get(SERVICE_UUID_KEY);
+		this.characteristicUUID = params.get(CHARACTERISTIC_UUID_KEY);
+		if (params.containsKey(BACKOFF_ON_NULL_KEY))
+		{
+			this.backOffOnNull = Integer.parseInt(params.get(BACKOFF_ON_NULL_KEY));
+		}
 	}
 
 	@Override
@@ -56,22 +72,17 @@ public class BLEDummy extends WirelessNetworkCommand{
 
 	@Override
 	public void run(IParameterManager parameters) {
-		Log.d(getClass().getSimpleName(), "Yay, we is of hellfest !");
 
-		Location location  = ControllerServices.getInstance().getLocation().getLocation();
-		if (location != null)
+		String charValue = ControllerServices.getInstance().getBLE().readCharacteristic(deviceAddress, serviceUUID, characteristicUUID);
+		if (backOffOnNull > 0  && (charValue == null || charValue.length() == 0))
 		{
-
-			String charValue = String.format("%f %f", location.getLatitude(), location.getLongitude());
-
-			ControllerServices.getInstance().getBLE().writeCharacteristic(charValue);
-		}
-
-		try{
-			Thread.sleep(10000);
-		}
-		catch (InterruptedException e)
-		{
+			try{
+				Thread.sleep(backOffOnNull);
+			}
+			catch (InterruptedException e)
+			{
+				Log.d(getClass().getSimpleName(), "Interrupted.");
+			}
 		}
 	}
 

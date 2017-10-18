@@ -23,5 +23,6 @@ public interface IBLEService {
 
 	void finalizeService();
 
-	public boolean writeCharacteristic(String charvalue);
+	public boolean writeCharacteristic(String charValue, String deviceAddr, String serviceUUID, String characteristicUUID);
+	public String readCharacteristic(String deviceAddr, String serviceUUID, String characteristicUUID);
 }

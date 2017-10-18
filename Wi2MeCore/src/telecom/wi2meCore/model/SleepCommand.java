@@ -22,23 +22,20 @@ package telecom.wi2meCore.model;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 
-import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 import android.util.Log;
 
+public class SleepCommand extends WirelessNetworkCommand{
 
-public class ShellPoppingCommand extends WirelessNetworkCommand{
+	private final String SLEEP_KEY = "sleep_ms";
+	private int ms = 0;
 
-	private static String COMMAND_KEY = "command";
-
-	private String command;
-
-	public ShellPoppingCommand(HashMap<String, String> params)
+	public SleepCommand(HashMap<String, String> params)
 	{
 		m_params = params;
 		m_subclassName = getClass().getCanonicalName();
-		this.command = params.get(COMMAND_KEY);
+		this.ms = Integer.parseInt(params.get(SLEEP_KEY));
 	}
 
 	@Override
@@ -54,21 +51,13 @@ public class ShellPoppingCommand extends WirelessNetworkCommand{
 	@Override
 	public void run(IParameterManager parameters)
 	{
-		OutputStreamWriter osw = null;
 		try
 		{
-			Process process = Runtime.getRuntime().exec("su");
-			osw = new OutputStreamWriter(process.getOutputStream());
-			String line;
-
-			osw.write(command);
-			osw.flush();
-			osw.close();
+			Thread.sleep(ms);
 		}
-		catch (Exception e)
+		catch (InterruptedException e)
 		{
-			Log.e(getClass().getSimpleName(), "Error popping command : " + command + " "+ e.getMessage(), e);
+			Log.d(getClass().getSimpleName(), "Interrupted.");
 		}
 	}
-
 }

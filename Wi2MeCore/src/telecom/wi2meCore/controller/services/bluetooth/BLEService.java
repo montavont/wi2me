@@ -50,117 +50,186 @@ public class BLEService implements IBLEService{
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
     private String mBluetoothDeviceAddress;
-    private BluetoothGatt mBluetoothGatt;
     private int mConnectionState = STATE_DISCONNECTED;
 
     private static final int STATE_DISCONNECTED = 0;
     private static final int STATE_CONNECTING = 1;
     private static final int STATE_CONNECTED = 2;
 
-    public final static String ACTION_GATT_CONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_CONNECTED";
-    public final static String ACTION_GATT_DISCONNECTED =
-            "com.example.bluetooth.le.ACTION_GATT_DISCONNECTED";
-    public final static String ACTION_GATT_SERVICES_DISCOVERED =
-            "com.example.bluetooth.le.ACTION_GATT_SERVICES_DISCOVERED";
-    public final static String ACTION_DATA_AVAILABLE =
-            "com.example.bluetooth.le.ACTION_DATA_AVAILABLE";
-    public final static String EXTRA_DATA =
-            "com.example.bluetooth.le.EXTRA_DATA";
-
-    public final static UUID UUID_LOPY = UUID.fromString("36353433-3231-3039-3837-363534333231");
-	public final static UUID UUID_CHARACTERISTIC = UUID.fromString("36353433-3231-3039-3837-363534336261");
-
-
-	private boolean durtyBool = false;
-
     // Various callback methods defined by the BLE API.
-    private final BluetoothGattCallback mGattCallback =
-            new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status,
-                int newState) {
-            String intentAction;
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                intentAction = ACTION_GATT_CONNECTED;
-                mConnectionState = STATE_CONNECTED;
-                //broadcastUpdate(intentAction);
-                Log.i(TAG, "Connected to GATT server.");
-                Log.i(TAG, "Attempting to start service discovery:" +
-                        mBluetoothGatt.discoverServices());
+    //private final BluetoothGattCallback mGattCallback =
+    private class localBLEGattCallback extends BluetoothGattCallback
+	{
+			public boolean discovered = false;
+			public boolean characteristic_read = false;
 
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                intentAction = ACTION_GATT_DISCONNECTED;
-                mConnectionState = STATE_DISCONNECTED;
-                Log.i(TAG, "Disconnected from GATT server.");
-                //broadcastUpdate(intentAction);
-            }
-        }
+	        @Override
+    	    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
+			{
+        	    String intentAction;
+            	if (newState == BluetoothProfile.STATE_CONNECTED)
+				{
+                    gatt.discoverServices();
+				}
+	        }
 
-        @Override
-        // New services discovered
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-				durtyBool = true;
-        		Log.d("BLE Dummy", " discovered serve size "  + gatt.getServices().size());
-                //broadcastUpdate(ACTION_GATT_SERVICES_DISCOVERED);
-            } else {
-                Log.w(TAG, "onServicesDiscovered received: " + status);
-            }
-        }
+	        @Override
+    	    // New services discovered
+        	public void onServicesDiscovered(BluetoothGatt gatt, int status)
+			{
+	            if (status == BluetoothGatt.GATT_SUCCESS) {
+					discovered = true;
+        			Log.d(getClass().getSimpleName(), " discovered serve size "  + gatt.getServices().size());
+            	}
+				else
+				{
+                	Log.w(TAG, "onServicesDiscovered received: " + status);
+	            }
+	        }
 
-        @Override
-        // Result of a characteristic read operation
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                BluetoothGattCharacteristic characteristic,
-                int status) {
-            if (status == BluetoothGatt.GATT_SUCCESS) {
-                //broadcastUpdate(ACTION_DATA_AVAILABLE, characteristic);
-            }
-        }
-    };
-
+	        @Override
+    	    // Result of a characteristic read operation
+        	public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status)
+			{
+            	if (status == BluetoothGatt.GATT_SUCCESS)
+				{
+					characteristic_read = true;
+	            }
+    	    }
+    }
 
 	@Override
-	public boolean writeCharacteristic(String charValue)
+	public boolean writeCharacteristic(String charValue, String deviceAddr, String serviceUUID, String characteristicUUID)
 	{
-
-		durtyBool = false;
+		boolean retval = false;
+		int timeOut = 10000;
+		int discoveryLoop = 500;
+    	localBLEGattCallback btcb = new localBLEGattCallback();
 		mBluetoothManager = (BluetoothManager)this.context.getApplicationContext().getSystemService(android.content.Context.BLUETOOTH_SERVICE);
 		mBluetoothAdapter = mBluetoothManager.getAdapter();
-		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice("24:0A:C4:00:CC:A0");
-		mBluetoothGatt = device.connectGatt(this.context, true, mGattCallback);//TKE TODO : reconnect only if necessary
+		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddr);
+		BluetoothGatt gatt = device.connectGatt(this.context, true, (BluetoothGattCallback) btcb);//TKE TODO : reconnect only if necessary
 
         //check mBluetoothGatt is available
-        if (mBluetoothGatt == null) {
-            Log.e("BLE Dummy", "lost connection");
-            return false;
+        if (gatt == null) {
+            Log.e(getClass().getSimpleName(), "lost connection");
         }
-
-		while (!durtyBool)
+		else
 		{
-			try{
-				Thread.sleep(500);
-			}
-			catch (InterruptedException e)
+			for (int i = 0; i <= timeOut; i += discoveryLoop)
 			{
-				durtyBool = true;
+				if(btcb.discovered)
+				{
+					break;
+				}
+				else
+				{
+					try{
+						Thread.sleep(discoveryLoop);
+					}
+					catch (InterruptedException e)
+					{
+						break;
+					}
+				}
+			}
+
+	        BluetoothGattService service = gatt.getService(UUID.fromString(serviceUUID));
+    	    if (service == null) {
+        	    Log.e(getClass().getSimpleName(), "service not found!");
+	        }
+			else
+			{
+		        BluetoothGattCharacteristic charac = service.getCharacteristic(UUID.fromString(characteristicUUID));
+		        if (charac == null) {
+        		    Log.e(getClass().getSimpleName(), "characateristic not found!");
+        		}
+				else
+				{
+			        charac.setValue(charValue);
+        			boolean status = gatt.writeCharacteristic(charac);
+				}
 			}
 		}
+		gatt.close();
+   		return retval;
+	}
 
-        BluetoothGattService service = mBluetoothGatt.getService(UUID_LOPY);
+	@Override
+	public String readCharacteristic(String deviceAddr, String serviceUUID, String characteristicUUID)
+	{
+
+		String retval = "";
+		int timeOut = 10000;
+		int discoveryLoop = 500;
+    	localBLEGattCallback btcb = new localBLEGattCallback();
+		mBluetoothManager = (BluetoothManager)this.context.getApplicationContext().getSystemService(android.content.Context.BLUETOOTH_SERVICE);
+		mBluetoothAdapter = mBluetoothManager.getAdapter();
+		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddr);
+		BluetoothGatt gatt = device.connectGatt(this.context, true, (BluetoothGattCallback) btcb);//TKE TODO : reconnect only if necessary
+
+        //check mBluetoothGatt is available
+        if (gatt == null) {
+            Log.e(getClass().getSimpleName(), "lost connection");
+        }
+		else
+		{
+			for (int i = 0; i <= timeOut; i += discoveryLoop)
+			{
+				if(btcb.discovered)
+				{
+					break;
+				}
+				else
+				{
+					try{
+						Thread.sleep(discoveryLoop);
+					}
+					catch (InterruptedException e)
+					{
+						break;
+					}
+				}
+			}
+
+        BluetoothGattService service = gatt.getService(UUID.fromString(serviceUUID));
         if (service == null) {
-            Log.e("BLE Dummy", "service not found!");
-            return false;
+            Log.e(getClass().getSimpleName(), "service not found!");
         }
-        BluetoothGattCharacteristic charac = service.getCharacteristic(UUID_CHARACTERISTIC);
-        if (charac == null) {
-            Log.e("BLE Dummy", "char not found!");
-            return false;
-        }
-
-        charac.setValue(charValue);
-        boolean status = mBluetoothGatt.writeCharacteristic(charac);
-        return status;
+		else
+		{
+	        BluetoothGattCharacteristic charac = service.getCharacteristic(UUID.fromString(characteristicUUID));
+   		    if (charac == null) {
+        		    Log.e(getClass().getSimpleName(), "characteristic not found!");
+		        }
+				else
+				{
+        			boolean status = gatt.readCharacteristic(charac);
+					if (status)
+					{
+						for (int i = 0; i <= timeOut; i += discoveryLoop)
+						{
+							if(btcb.characteristic_read)
+							{
+								break;
+							}
+							else
+							{
+								try{
+									Thread.sleep(discoveryLoop);
+								}
+								catch (InterruptedException e)
+								{
+									break;
+								}
+							}
+						}
+		        		retval = charac.getStringValue(0);
+					}
+				}
+			}
+		}
+		gatt.close();
+    	return retval;
 	}
 }

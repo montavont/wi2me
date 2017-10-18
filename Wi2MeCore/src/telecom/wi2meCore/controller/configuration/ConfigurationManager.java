@@ -376,7 +376,6 @@ public class ConfigurationManager
 		while (reader.hasNext())
 		{
 			String LooperName = reader.nextName();
-    		Log.d("ConfigurationManager", "++ " + " Hellfest  " + LooperName);
 			reader.beginObject();
 			while (reader.hasNext())
 			{
@@ -389,11 +388,9 @@ public class ConfigurationManager
 					while (reader.hasNext())
 					{
 						String key = reader.nextName();
-    					Log.d("ConfigurationManager", "++ " + " Hellfest  12 " + key);
 						if (key.equals("module"))
 						{
          						commandModule = reader.nextString();
-    							Log.d("ConfigurationManager", "++ " + " Hellfest  13 " + commandModule);
 						}
        					else if (key.equals("params"))
 						{
