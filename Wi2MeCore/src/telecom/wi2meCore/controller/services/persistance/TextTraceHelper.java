@@ -359,6 +359,31 @@ public class TextTraceHelper implements ITraceDatabase
 							+ CSV_SEP
 					        + location.getBearing()
 						);
+						break;
+					case BLE_WRITE_EVENT:
+						BLEWriteEvent bleWEvent = (BLEWriteEvent)trace;
+						trace_strings.add(
+							bleWEvent.getDeviceAddress()
+							+ CSV_SEP
+							+ bleWEvent.getServiceUuid()
+							+ CSV_SEP
+							+ bleWEvent.getCharacteristicUuid()
+							+ CSV_SEP
+							+ bleWEvent.getCharValue()
+						);
+						break;
+					case BLE_READ_EVENT:
+						BLEReadEvent bleREvent = (BLEReadEvent)trace;
+						trace_strings.add(
+							bleREvent.getDeviceAddress()
+							+ CSV_SEP
+							+ bleREvent.getServiceUuid()
+							+ CSV_SEP
+							+ bleREvent.getCharacteristicUuid()
+							+ CSV_SEP
+							+ bleREvent.getCharValue()
+						);
+						break;
 				}
 
 				try
