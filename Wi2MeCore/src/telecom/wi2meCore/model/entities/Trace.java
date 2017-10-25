@@ -44,6 +44,8 @@ public abstract class Trace {
         EXTERNAL_EVENT,
         WIFI_PING,
 		LOCATION_EVENT,
+		BLE_WRITE_EVENT,
+		BLE_READ_EVENT,
 	};
 
 	/**

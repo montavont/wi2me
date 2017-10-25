@@ -25,6 +25,7 @@ import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.model.Logger;
 import telecom.wi2meCore.model.TraceManager;
 import telecom.wi2meCore.model.WirelessNetworkCommand;
+import telecom.wi2meCore.model.entities.BLEWriteEvent;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 
@@ -71,7 +72,10 @@ public class BLEWriteGPSToCharacteristicCommand extends WirelessNetworkCommand{
 
 			String charValue = String.format("%f %f", location.getLatitude(), location.getLongitude());
 
-			ControllerServices.getInstance().getBLE().writeCharacteristic(charValue, deviceAddress, serviceUUID, characteristicUUID);
+			if (ControllerServices.getInstance().getBLE().writeCharacteristic(charValue, deviceAddress, serviceUUID, characteristicUUID))
+			{
+				Logger.getInstance().log(BLEWriteEvent.getNewBLEWriteEvent(TraceManager.getTrace(), deviceAddress, serviceUUID, characteristicUUID, charValue));
+			}
 		}
 	}
 

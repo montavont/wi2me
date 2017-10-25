@@ -39,6 +39,9 @@ public class BLEService implements IBLEService{
 
 	public BLEService(Context context){
 		this.context = context;
+		mBluetoothManager = (BluetoothManager)this.context.getApplicationContext().getSystemService(android.content.Context.BLUETOOTH_SERVICE);
+		mBluetoothAdapter = mBluetoothManager.getAdapter();
+		mBluetoothAdapter.enable();
 	}
 
 	@Override
@@ -49,15 +52,8 @@ public class BLEService implements IBLEService{
 
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
-    private String mBluetoothDeviceAddress;
-    private int mConnectionState = STATE_DISCONNECTED;
-
-    private static final int STATE_DISCONNECTED = 0;
-    private static final int STATE_CONNECTING = 1;
-    private static final int STATE_CONNECTED = 2;
 
     // Various callback methods defined by the BLE API.
-    //private final BluetoothGattCallback mGattCallback =
     private class localBLEGattCallback extends BluetoothGattCallback
 	{
 			public boolean discovered = false;
@@ -66,10 +62,14 @@ public class BLEService implements IBLEService{
 	        @Override
     	    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState)
 			{
-        	    String intentAction;
+        	    //String intentAction;
             	if (newState == BluetoothProfile.STATE_CONNECTED)
 				{
                     gatt.discoverServices();
+				}
+				else
+				{
+                	Log.w(TAG, "Not connected: " + status + "	" + newState);
 				}
 	        }
 
@@ -79,7 +79,6 @@ public class BLEService implements IBLEService{
 			{
 	            if (status == BluetoothGatt.GATT_SUCCESS) {
 					discovered = true;
-        			Log.d(getClass().getSimpleName(), " discovered serve size "  + gatt.getServices().size());
             	}
 				else
 				{
@@ -105,10 +104,8 @@ public class BLEService implements IBLEService{
 		int timeOut = 10000;
 		int discoveryLoop = 500;
     	localBLEGattCallback btcb = new localBLEGattCallback();
-		mBluetoothManager = (BluetoothManager)this.context.getApplicationContext().getSystemService(android.content.Context.BLUETOOTH_SERVICE);
-		mBluetoothAdapter = mBluetoothManager.getAdapter();
 		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddr);
-		BluetoothGatt gatt = device.connectGatt(this.context, true, (BluetoothGattCallback) btcb);//TKE TODO : reconnect only if necessary
+		BluetoothGatt gatt = device.connectGatt(this.context, false, (BluetoothGattCallback) btcb);
 
         //check mBluetoothGatt is available
         if (gatt == null) {
@@ -147,7 +144,7 @@ public class BLEService implements IBLEService{
 				else
 				{
 			        charac.setValue(charValue);
-        			boolean status = gatt.writeCharacteristic(charac);
+        			retval = gatt.writeCharacteristic(charac);
 				}
 			}
 		}
@@ -158,15 +155,24 @@ public class BLEService implements IBLEService{
 	@Override
 	public String readCharacteristic(String deviceAddr, String serviceUUID, String characteristicUUID)
 	{
+		String retval = "";
+		String part = " ";
+		while (part.length() > 0)
+		{
+			part = readCharacteristicPart(deviceAddr, serviceUUID, characteristicUUID);
+			retval += part;
+		}
+		return retval;
+	}
 
+	private String readCharacteristicPart(String deviceAddr, String serviceUUID, String characteristicUUID)
+	{
 		String retval = "";
 		int timeOut = 10000;
 		int discoveryLoop = 500;
     	localBLEGattCallback btcb = new localBLEGattCallback();
-		mBluetoothManager = (BluetoothManager)this.context.getApplicationContext().getSystemService(android.content.Context.BLUETOOTH_SERVICE);
-		mBluetoothAdapter = mBluetoothManager.getAdapter();
 		BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddr);
-		BluetoothGatt gatt = device.connectGatt(this.context, true, (BluetoothGattCallback) btcb);//TKE TODO : reconnect only if necessary
+		BluetoothGatt gatt = device.connectGatt(this.context, true, (BluetoothGattCallback) btcb);
 
         //check mBluetoothGatt is available
         if (gatt == null) {
@@ -178,6 +184,7 @@ public class BLEService implements IBLEService{
 			{
 				if(btcb.discovered)
 				{
+            		Log.e(getClass().getSimpleName(), "discovered  !");
 					break;
 				}
 				else
@@ -198,12 +205,13 @@ public class BLEService implements IBLEService{
         }
 		else
 		{
-	        BluetoothGattCharacteristic charac = service.getCharacteristic(UUID.fromString(characteristicUUID));
-   		    if (charac == null) {
+		        BluetoothGattCharacteristic charac = service.getCharacteristic(UUID.fromString(characteristicUUID));
+   			    if (charac == null) {
         		    Log.e(getClass().getSimpleName(), "characteristic not found!");
-		        }
+				}
 				else
 				{
+
         			boolean status = gatt.readCharacteristic(charac);
 					if (status)
 					{
@@ -211,6 +219,7 @@ public class BLEService implements IBLEService{
 						{
 							if(btcb.characteristic_read)
 							{
+								btcb.characteristic_read = false;
 								break;
 							}
 							else
@@ -225,6 +234,7 @@ public class BLEService implements IBLEService{
 							}
 						}
 		        		retval = charac.getStringValue(0);
+        		    	Log.e(getClass().getSimpleName(), "characteristic : " + charac.getStringValue(0));
 					}
 				}
 			}

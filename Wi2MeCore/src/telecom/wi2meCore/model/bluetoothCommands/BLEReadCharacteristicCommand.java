@@ -25,6 +25,7 @@ import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.model.Logger;
 import telecom.wi2meCore.model.TraceManager;
 import telecom.wi2meCore.model.WirelessNetworkCommand;
+import telecom.wi2meCore.model.entities.BLEReadEvent;
 import telecom.wi2meCore.model.parameters.IParameterManager;
 import telecom.wi2meCore.model.parameters.Parameter;
 
@@ -71,10 +72,14 @@ public class BLEReadCharacteristicCommand extends WirelessNetworkCommand{
 	}
 
 	@Override
-	public void run(IParameterManager parameters) {
-
+	public void run(IParameterManager parameters)
+	{
 		String charValue = ControllerServices.getInstance().getBLE().readCharacteristic(deviceAddress, serviceUUID, characteristicUUID);
-		if (backOffOnNull > 0  && (charValue == null || charValue.length() == 0))
+		if (charValue != null && charValue.length() > 0)
+		{
+			Logger.getInstance().log(BLEReadEvent.getNewBLEReadEvent(TraceManager.getTrace(), deviceAddress, serviceUUID, characteristicUUID, charValue));
+		}
+		else if (backOffOnNull > 0)
 		{
 			try{
 				Thread.sleep(backOffOnNull);

@@ -54,7 +54,6 @@ public class Logger extends ILogger
 	private Boolean trial = ConfigurationManager.TRIAL;
 	private int count;
 
-	//private static final int maxCachedTraces = 1000;
 	private static final int maxCachedTraces = 10;
 
 	private ArrayList<Trace> traces;
@@ -100,6 +99,9 @@ public class Logger extends ILogger
 					type = Type.WIFI;
 				case LOCATION_EVENT:
 					type = Type.LOC;
+				case BLE_WRITE_EVENT:
+				case BLE_READ_EVENT:
+					type = Type.BLE;
 					break;
 			}
 			this.setChanged();
@@ -160,6 +162,7 @@ public class Logger extends ILogger
 		CELL,
 		WIFI,
 		LOC,
+		BLE,
 	}
 
 	public class TraceString{

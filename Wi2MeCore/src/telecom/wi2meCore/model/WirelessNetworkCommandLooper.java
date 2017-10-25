@@ -75,7 +75,6 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 		this.running = false;
 	}
 
-	//@Override
 	@Override
 	public void loop(IParameterManager parameters)
 	{
