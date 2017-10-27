@@ -77,7 +77,18 @@ public class BLEReadCharacteristicCommand extends WirelessNetworkCommand{
 		String charValue = ControllerServices.getInstance().getBLE().readCharacteristic(deviceAddress, serviceUUID, characteristicUUID);
 		if (charValue != null && charValue.length() > 0)
 		{
-			Logger.getInstance().log(BLEReadEvent.getNewBLEReadEvent(TraceManager.getTrace(), deviceAddress, serviceUUID, characteristicUUID, charValue));
+			if (charValue.contains(" "))
+			{
+				String[] messages = charValue.split(" ");
+				for (int i = 0; i < messages.length; i++)
+				{
+					Logger.getInstance().log(BLEReadEvent.getNewBLEReadEvent(TraceManager.getTrace(), deviceAddress, serviceUUID, characteristicUUID, messages[i]));
+				}
+			}
+			else
+			{
+				Logger.getInstance().log(BLEReadEvent.getNewBLEReadEvent(TraceManager.getTrace(), deviceAddress, serviceUUID, characteristicUUID, charValue));
+			}
 		}
 		else if (backOffOnNull > 0)
 		{

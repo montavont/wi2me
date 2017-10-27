@@ -157,17 +157,20 @@ public class BLEService implements IBLEService{
 	{
 		String retval = "";
 		String part = " ";
-		while (part.length() > 0)
+		while (part != null && part.length() > 0)
 		{
 			part = readCharacteristicPart(deviceAddr, serviceUUID, characteristicUUID);
-			retval += part;
+			if (part != null)
+			{
+				retval += part;
+			}
 		}
 		return retval;
 	}
 
 	private String readCharacteristicPart(String deviceAddr, String serviceUUID, String characteristicUUID)
 	{
-		String retval = "";
+		String retval = null;
 		int timeOut = 10000;
 		int discoveryLoop = 500;
     	localBLEGattCallback btcb = new localBLEGattCallback();
@@ -234,7 +237,6 @@ public class BLEService implements IBLEService{
 							}
 						}
 		        		retval = charac.getStringValue(0);
-        		    	Log.e(getClass().getSimpleName(), "characteristic : " + charac.getStringValue(0));
 					}
 				}
 			}
