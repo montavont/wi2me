@@ -100,7 +100,7 @@ public class WifiService implements IWifiService{
 		supplicantConnectedReceiver = new SupplicantConnectedReceiver();
 		context.registerReceiver(supplicantConnectedReceiver,  new IntentFilter(WifiManager.SUPPLICANT_CONNECTION_CHANGE_ACTION));
 		context.registerReceiver(supplicantConnectedReceiver,  new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
-
+		context.registerReceiver(supplicantConnectedReceiver,  new IntentFilter(WifiManager.SUPPLICANT_STATE_CHANGED_ACTION));
 
 		//Register receiver to log events to database
 		eventLoggingReceiver = new EventLoggingReceiver();
@@ -379,7 +379,7 @@ public class WifiService implements IWifiService{
 			for(WifiConfiguration ap:knownNetworks)
 			{
 
-				if(ap.BSSID != null &&  ap.BSSID.equals(netConfiguration.BSSID))
+				if(ap.SSID != null &&  ap.SSID.equals(netConfiguration.SSID))
 				{
 					knownNetworkPosition = knownNetworks.indexOf(ap);
 					break;
@@ -732,9 +732,6 @@ public class WifiService implements IWifiService{
 			WifiAP connectionToWifiAP = null;
 
 			String action = intent.getAction();
-
-			Log.d(this.getClass().getSimpleName(), "++ ACTION " + action); //TKE
-
 
 			if (action == ConnectivityManager.CONNECTIVITY_ACTION)
 			{

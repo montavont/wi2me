@@ -24,7 +24,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.InetAddress; 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +50,7 @@ import telecom.wi2meCore.model.Utils;
  *
  */
 public class SALSA implements ICommunityNetwork {
-	
+
 	private String name = "SALSA";
 	private String regExp = "SALSA";
 	private String pluginFilename = "plugins/salsa.js";
@@ -59,8 +59,11 @@ public class SALSA implements ICommunityNetwork {
 	private String userParameter = "SALSA_USER";
 	private String passwordParameter = "SALSA_PASSWORD";
 	private String encryptionKeyLocation = "SALSA.key";
- 
-	private static final String publicKey = "ae2fb982abcfd574ba571a26333f10bf4cbcc6d7f423b8eb1579907268332236e07a6698e00d54a88db7e1ae0ced3a8dc427f070071998acfa65582c7b3ec90113a5625da9ec400d7e70255e62c0cd8d285fe6f636f70cfd41b6c653be4c8b429ec8cad726fdd458abefded2971a08d0eb1b10fb5c3848b5d31d7e0574ce3a152f05b684d8bfa3357c32ce35d882d89e1e950c31ca3b56e74f46e3b70b9630cc4bec8d05f7d129c5ad882f13acd62a897a44c2c3c6c5f0ccf867810e6ca67ab15465622b2f8ea696f423263a2f4a076631e2c169b9b16c8ef5bf2bd062fe7a2f7c8440bb6452e9b1621f13c5664c6f3bb4343f0b2207e8a2c3b4c17c0e38d513";
+
+	private static final String publicKey = "b74e42e8c18e03c79e54a1095f2faf7949affcc76974faac804e2daad9ccc4b4123268868d55ffce20b686c0c4ffa9083c06ec78e6a93833b3dd12c2b748635b6b4a5031c6f75d0cbe027cf325c46041ad83b8ec6cbe75f7581905b6382966b1bbc7aa634b7c044173aaed4f6ba372ba1e7a205d1934b648dce3c345965c1c228b9258030f6089f80682e25428d9d9bd9c45887f91bdeba21db58dff4579cc0df2d51c25826ad8315c518a6397d8ccf9ad670ce6b7e90888a58069baf9d8ef3b9832f41503d4b7ca989935ea9e918af540b572bfd37dc74c2767b0303e0bb1530bc6af41c8f59a8453c59efa8280ba6a7224e321133488ab836071db19e354c3";
+
+	//private static final String publicKey = "a6110b39014d2f768f6bc61cc5e3ad480c576d7759a76b97a81a9d0cb1cad0d9decc22cb6fbcbb0fe84d7213e8204de0e53c706481844e998f9e4c44d349379ee9c04f72de6e3a3c44772eedb313cb9a4a2e8f5c6d74e2ba41ea325a153acd893ea3e3120e700a131f273ad331d4225990325631758623cd4f0e62ecd17212112ed8ba0cabd345dedc3bcb08d190ca6f3a3eb5892eb45b9dd74ef7dfcc98dcd90cf4408d66e5e5134c176bc408ab88ea74dd3d5e0973af9160b7674d0d616441521169374e7a067b70e2192587a55ce70717172ebe1cdf155ae29941d2fed9980b76c6f10a9135c509bc480e755713440279a00f0021230689bbd9571e34ece7";
+
 	private static final String commonName = "*.telecom-bretagne.eu";
 
 	@Override
@@ -71,7 +74,7 @@ public class SALSA implements ICommunityNetwork {
 	public String getRegExp() {
 		return regExp;
 	}
-	
+
 	@Override
 	public String getNameInApplication() {
 		return nameInApplication;
@@ -88,7 +91,7 @@ public class SALSA implements ICommunityNetwork {
 	public String getEncryptionKeyLocation() {
 		return encryptionKeyLocation;
 	}
-	
+
 	@Override
 	public Runnable getAuthenticationRoutine(String UserName, String Password)
 	{
@@ -98,13 +101,12 @@ public class SALSA implements ICommunityNetwork {
 
 		Runnable routine = new Runnable()
 		{
-			String wi2meServer = ConfigurationManager.CONNECTION_CHECK_URL;
-
-			String wi2meServerPage = "Telecom Bretagne Server for Wi2MeTraceXPlorer";
+			String wi2meServer = "http://216.34.181.45";
+			String wi2meServerPage = "News for nerds, stuff that matters";
 
 			String salsaUrl = "https://webauth.telecom-bretagne.eu/login.html";
 			String successfullLoginPage = "Login Successful";
-	
+
 			String SCHEME_NAME = "https";
 
 			String str = "";
@@ -113,34 +115,25 @@ public class SALSA implements ICommunityNetwork {
 
 			@Override
 			public void run()
-			{ 
+			{
 
-				try 
+				try
 				{
 				    	communityNetworkConnectionHttpClient = new DefaultHttpClient();
 
-					WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
-					int wifiAddress = info.getIpAddress();
-					Log.d("HTTPGet", "++ " + "Local IP Address " + Utils.intToIp(wifiAddress));
-	
-					communityNetworkConnectionHttpClient.getParams().setParameter(ConnRoutePNames.LOCAL_ADDRESS, Utils.intToInetAddress(wifiAddress));
+						WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
+						int wifiAddress = info.getIpAddress();
+						communityNetworkConnectionHttpClient.getParams().setParameter(ConnRoutePNames.LOCAL_ADDRESS, Utils.intToInetAddress(wifiAddress));
 
-					TrustAllSSLSocketFactory tasslf = new TrustAllSSLSocketFactory(publicKey, commonName);
-				        Scheme sch = new Scheme(SCHEME_NAME, tasslf, 443);
-				        communityNetworkConnectionHttpClient.getConnectionManager().getSchemeRegistry().register(sch);
-				    	
-					HttpGet initialGet = new HttpGet(wi2meServer);
-			
-					Log.d("HTTPGet", "++ " + "To execute " + wi2meServer + "-");
+						HttpGet initialGet = new HttpGet(wi2meServer);
 				    	HttpResponse response = communityNetworkConnectionHttpClient.execute(initialGet);
-				    	Log.d("HTTPGet", "++ " + "Executed " + wi2meServer + "-");
-			
+
 					BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 					while ((str = in.readLine()) != null)
 					{
 						page += str;
 					}
-			
+
 					if (page.contains(wi2meServerPage))
 					{
 						ControllerServices.getInstance().getCommunity().CNConnectionAlreadyConnected();
@@ -148,26 +141,30 @@ public class SALSA implements ICommunityNetwork {
 					else
 					{
 
-				
-					        HttpPost authPost = new HttpPost(salsaUrl);
-						page = ""; 
+
+						TrustAllSSLSocketFactory tasslf = new TrustAllSSLSocketFactory(publicKey, commonName);
+				        Scheme sch = new Scheme(SCHEME_NAME, tasslf, 443);
+				        communityNetworkConnectionHttpClient.getConnectionManager().getSchemeRegistry().register(sch);
+
+					    HttpPost authPost = new HttpPost(salsaUrl);
+						page = "";
 						List<NameValuePair> params = new ArrayList<NameValuePair>(2);
 						params.add(new BasicNameValuePair("username", username));
 						params.add(new BasicNameValuePair("password", password));
 						params.add(new BasicNameValuePair("buttonClicked", "4"));
-				
+
 						authPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-						
+
 						Log.d("HTTPGet", "++ " + "Now executing post " + salsaUrl + "-" );
 					    	response = communityNetworkConnectionHttpClient.execute(authPost);
 					    	Log.d("HTTPGet", "++ " + "Executed post  " + salsaUrl + "-" );
-				
+
 						in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 						while ((str = in.readLine()) != null)
 						{
 							page += str;
 						}
-	
+
 						if (page.contains(successfullLoginPage))
 						{
 							ControllerServices.getInstance().getCommunity().CNConnectionEnd();
@@ -189,6 +186,6 @@ public class SALSA implements ICommunityNetwork {
 			}
 		};
 		return routine;
-		
+
 	}
 }

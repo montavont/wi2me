@@ -69,6 +69,8 @@ public class TextTraceHelper implements ITraceDatabase
 	{
 		packageName = context.getPackageName();
 		storageFile = Environment.getDataDirectory() + "/data/" + packageName + "/databases/" + TRACEFILE_NAME;
+		File dir = new File( Environment.getDataDirectory() + "/data/" + packageName + "/databases/");
+		dir.mkdirs();
 		tth = new TextTraceHelper();
 	}
 

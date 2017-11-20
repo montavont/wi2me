@@ -64,7 +64,7 @@ public class WifiCleanerCommand extends CleanerCommand{
 				ControllerServices.getInstance().getWifi().disable();
 			} catch (TimeoutException e) {
 				Log.e(getClass().getSimpleName(),"++ "+e.toString());
-				throw new RuntimeException("FATAL ERROR: Wifi cannot be disabled in cleaner, unable to continue"); 
+				throw new RuntimeException("FATAL ERROR: Wifi cannot be disabled in cleaner, unable to continue");
 			}
 			parameters.setParameter(Parameter.IS_FIRST_LOOP, false);
 		}

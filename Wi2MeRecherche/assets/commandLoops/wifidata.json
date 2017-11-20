@@ -1,0 +1,27 @@
+{
+	"wifi":{
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
+		},
+		"command":{
+			"module":"telecom.wi2meRecherche.model.wifiCommands.WifiConnector",
+			"params":{
+				"bssid_file":""
+			}
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.CommunityNetworkConnector"
+		},
+		"command":{
+			"module":"telecom.wi2meCore.model.wifiCommands.WifiDownloader",
+			"params":{
+				"server":"ipv4.download.thinkbroadband.com",
+				"path":"/100MB.zip",
+				"size":"102400000"
+			}
+		}
+	}
+}

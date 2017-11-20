@@ -84,7 +84,7 @@ public class WifiScanner extends WirelessNetworkCommand{
 				} catch (TimeoutException e) {
 					Log.e(getClass().getSimpleName(), "++ "+e.getMessage(), e);
 					//If we cannot enable the wifi interface we are unable to continue
-					throw new RuntimeException("FATAL ERROR: Wifi cannot be enabled, unable to continue");
+					//throw new RuntimeException("FATAL ERROR: Wifi cannot be enabled, unable to continue");
 				}
 			}
 
