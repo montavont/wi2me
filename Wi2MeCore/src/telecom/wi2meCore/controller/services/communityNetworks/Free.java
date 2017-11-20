@@ -24,7 +24,7 @@ import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.net.InetAddress; 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +54,7 @@ import telecom.wi2meCore.model.Utils;
  *
  */
 public class Free implements ICommunityNetwork {
-	
+
 	private String name = "FreeWifi";
 	private String regExp = "FreeWifi";
 	private String pluginFilename = "plugins/freewifi.js";
@@ -64,7 +64,8 @@ public class Free implements ICommunityNetwork {
 	private String passwordParameter = "FREEWIFI_PASSWORD";
 	private String encryptionKeyLocation = "FREEWIFI.key";
 
-	private static final String publicKey = "c5ca4db0fdca261a23d39a36805bef5ac3ed7958cc3518480cf4e35f76b5d84dc084f296aae9c118f57cdda9ae6271f1bb2bef62b883371f115d44eb6c692112f05d6cd86c5fd051dbdfcdffac5ad84a9f00e0f2f37c92f3a0be1fa766cb0cf58d87043dce89fa670fdd0b90a237535c47698e6747afe5856da65dad3c338bc835db6244a631d4bc4e53795f96d4212b5a781d622936a36598b478065fb0a854dcf12204a658d82981fd04a92b2d04c1c8a694e976526eee6b2ba46ed777f770ca9bcb32ce18e686e8cf5e758ead8a55ce589091c5f03691c02af4efb11f1df14597f124c13d87905ff8ab46ade1c99eaf14be787c067365ff3eb74cf5b0f3bf";
+	//private static final String publicKey = "c5ca4db0fdca261a23d39a36805bef5ac3ed7958cc3518480cf4e35f76b5d84dc084f296aae9c118f57cdda9ae6271f1bb2bef62b883371f115d44eb6c692112f05d6cd86c5fd051dbdfcdffac5ad84a9f00e0f2f37c92f3a0be1fa766cb0cf58d87043dce89fa670fdd0b90a237535c47698e6747afe5856da65dad3c338bc835db6244a631d4bc4e53795f96d4212b5a781d622936a36598b478065fb0a854dcf12204a658d82981fd04a92b2d04c1c8a694e976526eee6b2ba46ed777f770ca9bcb32ce18e686e8cf5e758ead8a55ce589091c5f03691c02af4efb11f1df14597f124c13d87905ff8ab46ade1c99eaf14be787c067365ff3eb74cf5b0f3bf";
+	private static final String publicKey = "bd236ff992fbf8c11a1ffda3a2992b4940d771d4143ca56f1257976a17ddd126a1a7329a94a828f4e7bde48b6d6766dcbf162c38169214c6e2a410348c077e39a9ba0eef470803aaabd9489303f6c957ec062d84aa97f4a4b1ef47c79b663b21fd8ef447ee418057f0914c008a85bab06dcd94f89f591eefff95f4acbcf716eb063da9529c2de169d1e828170578c3ad4f5e88084d268dca5f5d07645ece2fe3a4db9412209c79727176052cb0f801138c2a0f1d7f579a76aa666d6c507dd985a39d3efffa9ea97bff189ad0010cbd299762fee02ab011ce7af6cf2236245607a6df5cd22fb5eff3422b18bf4283326f902be1b25480485edc83167e87653387";
 	private static final String commonName = "*.free.fr";
 
 	@Override
@@ -100,10 +101,11 @@ public class Free implements ICommunityNetwork {
 		Runnable routine = new Runnable()
 		{
 			String freeWifiServer =  "https://wifi.free.fr/Auth";
-			String wi2meServer = ConfigurationManager.CONNECTION_CHECK_URL;
-			String wi2meServerPage = "Telecom Bretagne Server for Wi2MeTraceXPlorer";
+			String wi2meServer = "http://216.34.181.45";
 
-			String successfullLoginPage = "CONNEXION AU SERVICE REUSSIE";	
+			String wi2meServerPage = "News for nerds, stuff that matters";
+
+			String successfullLoginPage = "CONNEXION AU SERVICE REUSSIE";
 			String SCHEME_NAME = "https";
 
 			String str = "";
@@ -112,47 +114,34 @@ public class Free implements ICommunityNetwork {
 
 			@Override
 			public void run()
-			{ 
-
-				try 
+			{
+				try
 				{
-
-				    	communityNetworkConnectionHttpClient = new DefaultHttpClient();
-
+			    	communityNetworkConnectionHttpClient = new DefaultHttpClient();
 					WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 					int wifiAddress = info.getIpAddress();
-					Log.d("HTTPGet", "++ " + "Local IP Address " + Utils.intToIp(wifiAddress));
-	
 					communityNetworkConnectionHttpClient.getParams().setParameter(ConnRoutePNames.LOCAL_ADDRESS, Utils.intToInetAddress(wifiAddress));
 
-
-					TrustAllSSLSocketFactory tasslf = new TrustAllSSLSocketFactory(publicKey, commonName);
-				        Scheme sch = new Scheme(SCHEME_NAME, tasslf, 443);
-				        communityNetworkConnectionHttpClient.getConnectionManager().getSchemeRegistry().register(sch);
-
-
-
-
-
 					HttpGet initialGet = new HttpGet(wi2meServer);
-			
-					Log.d("HTTPGet", "++ " + "To execute " + wi2meServer + "-");
-				    	HttpResponse response = communityNetworkConnectionHttpClient.execute(initialGet);
-				    	Log.d("HTTPGet", "++ " + "Executed " + wi2meServer + "-");
-			
+			    	HttpResponse response = communityNetworkConnectionHttpClient.execute(initialGet);
+
 					BufferedReader in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 					while ((str = in.readLine()) != null)
 					{
 						page += str;
 					}
-			
+
 					if (page.contains(wi2meServerPage))
 					{
 						ControllerServices.getInstance().getCommunity().CNConnectionAlreadyConnected();
 					}
 					else
 					{
-				    	
+
+						TrustAllSSLSocketFactory tasslf = new TrustAllSSLSocketFactory(publicKey, commonName);
+				        Scheme sch = new Scheme(SCHEME_NAME, tasslf, 443);
+				        communityNetworkConnectionHttpClient.getConnectionManager().getSchemeRegistry().register(sch);
+
 						page = "";
 						HttpPost authPost = new HttpPost(freeWifiServer);
 						List<NameValuePair> params = new ArrayList<NameValuePair>(2);
@@ -161,18 +150,15 @@ public class Free implements ICommunityNetwork {
 						params.add(new BasicNameValuePair("submit", "Valider"));
 
 						authPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
-							
-						Log.d("HTTPGet", "++ " + "Now executing post " + freeWifiServer + "-" );
-						response = communityNetworkConnectionHttpClient.execute(authPost);
-						Log.d("HTTPGet", "++ " + "Executed post  " + freeWifiServer + "-" );
 
-				
+						response = communityNetworkConnectionHttpClient.execute(authPost);
+
 						in = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 						while ((str = in.readLine()) != null)
 						{
 							page += str;
 						}
-				
+
 						if (page.contains(successfullLoginPage))
 						{
 
@@ -188,7 +174,7 @@ public class Free implements ICommunityNetwork {
 				catch (Exception e)
 				{
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-					
+
 					communityNetworkConnectionHttpClient.getConnectionManager().shutdown();
 
 					ControllerServices.getInstance().getCommunity().CNConnectionFailed();

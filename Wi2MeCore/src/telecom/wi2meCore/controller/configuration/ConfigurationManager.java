@@ -279,7 +279,7 @@ public class ConfigurationManager
 						KEY_FILE = Environment.getExternalStorageDirectory()+WI2ME_DIRECTORY+ENCRYPTIONKEY_DIRECTORY+communityService.getEncryptionKeyLocation(cn);
 						try {
 							decryptedPwd = CryptoUtils.decrypt(props.getProperty(communityService.getPasswordParameter(cn)), new File(KEY_FILE));
-							User user = new User(props.getProperty(communityService.getUserParameter(cn)),decryptedPwd,cn);
+						 	User user = new User(props.getProperty(communityService.getUserParameter(cn)),decryptedPwd,cn);
 							communityNets.add(cn);
 							users.add(user);
 						} catch (GeneralSecurityException e) {
