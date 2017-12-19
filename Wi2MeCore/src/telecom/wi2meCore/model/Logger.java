@@ -85,6 +85,7 @@ public class Logger extends ILogger
 				case CELL_SCAN_RESULT:
 				case CELL_CONNECTION_EVENT:
 				case CELL_CONNECTION_DATA:
+				case CELL_SIGNAL_EVENT:
 				case EXTERNAL_EVENT:
 					type = Type.CELL;
 					break;

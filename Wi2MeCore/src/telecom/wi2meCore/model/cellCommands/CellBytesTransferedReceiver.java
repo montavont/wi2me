@@ -42,7 +42,7 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 	private static final String SEPARATOR = "-";
 	private String type;
 	private int byteCounter;
-	
+
 	public CellBytesTransferedReceiver(boolean download){
 		byteCounter = 0;
 		if (download){
@@ -51,7 +51,7 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 			type = Utils.TYPE_UPLOAD;
 		}
 	}
-	
+
 	public String getLocalIpAddress() {
 		String ret = null;
         try {
@@ -64,13 +64,13 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
                     }
                 }
             }
-            
+
         } catch (SocketException ex) {
             Log.e(getClass().getSimpleName(), "++ "+ex.toString());
         }
         return ret;
-    } 
-	
+    }
+
 	@Override
 	public void receiveTransferredBytes(int bytes, long totalBytes) {
 		receiveTransferredBytes(bytes, totalBytes, "");
@@ -79,11 +79,11 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 	@Override
 	public void receiveTransferredBytes(int bytes, long totalBytes,
 			String eventDescription) {
-		
+
 		int tx = 0; // Only for WiFi
 		int rx = 0;
 		int retries = 0;
-		
+
 		if (eventDescription != ""){
 			eventDescription = SEPARATOR + eventDescription;
 		}
@@ -102,7 +102,7 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 		File f = new File(filename);
 		return new RandomAccessFile(f, "r");
 	}
-	
+
 	private static String readBytes(String file){
 		RandomAccessFile raf = null;
 		try {
@@ -119,5 +119,5 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 			}
 		}
 	}
-	
+
 }

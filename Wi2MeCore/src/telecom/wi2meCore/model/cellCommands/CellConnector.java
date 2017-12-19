@@ -87,9 +87,6 @@ public class CellConnector extends WirelessNetworkCommand{
 		if (!(Boolean)parameters.getParameter(Parameter.WIFI_CONNECTION_ATTEMPT)){
 			boolean connected = false;
 			CellTransferrerContainer transferCommands = (CellTransferrerContainer) parameters.getParameter(Parameter.CELL_TRANSFER_COMMANDS);
-			//If the current cell was not completely tested, we attempt to connect and test it
-			if (!transferCommands.wasCompletelyTested(lastScannedCell)){
-
 				if (!(Boolean)parameters.getParameter(Parameter.CELL_CONNECTED)){
 					//we first wait a period of time
 					try {
@@ -99,10 +96,6 @@ public class CellConnector extends WirelessNetworkCommand{
 						Log.d(getClass().getSimpleName(), "++ "+"Connecting Interrupted while sleeping to connect", e1);
 						return;
 					}
-
-					//we check that the cell did not change again to the previous one while we slept
-					if (!lastScannedCell.equals(ControllerServices.getInstance().getCell().getLastScannedCell()))
-						return;
 
 					//now we will try to connect, but just in case we check for a wifi attempt, as we have been sleeping
 					if ((Boolean)parameters.getParameter(Parameter.WIFI_CONNECTION_ATTEMPT))
@@ -133,7 +126,7 @@ public class CellConnector extends WirelessNetworkCommand{
 						connected = false;
 					}
 				}
-			}
+			//}
 			parameters.setParameter(Parameter.CELL_CONNECTION_ATTEMPT, connected);
 			parameters.setParameter(Parameter.CELL_CONNECTED, connected);
 			parameters.setParameter(Parameter.CELL_CONTINUE_TRANSFERRING, connected);

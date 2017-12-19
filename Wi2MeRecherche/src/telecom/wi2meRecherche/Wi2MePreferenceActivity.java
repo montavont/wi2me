@@ -437,45 +437,46 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		List<String> ifaces = new ArrayList<String>();
 		List<String> ifaceValues = new ArrayList<String>();
 
-		for (File f : files)
+		if (files != null )
 		{
-			if (f.isDirectory())
+			for (File f : files)
 			{
-				ifaces.add(f.getName());
-				ifaceValues.add(f.getName());
+				if (f.isDirectory())
+				{
+					ifaces.add(f.getName());
+					ifaceValues.add(f.getName());
+				}
 			}
 
+
+			//Select monitored interfaces
+			MonitoredInterfaces.setEntries(ifaces.toArray(new CharSequence[ifaces.size()]));
+			MonitoredInterfaces.setEntryValues(ifaceValues.toArray(new CharSequence[ifaceValues.size()]));
+			MonitoredInterfaces.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+			{
+
+				@Override
+				public boolean onPreferenceChange(Preference preference, Object newValue)
+				{
+					boolean retval = true;
+
+					List<String> newVals = new ArrayList<String>((HashSet<String>) newValue);
+
+					MultiSelectListPreference mpreference = (MultiSelectListPreference) preference;
+					try
+					{
+						changeParameter(newVals, Parameter.MONITORED_INTERFACES);
+					}
+					catch (IOException e)
+					{
+						e.printStackTrace();
+						retval = false;
+					}
+					return retval;
+				}
+
+			});
 		}
-
-
-		//Select monitored interfaces
-		MonitoredInterfaces.setEntries(ifaces.toArray(new CharSequence[ifaces.size()]));
-		MonitoredInterfaces.setEntryValues(ifaceValues.toArray(new CharSequence[ifaceValues.size()]));
-		MonitoredInterfaces.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
-		{
-
-			@Override
-			public boolean onPreferenceChange(Preference preference, Object newValue)
-			{
-				boolean retval = true;
-
-				List<String> newVals = new ArrayList<String>((HashSet<String>) newValue);
-
-				MultiSelectListPreference mpreference = (MultiSelectListPreference) preference;
-				try
-				{
-					changeParameter(newVals, Parameter.MONITORED_INTERFACES);
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-					retval = false;
-				}
-				return retval;
-			}
-
-		});
-
 		// Set parameter LOCK_NETWORK
 
 		try

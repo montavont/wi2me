@@ -22,9 +22,9 @@ package telecom.wi2meCore.model.entities;
 import telecom.wi2meCore.controller.services.cell.CellInfo;
 
 public class Cell {
-	
+
 	public static final String CELL_REFERENCE = Cell.TABLE_NAME + "Id";
-	
+
 	public static final String TABLE_NAME = "Cell";
 	public static final String OPERATOR_NAME = "operatorName";
 	public static final String OPERATOR = "operator";
@@ -34,7 +34,7 @@ public class Cell {
 	public static final String LAC = "lac";
 	public static final String LEVEL_DBM = "leveldBm";
 	public static final String CURRENT = "current";
-	
+
 	private String operatorName;
 	private String operator;
 	private String networkType;
@@ -43,7 +43,7 @@ public class Cell {
 	private int lac;
 	private int leveldBm;
 	private boolean current;
-	
+
 	public Cell(String operatorName, String operator, String networkType, String phoneType, 
 				int cid, int lac, int leveldBm, boolean current){
 		this.operatorName = operatorName;
@@ -55,7 +55,7 @@ public class Cell {
 		this.leveldBm = leveldBm;
 		this.current = current;
 	}
-	
+
 	public String getOperatorName() {
 		return operatorName;
 	}
@@ -104,12 +104,12 @@ public class Cell {
 	public void setCurrent(boolean current) {
 		this.current = current;
 	}
-	
+
 	public static Cell getNewCell(String operatorName, String operator, String networkType, String phoneType, 
 			int cid, int lac, int leveldBm, boolean current){
 		return new Cell (operatorName, operator, networkType, phoneType, cid, lac, leveldBm, current);
 	}
-	
+
 	/**
 	 * Returns a Cell object out of a CellInfo object. This method will be used to convert the info obtained from scanning to a Cell object
 	 * @param info The info of the cell we want to use to fill the Cell object
@@ -118,9 +118,9 @@ public class Cell {
 	public static Cell getNewCellFromCellInfo(CellInfo info){
 		return new Cell (info.operatorName, info.operator, info.networkType, info.phoneType, info.cid, info.lac, info.getLeveldBm(), true);
 	}
-	
+
 	private static final String ATRIBUTE_SEPARATOR = ",";
-	
+
 	public String toString(){
 		return operatorName + ATRIBUTE_SEPARATOR + operator + ATRIBUTE_SEPARATOR + networkType + ATRIBUTE_SEPARATOR
 		        + phoneType + ATRIBUTE_SEPARATOR + cid + ATRIBUTE_SEPARATOR + lac + ATRIBUTE_SEPARATOR 

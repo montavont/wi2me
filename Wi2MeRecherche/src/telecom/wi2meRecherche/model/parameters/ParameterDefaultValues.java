@@ -71,7 +71,8 @@ public class ParameterDefaultValues {
 	public static final boolean LOCK_NETWORK = true;
 	public static final String REMOTE_UPLOAD_DIRECTORY = "wi2me/";
 	public static final String SERVER_IP = "192.108.119.26";
-	public static final String CONNECTION_CHECK_URL = "http://192.108.119.26/mnt/vg1/volume1/wi2me/page.html";
+	//public static final String CONNECTION_CHECK_URL = "http://192.108.119.26/mnt/vg1/volume1/wi2me/page.html";
+	public static final String CONNECTION_CHECK_URL = "https://slashdot.org";
 	public static final String WI2ME_DIRECTORY = "/Wi2MeRecherche/";
 	public static final String MONITORED_INTERFACES = "wlan0";
 	public static final int STORAGE_TYPE = 1;

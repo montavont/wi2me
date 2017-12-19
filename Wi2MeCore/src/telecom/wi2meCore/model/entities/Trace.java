@@ -41,6 +41,7 @@ public abstract class Trace {
         CELL_SCAN_RESULT,
         CELL_CONNECTION_EVENT,
         CELL_CONNECTION_DATA,
+        CELL_SIGNAL_EVENT,
         EXTERNAL_EVENT,
         WIFI_PING,
 		LOCATION_EVENT,
