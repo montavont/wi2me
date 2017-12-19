@@ -93,6 +93,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -908,7 +909,7 @@ public class Wi2MeRecherche extends Activity
 	{
 
 		localizationView = (ListView) findViewById(R.id.gridViewLocalization);
-
+		RelativeLayout looperLogContainer = (RelativeLayout) findViewById(R.id.LooperLogContainer);
 		myListAdapter localizationAdapter = (myListAdapter) localizationView.getAdapter();
 
 		if (logTrace != null)
@@ -931,122 +932,6 @@ public class Wi2MeRecherche extends Activity
 			TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
 			ListView dataView = (ListView) findViewById(R.id.gridViewConnection);
 			TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
-
-			if (mCellConnectionEvent != null)
-			{
-				cellView = (ListView) findViewById(R.id.gridViewCell);
-				myListAdapter adapterCell = (myListAdapter) cellView.getAdapter();
-				adapterCell.setData("Operator Name", mCellConnectionEvent.getConnectionTo().getOperatorName());
-				adapterCell.setData("Signal Level (dBm)", String.valueOf(mCellConnectionEvent.getConnectionTo().getLeveldBm()));
-				adapterCell.setData("Network type", mCellConnectionEvent.getConnectionTo().getNetworkType());
-				adapterCell.setData("CID/LAC", String.valueOf(mCellConnectionEvent.getConnectionTo().getCid())+"/"+String.valueOf(mCellConnectionEvent.getConnectionTo().getLac()));
-
-				adapterCell.notifyDataSetChanged();
-
-				cellStatus.setText(mCellConnectionEvent.getEvent());
-				mCellConnectionEvent = null;
-			}
-			if (mCellConnectionData != null)
-			{
-				TextView connectionStatus=(TextView) findViewById(R.id.connectionStatus);
-				if(mCellConnectionData.getConnectionData().getType().startsWith("IN")){
-				connectionStatus.setText(mCellConnectionData.getConnectionData().getType().replaceFirst("IN", "Cell-Download"));
-				}
-				if(mCellConnectionData.getConnectionData().getType().startsWith("OUT")){
-					connectionStatus.setText(mCellConnectionData.getConnectionData().getType().replaceFirst("OUT", "Cell-Upload"));
-				}
-
-				if (mCellConnectionData.getConnectionData().getType().contains("START")){
-					cell_start_time=mCellConnectionData.getTimestamp();
-					cell_start = true;
-				}
-				else if (!cell_start){
-					cell_start = true;
-					cell_start_time=mCellConnectionData.getTimestamp();
-				}
-
-
-				myListAdapter adapterCellData = (myListAdapter) dataView.getAdapter();
-				adapterCellData.setData("IP address", mCellConnectionData.getConnectionData().getIp());
-				adapterCellData.setData("Elapsed time (ms)", String.valueOf(mCellConnectionData.getTimestamp()-cell_start_time));
-				adapterCellData.setData("Retries", "-");
-				adapterCellData.setData("Tx/Rx packets", "-");
-				adapterCellData.setData("Throughput (KB/s)", String.valueOf((float)(mCellConnectionData.getConnectionData().getBytesTransferred())/(mCellConnectionData.getTimestamp()-cell_start_time)));
-				adapterCellData.setData("Transfer progress", String.valueOf((int)((float)(mCellConnectionData.getConnectionData().getBytesTransferred())/(float)(mCellConnectionData.getConnectionData().getTotalBytes())*100))+"%"+" (Total:"+String.valueOf(mCellConnectionData.getConnectionData().getTotalBytes())+')');
-
-				adapterCellData.notifyDataSetChanged();
-
-				cellView = (ListView) findViewById(R.id.gridViewCell);
-				myListAdapter adapterCell2 = (myListAdapter) cellView.getAdapter();
-				adapterCell2.setData("Operator Name", mCellConnectionData.getConnectedTo().getOperatorName());
-				adapterCell2.setData("Signal Level (dBm)", String.valueOf(mCellConnectionData.getConnectedTo().getLeveldBm()));
-				adapterCell2.setData("Network type", mCellConnectionData.getConnectedTo().getNetworkType());
-				adapterCell2.setData("CID/LAC", String.valueOf(mCellConnectionData.getConnectedTo().getCid())+"/"+String.valueOf(mCellConnectionData.getConnectedTo().getLac()));
-
-				adapterCell2.notifyDataSetChanged();
-
-				cellStatus.setText(mCellConnectionData.toString());
-				mCellConnectionData = null;
-			}
-			if (mWifiConnectionEvent != null)
-			{
-				wifiView = (ListView) findViewById(R.id.gridViewWifi);
-
-				myListAdapter wifiAdapter1 = (myListAdapter) wifiView.getAdapter();
-				wifiAdapter1.setData("SSID", mWifiConnectionEvent.getConnectionTo().getSsid());
-				wifiAdapter1.setData("Signal strength (dBm)", String.valueOf(mWifiConnectionEvent.getConnectionTo().getLevel()));
-				wifiAdapter1.setData("Channel", String.valueOf(mWifiConnectionEvent.getConnectionTo().getChannel()));
-				wifiAdapter1.setData("BSSID", mWifiConnectionEvent.getConnectionTo().getBSSID());
-				wifiAdapter1.setData("Rate (Mbps)", String.valueOf(mWifiConnectionEvent.getConnectionTo().getLinkSpeed()));
-
-				wifiAdapter1.notifyDataSetChanged();
-
-				wifiStatus.setText(mWifiConnectionEvent.getEvent());
-
-				mWifiConnectionEvent = null;
-
-			}
-			if (mWifiConnectionData != null)
-			{
-
-				if (mWifiConnectionData.getConnectionData().getType().contains("START")||mWifiConnectionData.getConnectionData().getBytesTransferred() < lastBytesTransferred){
-					wifi_start_time=mWifiConnectionData.getTimestamp();
-					wifi_start = true;
-				}
-				else if (!wifi_start){
-					wifi_start = true;
-					wifi_start_time=mWifiConnectionData.getTimestamp();
-				}
-
-				myListAdapter adapterWifiData = (myListAdapter) dataView.getAdapter();
-				adapterWifiData.setData("IP address", mWifiConnectionData.getConnectionData().getIp());
-				adapterWifiData.setData("Elapsed time (ms)", String.valueOf(mWifiConnectionData.getTimestamp()-wifi_start_time));
-				adapterWifiData.setData("Retries", String.valueOf(mWifiConnectionData.getConnectionData().getRetries()));
-				adapterWifiData.setData("Tx/Rx packets", String.valueOf(mWifiConnectionData.getConnectionData().getTxPackets())+"/"+String.valueOf(mWifiConnectionData.getConnectionData().getRxPackets()));
-				adapterWifiData.setData("Throughput (KB/s)", String.valueOf((float)(mWifiConnectionData.getConnectionData().getBytesTransferred())/(mWifiConnectionData.getTimestamp()-wifi_start_time)));
-				adapterWifiData.setData("Transfer progress", String.valueOf((int)((float)(mWifiConnectionData.getConnectionData().getBytesTransferred())/(float)(mWifiConnectionData.getConnectionData().getTotalBytes())*100))+"%"+" (Total:"+String.valueOf(mWifiConnectionData.getConnectionData().getTotalBytes())+')');
-
-				adapterWifiData.notifyDataSetChanged();
-
-				TextView connectionStatus=(TextView) findViewById(R.id.connectionStatus);
-				if(mWifiConnectionData.getConnectionData().getType().startsWith("IN")){
-				connectionStatus.setText(mWifiConnectionData.getConnectionData().getType().replaceFirst("IN", "Wifi-Download"));
-				}
-				if(mWifiConnectionData.getConnectionData().getType().startsWith("OUT")){
-					connectionStatus.setText(mWifiConnectionData.getConnectionData().getType().replaceFirst("OUT", "Wifi-Upload"));
-				}
-				wifiView = (ListView) findViewById(R.id.gridViewWifi);
-
-				myListAdapter adapterWifi = (myListAdapter) wifiView.getAdapter();
-				adapterWifi.setData("SSID", mWifiConnectionData.getConnectedTo().getSsid());
-				adapterWifi.setData("Signal strength (dBm)", String.valueOf(mWifiConnectionData.getConnectedTo().getLevel()));
-				adapterWifi.setData("Channel", String.valueOf(mWifiConnectionData.getConnectedTo().getChannel()));
-				adapterWifi.setData("BSSID", mWifiConnectionData.getConnectedTo().getBSSID());
-				adapterWifi.setData("Rate (Mbps)", String.valueOf(mWifiConnectionData.getConnectedTo().getLinkSpeed()));
-				adapterWifi.notifyDataSetChanged();
-				lastBytesTransferred = mWifiConnectionData.getConnectionData().getBytesTransferred();
-				mWifiConnectionData = null;
-			}
 			if (refreshUI)
 			{
       				refreshHandler.postDelayed(refreshTask, UI_REFRESH_PERIOD);

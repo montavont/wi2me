@@ -32,6 +32,7 @@ import java.util.List;
 
 import telecom.wi2meCore.controller.configuration.CommunityNetworks;
 import telecom.wi2meCore.model.entities.*;
+import telecom.wi2meCore.model.entities.Trace.TraceType;
 
 public class TextTraceHelper implements ITraceDatabase
 {
@@ -45,20 +46,6 @@ public class TextTraceHelper implements ITraceDatabase
 
 
 
-	public enum TraceType{
-		WIFI_SCAN_RESULT,
-		WIFI_CONNECTION_EVENT,
-		COMMUNITY_NETWORK_CONNECTION_EVENT,
-		WIFI_CONNECTION_DATA,
-		WIFI_SNIFFER_DATA,
-		WIFI_CONNECTION_INFO,
-		BYTES_PER_UID,
-		CELL_SCAN_RESULT,
-		CELL_CONNECTION_EVENT,
-		CELL_CONNECTION_DATA,
-		EXTERNAL_EVENT,
-		WIFI_PING
-	}
 
 
 	private TextTraceHelper()
@@ -337,6 +324,27 @@ public class TextTraceHelper implements ITraceDatabase
 								cellToString(c)
 							);
 						}
+						break;
+					case CELL_SIGNAL_EVENT:
+						CellularSignalStrengthEvent cSignalStrengthEvent = (CellularSignalStrengthEvent) trace;
+						trace_strings.add(
+								cSignalStrengthEvent.getAsuLevel()
+								+ CSV_SEP
+								+ cSignalStrengthEvent.getCqi()
+								+ CSV_SEP
+								+ cSignalStrengthEvent.getDbm()
+								+ CSV_SEP
+								+ cSignalStrengthEvent.getLevel()
+								+ CSV_SEP
+								+ cSignalStrengthEvent.getRsrp()
+								+ CSV_SEP
+								+ cSignalStrengthEvent.getRsrq()
+								+ CSV_SEP
+								+ cSignalStrengthEvent.getRssnr()
+								+ CSV_SEP
+	 							+ cSignalStrengthEvent.getTimingAdvance()
+								+ CSV_SEP
+						);
 						break;
 					case EXTERNAL_EVENT:
 						ExternalEvent externalEvent = (ExternalEvent) trace;

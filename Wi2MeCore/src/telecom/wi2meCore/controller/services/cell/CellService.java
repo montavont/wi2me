@@ -28,8 +28,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import telecom.wi2meCore.controller.configuration.TimeoutConstants;
-import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.telephony.CellLocation;
@@ -39,6 +37,24 @@ import android.telephony.SignalStrength;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import android.telephony.CellInfoLte;
+import android.telephony.CellInfoWcdma;
+import android.telephony.CellInfoGsm;
+import android.telephony.CellInfoCdma;
+import android.telephony.SignalStrength;
+import android.telephony.CellSignalStrength;
+import android.telephony.CellSignalStrengthLte;
+import android.telephony.CellSignalStrengthGsm;
+import android.telephony.CellSignalStrengthCdma;
+import android.telephony.CellSignalStrengthWcdma;
+
+
+import telecom.wi2meCore.model.Logger;
+import telecom.wi2meCore.controller.configuration.TimeoutConstants;
+import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
+import telecom.wi2meCore.model.entities.CellularSignalStrengthEvent;
+import telecom.wi2meCore.model.TraceManager;
+
 /**
  * Service managing the cell connection.
  * Allows to get current status, connect, disconnect, etc.
@@ -46,40 +62,33 @@ import android.util.Log;
  *
  */
 public class CellService implements ICellService {
-	
+
 	private static final String DATA_CONNECTING_TIMEOUT_MESSAGE = "The timeout for connecting to a data network elapsed";
 	private static final String DATA_DISCONNECTING_TIMEOUT_MESSAGE = "The timeout for disconnecting to a data network elapsed";
-	
+
 	private static final String CANNOT_DISCONNECT_MESSAGE = "FATAL ERROR: Cellular network cannot be disconnected. Unable to continue";
 
-	
+
 	private TelephonyManager telephonyManager;
 	private ConnectivityManager connectivityManager;
 	private ConnectionChangeThread connectionChangeThread;
-	//private ConnectionStateListener connectionStateListener;
 	private CellInfo currentCell;
-	private ServiceStateListener stateListener;	
+	private ServiceStateListener stateListener;
 	private CellLocationListener locationListener;
 	private SignalStrengthListener signalListener;
 	private ScanningThread scanThread;
 	private NetworkConnectionEventReceiver netEventReceiver;
 	private Context context;
 	private List<ICellularConnectionEventReceiver> disconnectionEventReceivers;
-	
+
 	public CellService(Context context){
 		this.context = context;
 		telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
 		connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		
+
 		netEventReceiver = new NetworkConnectionEventReceiver();
 		context.registerReceiver(netEventReceiver, new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION));
-				
-		/*
-		connectionStateListener = new ConnectionStateListener(); 
-        //We register a listener to know when we are connected or disconnected
-        telephonyManager.listen(connectionStateListener, PhoneStateListener.LISTEN_DATA_CONNECTION_STATE);
-        */
-		
+
 		stateListener = new ServiceStateListener();
 		telephonyManager.listen(stateListener, PhoneStateListener.LISTEN_SERVICE_STATE);
 		locationListener = new CellLocationListener();
@@ -87,10 +96,10 @@ public class CellService implements ICellService {
 		signalListener = new SignalStrengthListener();
 		telephonyManager.listen(signalListener, PhoneStateListener.LISTEN_SIGNAL_STRENGTHS);
 		currentCell = new CellInfo();
-		
+
 		disconnectionEventReceivers = new ArrayList<ICellularConnectionEventReceiver>();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#finalizeService()
 	 */
@@ -99,29 +108,27 @@ public class CellService implements ICellService {
 		//unregister
 		telephonyManager.listen(stateListener, PhoneStateListener.LISTEN_NONE);
 		//unregister
-		telephonyManager.listen(signalListener, PhoneStateListener.LISTEN_NONE);		
+		telephonyManager.listen(signalListener, PhoneStateListener.LISTEN_NONE);
 		//unregister
 		telephonyManager.listen(locationListener, PhoneStateListener.LISTEN_NONE);
-		//unregister
-		//telephonyManager.listen(connectionStateListener, PhoneStateListener.LISTEN_NONE);
-		
+
 		context.unregisterReceiver(netEventReceiver);
 	}
-	
+
 	public NetworkInfo getCellularDataNetworkInfo(){
 		return connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 	}
-			
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#scan()
 	 */
 	@Override
-	public CellInfo scan() throws InterruptedException{		
+	public CellInfo scan() throws InterruptedException{
 		CellInfo ret = new CellInfo();
-		synchronized (currentCell) {						
+		synchronized (currentCell) {
 			if (currentCell.isChanged()){
 				currentCell.copy(ret);
-				currentCell.setChanged(false);	
+				currentCell.setChanged(false);
 				return ret;
 			}
 		}
@@ -137,16 +144,16 @@ public class CellService implements ICellService {
 			scanThread.join();
 			//If we reach this is because the thread was interrupted, so we return changes
 			return scan();
-		} catch (InterruptedException e) {			
+		} catch (InterruptedException e) {
 			//If we are interrupted is because we needed interruption from the outside, stop thread and rethrow
 			scanThread.interrupt();
 			throw e;
 		} finally{
 			scanThread = null;
 		}
-		
+
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#getLastScannedCell()
 	 */
@@ -155,14 +162,14 @@ public class CellService implements ICellService {
 		//As the currentCell has synchronized methods, we do not need to synchronize
 		return currentCell.getCopyOfCurrentCell();
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#isDataNetworkConnected()
 	 */
 	@Override
 	public boolean isDataNetworkConnected(){
 		//return telephonyManager.getDataState() == TelephonyManager.DATA_CONNECTED;
-		
+
 		NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
 		if (netInfo != null){
 			return netInfo.isConnected() && (netInfo.getType() == ConnectivityManager.TYPE_MOBILE) && (telephonyManager.getDataState() == TelephonyManager.DATA_CONNECTED);
@@ -178,7 +185,7 @@ public class CellService implements ICellService {
 	public boolean isPhoneNetworkConnected(){
 		return telephonyManager.getPhoneType() != TelephonyManager.PHONE_TYPE_NONE;
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#isDataTransferringEnabled()
 	 */
@@ -186,7 +193,7 @@ public class CellService implements ICellService {
 	public boolean isDataTransferringEnabled(){
 		return getMobileDataEnabled();
 	}
-			
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#connect()
 	 */
@@ -194,7 +201,7 @@ public class CellService implements ICellService {
 	public boolean connect() throws InterruptedException, TimeoutException{
 		return changeConnectionState(true);
 	}
-	
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#disconnect()
 	 */
@@ -202,18 +209,18 @@ public class CellService implements ICellService {
 	public boolean disconnect() throws InterruptedException, TimeoutException{
 		return changeConnectionState(false);
 	}
-	
+
 	private class ConnectionMethod {
-		
+
 		private Method dataConnSwitchmethod;
 		private Object ITelephonyStub;;
-		
+
 		@SuppressWarnings("rawtypes")
-		public ConnectionMethod(boolean connect) throws Exception{		
-	        Class telephonyManagerClass;	        
+		public ConnectionMethod(boolean connect) throws Exception{
+	        Class telephonyManagerClass;
 	        Class ITelephonyClass;
 	        String methodToRun;
-	        
+
 	        if (connect){
 	        	methodToRun = "enableDataConnectivity";
 	        }else{
@@ -224,14 +231,14 @@ public class CellService implements ICellService {
 		        Method getITelephonyMethod = telephonyManagerClass.getDeclaredMethod("getITelephony");
 		        getITelephonyMethod.setAccessible(true);
 		        ITelephonyStub = getITelephonyMethod.invoke(telephonyManager);
-		        ITelephonyClass = Class.forName(ITelephonyStub.getClass().getName());	        	
-		        dataConnSwitchmethod = ITelephonyClass.getDeclaredMethod(methodToRun);   	       
-		        dataConnSwitchmethod.setAccessible(true);	
+		        ITelephonyClass = Class.forName(ITelephonyStub.getClass().getName());
+		        dataConnSwitchmethod = ITelephonyClass.getDeclaredMethod(methodToRun);
+		        dataConnSwitchmethod.setAccessible(true);
 	        }catch (Exception e){
 	        	throw e;
-	        }			
+	        }
 		}
-		
+
 		public void run() throws Exception
 		{
 		        //we call the method
@@ -247,10 +254,10 @@ public class CellService implements ICellService {
 		}
 
 	}
-		
+
 	private boolean changeConnectionState(boolean finalStateConnected) throws InterruptedException, TimeoutException{
 		ConnectionMethod connectionMethod;
-        String timeoutMessage;        
+        String timeoutMessage;
 
  	//TKER much of the following code is deprecated, look into
 	if (true)
@@ -264,18 +271,18 @@ public class CellService implements ICellService {
         if (connectionChangeThread != null)
         	if (connectionChangeThread.isAlive())
         		return false;
-                
+
         try{
 	        if (finalStateConnected){
 	            if (!this.isDataTransferringEnabled())
 	            	return false;
-	            connectionMethod = new ConnectionMethod(true);        	      
+	            connectionMethod = new ConnectionMethod(true);
 	        	timeoutMessage = DATA_CONNECTING_TIMEOUT_MESSAGE;
 	        	//connectionStateListener.setDesiredConnectionState(TelephonyManager.DATA_CONNECTED);
 	        	netEventReceiver.setDesiredState(NetworkInfo.DetailedState.CONNECTED);
-	        	
+
 	        }else{
-	        	connectionMethod = new ConnectionMethod(false);        	
+	        	connectionMethod = new ConnectionMethod(false);
 	        	timeoutMessage = DATA_DISCONNECTING_TIMEOUT_MESSAGE;
 	        	//connectionStateListener.setDesiredConnectionState(TelephonyManager.DATA_DISCONNECTED);
 	        	netEventReceiver.setDesiredState(NetworkInfo.DetailedState.DISCONNECTED);
@@ -286,10 +293,10 @@ public class CellService implements ICellService {
 	        Method getITelephonyMethod = telephonyManagerClass.getDeclaredMethod("getITelephony");
 	        getITelephonyMethod.setAccessible(true);
 	        ITelephonyStub = getITelephonyMethod.invoke(telephonyManager);
-	        ITelephonyClass = Class.forName(ITelephonyStub.getClass().getName());	        	
-	        dataConnSwitchmethod = ITelephonyClass.getDeclaredMethod(methodToRun);   	       
-	        dataConnSwitchmethod.setAccessible(true);	 */          
-	        
+	        ITelephonyClass = Class.forName(ITelephonyStub.getClass().getName());
+	        dataConnSwitchmethod = ITelephonyClass.getDeclaredMethod(methodToRun);
+	        dataConnSwitchmethod.setAccessible(true);	 */
+
 	        //We run the thread so that it can be interrupted when connected and we can return the function when connected
 	        //We synchronize with the thread listening for state changed
 	        synchronized (/*connectionStateListener*/netEventReceiver) {
@@ -301,21 +308,21 @@ public class CellService implements ICellService {
 	        dataConnSwitchmethod.invoke(ITelephonyStub);
 	        */
 	        connectionMethod.run();
-	        
+
 	        //we wait for it to finish
 	        connectionChangeThread.join();
 	        if (connectionChangeThread.timeoutElapsed){//If the timeout elapsed, throw an exception
 	        	throw new TimeoutException(timeoutMessage);
 	        }
 	        return true;
-	        
+
         } catch(InterruptedException e){
         	/*
-        	//If we are interrupted, re-throw exception        	
+        	//If we are interrupted, re-throw exception
         	connectionChangeThread.join(TimeoutConstants.CELL_CONNECTION_CHANGE_TIMEOUT);
         	if (finalStateConnected){//If we were connecting we also want connection not to take place! So wait until it finishes and disconnect
 	        	connectionChangeThread = null;
-	        	disconnect();        		
+	        	disconnect();
         	}
         	*/
             throw e;
@@ -330,11 +337,11 @@ public class CellService implements ICellService {
         	}
         }
 	}
-	
+
     @SuppressWarnings("rawtypes")
 	private boolean getMobileDataEnabled() {
     	try{
-	    	Class c = Class.forName(connectivityManager.getClass().getName());  
+	    	Class c = Class.forName(connectivityManager.getClass().getName());
 			Method getMobileDataEnabledMethod = c.getDeclaredMethod("getMobileDataEnabled");
 		 	getMobileDataEnabledMethod.setAccessible(true);
 			Object ret = getMobileDataEnabledMethod.invoke(connectivityManager);
@@ -342,39 +349,12 @@ public class CellService implements ICellService {
     	}catch (NoSuchMethodException e){
     		//If we do not have the method it is because it is enabled by default (version 2.1 or lower)
     		Log.w(this.getClass().getSimpleName(), "++ "+e.getMessage(), e);
-    		return true;    		
+    		return true;
     	}catch(Exception e){
     		Log.e(this.getClass().getSimpleName(), "++ "+e.getMessage(), e);
     		return false;
     	}
 	}
-	/*
-	private class ConnectionStateListener extends PhoneStateListener{
-		
-		private static final int INVALID_STATE = -1;
-		private int desiredConnectionState;
-		
-		public synchronized int getDesiredConnectionState() {
-			return desiredConnectionState;
-		}
-
-		public synchronized void setDesiredConnectionState(int desiredConnectionState) {
-			this.desiredConnectionState = desiredConnectionState;
-		}
-
-		public ConnectionStateListener(){
-		}
-		
-		@Override
-		public void onDataConnectionStateChanged (int state){
-			if (state == getDesiredConnectionState()){
-				setDesiredConnectionState(INVALID_STATE);
-				announceConnectionChanged();
-			}
-			Log.d("CONNECTION STATE LISTENER", "State: " + state + "-" + Calendar.getInstance().getTimeInMillis());
-		}		
-	}
-	*/
 	private void announceConnectionChanged(){
 		synchronized (/*connectionStateListener*/netEventReceiver) {
 			if (connectionChangeThread != null){
@@ -382,9 +362,9 @@ public class CellService implements ICellService {
 			}
 		}
 	}
-	
+
 	private class ConnectionChangeThread extends Thread{
-		
+
 		public boolean timeoutElapsed = false;
 		public void run(){
 			try {
@@ -392,11 +372,11 @@ public class CellService implements ICellService {
 				timeoutElapsed = true;
 			} catch (InterruptedException e) {
 				timeoutElapsed = false;
-			}			
+			}
 		}
 	}
 
-	
+
 	private class ScanningThread extends Thread{
 		public static final int SLEEP_TIME = 1000000; //in milliseconds
 		public void run(){
@@ -410,13 +390,13 @@ public class CellService implements ICellService {
 			}
 		}
 	}
-	
+
 	private void announceCellChanged(){
 		if (scanThread != null){
 			scanThread.interrupt();
 		}
 	}
-	
+
 	private class CellLocationListener extends PhoneStateListener{
 		public void onCellLocationChanged (CellLocation location){
 			super.onCellLocationChanged(location);
@@ -426,35 +406,47 @@ public class CellService implements ICellService {
 			announceCellChanged();
 		}
 	}
-	
+
 	private class SignalStrengthListener extends PhoneStateListener{
 		public void onSignalStrengthsChanged(SignalStrength signalStrength){
 			super.onSignalStrengthsChanged(signalStrength);
-			if (signalStrength.isGsm()){
-				int level = CellInfo.getLeveldBm(signalStrength.getGsmSignalStrength());
-				currentCell.setLevel(level);
-				
-			}else{
-				currentCell.setLevel(signalStrength.getCdmaDbm());
-			}
+
+			// Update current cell independently of cellular type
+			currentCell.setLevel(signalStrength.getCdmaDbm());
 			announceCellChanged();
+
+			// Look into more precise cell info
+			// Can't believe this is not passed to LISTEN_CELL_INFO listeners...
+			List<android.telephony.CellInfo> cellInfos = telephonyManager.getAllCellInfo();
+			if(cellInfos!=null){
+				for (int i = 0 ; i<cellInfos.size(); i++){
+       				if (cellInfos.get(i).isRegistered()){
+						//Only LTE supported for now
+    	            	if(cellInfos.get(i) instanceof CellInfoLte){
+	                	    CellInfoLte cellInfoLte = (CellInfoLte) telephonyManager.getAllCellInfo().get(0);
+            	        	CellSignalStrengthLte cellSignalStrengthLte = cellInfoLte.getCellSignalStrength();
+							Logger.getInstance().log(CellularSignalStrengthEvent.getNewCellularSignalStrengthEvent(TraceManager.getTrace(), (CellSignalStrength)cellSignalStrengthLte));
+                		}
+            		}
+        		}
+			}
 		}
 	}
-	
+
 	/**
 	 * This class is only for getting the ServiceState, which informs the operator (MCC + 00) for CDMA networks
 	 * @author Alejandro
 	 *
 	 */
-	
+
 	private class ServiceStateListener extends PhoneStateListener{
-		
+
 		@Override
         public void onServiceStateChanged(ServiceState serviceState) {
 			currentCell.setServiceState(serviceState);
 		}
 	}
-	
+
 	private class NetworkConnectionEventReceiver extends BroadcastReceiver{
 		private NetworkInfo.DetailedState desiredState;
 		public synchronized NetworkInfo.DetailedState getDesiredState() {
@@ -466,18 +458,18 @@ public class CellService implements ICellService {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			NetworkInfo mNetworkInfo = (NetworkInfo) intent.getParcelableExtra(ConnectivityManager.EXTRA_NETWORK_INFO);
-			if (mNetworkInfo != null){				
+			if (mNetworkInfo != null){
 				if (mNetworkInfo.getType() == ConnectivityManager.TYPE_MOBILE){
 					if (mNetworkInfo.getDetailedState() == getDesiredState()){
 						announceConnectionChanged();
 					}
 					switch (mNetworkInfo.getDetailedState()){
 					/*
-					case CONNECTED:				
+					case CONNECTED:
 						break;
 						*/
 					case DISCONNECTED:
-						broadcastDisconnectionEvent(mNetworkInfo.getDetailedState().name());					
+						broadcastDisconnectionEvent(mNetworkInfo.getDetailedState().name());
 						break;
 					}
 					Log.d(this.getClass().getSimpleName() + "-CellService", "++ "+mNetworkInfo.getDetailedState().name());
@@ -486,7 +478,7 @@ public class CellService implements ICellService {
 				Log.d(this.getClass().getSimpleName() + "-CellService", "++ "+"NetworkInfo = null");
 			}
 		}
-		
+
 	}
 
 	@Override
@@ -498,7 +490,7 @@ public class CellService implements ICellService {
 	public synchronized void unregisterDisconnectionReceiver(ICellularConnectionEventReceiver receiver) {
 		disconnectionEventReceivers.remove(receiver);
 	}
-	
+
 	private synchronized void broadcastDisconnectionEvent(String event){
 		for (ICellularConnectionEventReceiver rec : disconnectionEventReceivers){
 			rec.receiveEvent(event);
@@ -525,12 +517,12 @@ public class CellService implements ICellService {
 	public void connectAsync() {
 		try{
 			ConnectionMethod connect = new ConnectionMethod(true);
-			connect.run();			
+			connect.run();
 		}catch (Exception e){
 			// if an exception happens, connection cannot be made
 			Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 		}
 	}
-	
+
 
 }

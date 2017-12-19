@@ -68,7 +68,7 @@ import telecom.wi2meCore.controller.services.exceptions.DownloadingInterruptedEx
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
 import telecom.wi2meCore.controller.services.exceptions.UploadingFailException;
 import telecom.wi2meCore.controller.services.exceptions.UploadingInterruptedException;
-import telecom.wi2meCore.model.Utils; 
+import telecom.wi2meCore.model.Utils;
 import android.net.ConnectivityManager;
 import android.net.wifi.WifiInfo;
 import android.util.Log;
@@ -90,12 +90,12 @@ import com.squareup.okhttp.OkHttpClient;
 
 
 public class WebService implements IWebService {
-	
+
 	private static final String JAVASCRIPT_ERROR = "ABORT - Javascript error.";
 	private static final String WEB_VIEW_ERROR = "ABORT - Webview error.";
 
 	private static final int PACKET_SIZE = 1500;
-	
+
 	private static final String START = "START";
 	private static final String TRANSFERRING = "TRANSFERRING";
 	private static final String UPDATE = "UPDATE";
@@ -105,7 +105,7 @@ public class WebService implements IWebService {
 	private static final String FINISH_ERROR = "FINISH_ERROR";
 	private static final String SOCKET_TIMEOUT = "SOCKET_TIMEOUT";
 	private static final String CONNECT_TIMEOUT = "CONNECTION_TIMEOUT";
-	
+
 	private String urlRef;
 	private long uploadFileSize;
 	private IBytesTransferredReceiver transferReceiver;
@@ -121,15 +121,15 @@ public class WebService implements IWebService {
 		WIFI
 	}
 
-	
-	
-	public WebService(Context context) 
+
+
+	public WebService(Context context)
 	{
 		this.context=context;
-		
+
 		generator = new Random(Calendar.getInstance().getTimeInMillis());
 	}
-	
+
 	public boolean isOnline()
 	{
 		return isOnline(Route.ANY);
@@ -139,14 +139,11 @@ public class WebService implements IWebService {
 	{
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (cm.getActiveNetworkInfo() != null){
-			Log.d(getClass().getSimpleName(), "++ getActiveNetworkInfo() OK");
 			if (cm.getActiveNetworkInfo().isConnected()){
-				Log.d(getClass().getSimpleName(), "++ getActiveNetworkInfo().isConnected() OK");
 				if (cm.getActiveNetworkInfo().isAvailable()){
-					Log.d(getClass().getSimpleName(), "++ getActiveNetworkInfo().isAvailable() OK");
 					String response = executeHttpGet(ConfigurationManager.CONNECTION_CHECK_URL, route);
-					if (response.contains("Telecom Bretagne Server for Wi2MeTraceXPlorer")){
-						Log.d(getClass().getSimpleName(), "++ Internet Connection Avilable");
+					if (response.contains("News for nerds, stuff that matters")){
+						Log.d(getClass().getSimpleName(), "++ Internet Connection Available");
 						return true;
 					}
 				}
@@ -154,7 +151,7 @@ public class WebService implements IWebService {
 		}
 		return false;
 	}
-	
+
 	private String executeHttpGet(String url, Route route)
 	{
 		BufferedReader in = null;
@@ -163,14 +160,14 @@ public class WebService implements IWebService {
 			HttpClient client = new DefaultHttpClient();
 
 			if (route == Route.WIFI)
-			{	
+			{
 				WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 				int wifiAddress = info.getIpAddress();
 				client.getParams().setParameter(ConnRoutePNames.LOCAL_ADDRESS, Utils.intToInetAddress(wifiAddress));
 			}
 			else if (route == Route.CELL)
 			{
-				///TODO : implements! 
+				///TODO : implements!
 			}
 
 			HttpGet request = new HttpGet();
@@ -207,7 +204,7 @@ public class WebService implements IWebService {
 		private urlQueueHandler handler;
 		private int index = 0;
 		private Route route = Route.ANY;
-		private IBytesTransferredReceiver receiver;	
+		private IBytesTransferredReceiver receiver;
 		private String tag;
 
 		public fileDownloadingThread(urlQueueHandler handler, int index, Route route, IBytesTransferredReceiver receiver, String tag)
@@ -229,14 +226,14 @@ public class WebService implements IWebService {
 				int read = 0;
 				int cSize = 0;
 				if (route == Route.WIFI)
-				{	
+				{
 					WifiInfo info = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 					int wifiAddress = info.getIpAddress();
 					client.getParams().setParameter(ConnRoutePNames.LOCAL_ADDRESS, Utils.intToInetAddress(wifiAddress));
 				}
 				else if (route == Route.CELL)
 				{
-					///TODO : implements! 
+					///TODO : implements!
 				}
 
 				HttpGet request = new HttpGet();
@@ -271,7 +268,7 @@ public class WebService implements IWebService {
 
 	private class urlQueueHandler
 	{
-		private int deadSons = 0;	
+		private int deadSons = 0;
 		private boolean enabled = true;
 		private final ConcurrentLinkedQueue<String> urlQ = new ConcurrentLinkedQueue<String>();
 
@@ -323,9 +320,9 @@ public class WebService implements IWebService {
 	{
 		Elements files = null;
 		List<String> retval = new ArrayList<String>();
-		
+
 		String host = "";
-		final String schemeSep = "://";	
+		final String schemeSep = "://";
 		final char urlSep =  '/';
 		int schemeSize = url.indexOf(schemeSep);
 		if (schemeSize > 0)
@@ -338,19 +335,19 @@ public class WebService implements IWebService {
 		for (String tag : htmlTag)
 		{
 			files = doc.getElementsByTag(tag);
-		
+
 			for( Element el : files)
 			{
 				String embedUrl = el.attr("src");
 				if (embedUrl.length() > 0)
 				{
 					if (embedUrl.indexOf(schemeSep) < 0)
-					{	
+					{
 						if (embedUrl.indexOf(urlSep) != 0)
 						{
 							if (url.endsWith(HTML_DEFAULT_EXT))
 								url = url.substring(0, url.lastIndexOf(urlSep));
-								
+
 							embedUrl = url + urlSep + embedUrl;
 						}
 						else
@@ -364,7 +361,7 @@ public class WebService implements IWebService {
 		}
 		return retval;
 	}
-		
+
 	private final String HTML_DEFAULT_EXT = ".html";
 	private final String HTML_DEFAULT_FILE = "/index" + HTML_DEFAULT_EXT;
 	private static final List<String> htmlTag = Arrays.asList("img", "script");
@@ -393,7 +390,7 @@ public class WebService implements IWebService {
 			Log.e(getClass().getSimpleName(), "++ Unable to download page " + url + " : " + e.getMessage(), e);
 			e.printStackTrace();
 		}
-		
+
 		if (doc != null)
 		{
 			embeddedUrls = getEmbeddedObjects(doc, url);
@@ -403,7 +400,7 @@ public class WebService implements IWebService {
 				fileDownloadingThread dler = new fileDownloadingThread(handler, i, route, receiver, tag);
 				dler.start();
 			}
-				
+
 			int MAX_WAIT = 20000;
 			int waitTime = 0;
 			int checkFreq = 500;
@@ -429,7 +426,7 @@ public class WebService implements IWebService {
 	private class urlCounter
 	{
 		private int currentValue;
-		private IBytesTransferredReceiver receiver;	
+		private IBytesTransferredReceiver receiver;
 		private String tag;
 
 		public urlCounter(IBytesTransferredReceiver receiver, String tag)
@@ -463,16 +460,16 @@ public class WebService implements IWebService {
 	{
 		//TODO ROUTE ! (Not necesseraly possible, OkHttpClient does not extend HttpClient, therefore no setParameters
 		List<String> embeddedUrls = null;
-		
+
 		OkHttpClient client = new OkHttpClient();
-	
-		
+
+
 		List<Protocol> plist = new ArrayList<Protocol>();
 		plist.add(Protocol.SPDY_3);
 		plist.add(Protocol.HTTP_1_1);
 		client.setProtocols(plist);
 
-		final urlCounter uCntr = new urlCounter(receiver, tag);		
+		final urlCounter uCntr = new urlCounter(receiver, tag);
 
 		com.squareup.okhttp.Dispatcher dispatch = new com.squareup.okhttp.Dispatcher();
 		dispatch.setMaxRequests(6);
@@ -502,7 +499,7 @@ public class WebService implements IWebService {
 		if (doc != null)
 		{
 			embeddedUrls = getEmbeddedObjects(doc, url);
-	
+
 			if (embeddedUrls != null)
 			{
 				for (final String eUrl : embeddedUrls)
@@ -562,49 +559,49 @@ public class WebService implements IWebService {
 		}
 	}
 
-	
+
 	/*The uploading is done this way (by hand) because if not we cannot put a timeout and the socket would stay blocked until it is able to send something*/
 	public boolean uploadFile(String ip, String uploadScript, IBytesTransferredReceiver receiver, byte[] bytes, int timeoutConnection, int timeoutSocket, int receiverCallTimer) throws UploadingInterruptedException, UploadingFailException, TimeoutException
 	{
-	
+
 		SocketChannel socketChannel = null;
 		try
 		{
-			
+
 	        	int sent = 0;
 		        urlRef = ip;
 		        uploadFileSize = bytes.length;
 		        transferReceiver = receiver;
-		        
+
 		        long time = Calendar.getInstance().getTimeInMillis();
-		        
+
 		        Log.d(getClass().getSimpleName(), "++ "+ "SIZE " + uploadFileSize + "RECEIVER " + transferReceiver + urlRef);
-		        
+
 		        //Compatibility with first server
 		        if (ip.contains("192.108.119.11"))
 		        {
 		        	uploadScript = "/cgi-bin/upload.cgi";
-		        }            		
-		        
-		        
+		        }
+
+
 		        String postHeader = "POST "+ uploadScript +" HTTP/1.1\r\n" +
 		                            "Host: " + ip +"\r\n" +
 		                            "Content-Length: "+bytes.length+"\r\n" +
 		                            //"Connection: Keep-Alive\n" +
 		                            "Content-Type: "+time+"\r\n" +
 		                            "\r\n";
-		        
-		        
-		       	            
+
+
+
 		        Log.d(getClass().getSimpleName(), "++ POST HEADER "+ postHeader);
-		        
+
 		        byte[] headerBytes = postHeader.getBytes();
-		  
-			      
+
+
 		        totalBytesToTransfer = headerBytes.length + bytes.length;
-		        
+
 		        receiver.receiveTransferredBytes(0, totalBytesToTransfer, START+"-"+time);
-		        
+
 		        int sleepConnectionTime = 5;//ms
 		        socketChannel = SocketChannel.open();
 		        socketChannel.configureBlocking(false);
@@ -628,13 +625,13 @@ public class WebService implements IWebService {
 			        }
 			        if (connectionDelay >= timeoutConnection){
 			            throw new ConnectTimeoutException();
-			        }                
+			        }
 		        }
-		        
+
 		        long lastSentTimestamp = Calendar.getInstance().getTimeInMillis();
-		        
+
 		        //send the payload
-		        sent = 0;                        
+		        sent = 0;
 		        Log.d(getClass().getSimpleName(), "++ "+ "About to start sending");
 			while(receiver.getTransferredBytes() < totalBytesToTransfer)
 			{
@@ -673,7 +670,7 @@ public class WebService implements IWebService {
 			            throw new UploadingInterruptedException("Size:"+ uploadFileSize +"-"+urlRef);
 			        }
 		        }
-		       
+
 		        if (receiver.getTransferredBytes() >= totalBytesToTransfer){
 		            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_COMPLETE);
 		            return true;
@@ -681,17 +678,17 @@ public class WebService implements IWebService {
 		            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INCOMPLETE);
 		            return false;
 		        }
-	            
+
 	        } catch(UploadingInterruptedException ex){
 	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INTERRUPTED);
 	            throw new UploadingInterruptedException(ex.getMessage());
 	        }catch(SocketTimeoutException e){
 	            String msg = SOCKET_TIMEOUT+"("+ timeoutSocket +"ms)";
-	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);    
+	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
 	            throw new TimeoutException(msg);
 	        }catch(ConnectTimeoutException e){
 	            String msg = CONNECT_TIMEOUT+"("+ timeoutConnection +"ms)";
-	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);            
+	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
 	            throw new TimeoutException(msg);
 	        }catch(Exception e){
 	            Log.w(getClass().getSimpleName(), "++ "+ e.getMessage(), e);
@@ -703,26 +700,26 @@ public class WebService implements IWebService {
 	                    socketChannel.close();
 	                } catch (IOException e) {
 	                    Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-	                } 
+	                }
 	            }
 	        }
 	}
-	
+
 	@Override
 	public boolean downloadFile(String host, String filePath, IBytesTransferredReceiver receiver, long length, int timeoutConnection, int timeoutSocket, int receiverCallTimer, String ap, String network) throws DownloadingInterruptedException, DownloadingFailException, TimeoutException
 	{
 		SocketChannel socketChannel = null;
-		try {						
+		try {
 			totalBytesToTransfer = length;
 		    long time = Calendar.getInstance().getTimeInMillis();
 
-			receiver.receiveTransferredBytes(0, totalBytesToTransfer, START+"-"+time); 
-			
+			receiver.receiveTransferredBytes(0, totalBytesToTransfer, START+"-"+time);
+
 			int sleepConnectionTime = 5;//ms
 			socketChannel = SocketChannel.open();
 			socketChannel.configureBlocking(false);
 			//connect
-			
+
 			socketChannel.connect(new InetSocketAddress(host, 80));
 			int connectionDelay = 0;
 			//int lastConnectionDelayUpdate = 0;
@@ -743,35 +740,35 @@ public class WebService implements IWebService {
 		    	}
 				if (connectionDelay >= timeoutConnection){
 					throw new ConnectTimeoutException();
-				}				
+				}
 			}
-			
+
 			//Prepare and send the GET REQUEST
-			
-			
-			network = network.replaceAll(" ", "-");		
-			
+
+
+			network = network.replaceAll(" ", "-");
+
 			String getHeader;
-				
+
 			getHeader = "GET "+ filePath +"?id="+time + "&mac="+ap+"&ssid="+network+"&size="+totalBytesToTransfer+" HTTP/1.1\n" +
 			"Host: " + host +"\n" +
 			"Connection: Keep-Alive\n" +
-			"\n";	
-		    
-			
+			"\n";
+
+
 			Log.d(getClass().getSimpleName(), "++ " + getHeader);
-			
+
 			byte[] headerBytes = getHeader.getBytes();
 
 			ByteBuffer buf = ByteBuffer.allocate((int)headerBytes.length);
 			buf.clear();
 			buf.put(headerBytes);//we put the GET REQUEST in the buffer
 			buf.flip();
-			
+
 			long lastSentTimestamp = Calendar.getInstance().getTimeInMillis();
-			
+
 			//send the request
-			int sent = 0;		
+			int sent = 0;
 			Log.d(getClass().getSimpleName(), "++ "+ "About to start sending request");
 
 
@@ -801,24 +798,24 @@ public class WebService implements IWebService {
 					throw new DownloadingInterruptedException(host + filePath);
 				}
 			}
-			
+
 			//we sent the complete request, now we read the response (the file)
 			long lastReadTimestamp = Calendar.getInstance().getTimeInMillis();
 
 
 			receiver.receiveTransferredBytes(0, totalBytesToTransfer, TRANSFERRING+"-"+lastSentTimestamp);
 
-			int read = 0;		
+			int read = 0;
 			ByteBuffer buffer = ByteBuffer.allocate(PACKET_SIZE * 10);
-			
+
 			Log.d(getClass().getSimpleName(), "++ "+ "About to start downloading");
-			
+
 			while(receiver.getTransferredBytes() < totalBytesToTransfer)
 			{
 				read = socketChannel.read(buffer);
-				
+
 				buffer.clear();
-				
+
 				//The channel was closed, possibly from outside wi2me
 				if (read < 0)
 				{
@@ -841,14 +838,14 @@ public class WebService implements IWebService {
 			    		lastReadTimestamp = Calendar.getInstance().getTimeInMillis();
 			    		buffer.flip(); //return buffer to the beginning to read again
 			    	}
-	
+
 				//Either we read it or not, we see if it is necessary to update the receiver data
 		    		if (Calendar.getInstance().getTimeInMillis() - lastUpdateTimestamp >= receiverCallTimer)
 				{
 		    			receiver.receiveTransferredBytes(0, totalBytesToTransfer, UPDATE);
 		    			lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
 		    		}
-	
+
 				//We sleep so we can be interrupted and finish
 				try {
 					Thread.sleep(0);
@@ -857,7 +854,7 @@ public class WebService implements IWebService {
 					throw new DownloadingInterruptedException(host + filePath);
 				}
 			}
-			
+
 	        if (receiver.getTransferredBytes() >= totalBytesToTransfer){
 	        	receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_COMPLETE);
 	        	return true;
@@ -870,11 +867,11 @@ public class WebService implements IWebService {
 				throw e;
 		}catch(SocketTimeoutException e){
 			String msg = SOCKET_TIMEOUT+"("+ timeoutSocket +"ms)";
-			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);	
+			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
 			throw new TimeoutException(msg);
 		}catch(ConnectTimeoutException e){
 			String msg = CONNECT_TIMEOUT+"("+ timeoutConnection +"ms)";
-			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);			
+			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
 			throw new TimeoutException(msg);
 		}catch(Exception e){
 			e.printStackTrace();
@@ -889,33 +886,33 @@ public class WebService implements IWebService {
 					socketChannel.close();
 				} catch (IOException e) {
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				} 
+				}
 			}
 		}
 	}
-	
+
 	private boolean downloadFileWithLength(String url, IBytesTransferredReceiver receiver, long length, int timeoutConnection, int timeoutSocket) throws DownloadingInterruptedException, DownloadingFailException, TimeoutException{
     	byte[] buffer = new byte[100000];
     	int bytesReceived = 0;
-				
+
 		HttpParams httpParameters = new BasicHttpParams();
 		// Set the timeout in milliseconds until a connection is established.
 		HttpConnectionParams.setConnectionTimeout(httpParameters, timeoutConnection);
-		// Set the default socket timeout (SO_TIMEOUT) 
+		// Set the default socket timeout (SO_TIMEOUT)
 		HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
 
 		DefaultHttpClient httpClient = new DefaultHttpClient(httpParameters);
 		try{
 			boolean downloadComplete = false;
-			
+
 	    	HttpGet request = new HttpGet(url);
 	    	HttpResponse response = httpClient.execute(request);
-		    	
+
 	    	//Broadcast to know it is starting
 	    	receiver.receiveTransferredBytes(bytesReceived, totalBytesToTransfer, START);
-	    	
-	    	InputStream in = response.getEntity().getContent();	  
-	    	
+
+	    	InputStream in = response.getEntity().getContent();
+
 
 	        while ((bytesReceived = in.read(buffer)) != -1){
 	        	receiver.receiveTransferredBytes(bytesReceived, totalBytesToTransfer);
@@ -927,24 +924,24 @@ public class WebService implements IWebService {
 					throw new DownloadingInterruptedException(url);
 				}
 	        }
-	        
+
 	        if (receiver.getTransferredBytes() == totalBytesToTransfer){
 	        	receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_COMPLETE);
 	        	downloadComplete = true;
 	        }else{
 	        	receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INCOMPLETE);
-	        }	        
+	        }
 	        return downloadComplete;
 		}catch(DownloadingInterruptedException ex){
 				receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INTERRUPTED);
 				throw ex;
 		}catch(SocketTimeoutException e){
 			String msg = SOCKET_TIMEOUT+"("+ timeoutSocket +"ms)";
-			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);	
+			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
 			throw new TimeoutException(msg);
 		}catch(ConnectTimeoutException e){
 			String msg = CONNECT_TIMEOUT+"("+ timeoutConnection +"ms)";
-			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);			
+			receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
 			throw new TimeoutException(msg);
 		}catch(Exception e){
 			Log.w(getClass().getSimpleName(), "++ "+e.getMessage(), e);
@@ -954,5 +951,5 @@ public class WebService implements IWebService {
 			httpClient.getConnectionManager().shutdown();
 		}
 	}
-	
+
 }
