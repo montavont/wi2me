@@ -344,6 +344,7 @@ public class TextTraceHelper implements ITraceDatabase
 								+ CSV_SEP
 	 							+ cSignalStrengthEvent.getTimingAdvance()
 								+ CSV_SEP
+							    + cellToString(cSignalStrengthEvent.getConnectedTo())
 						);
 						break;
 					case EXTERNAL_EVENT:

@@ -40,7 +40,9 @@ public class CellularSignalStrengthEvent extends Trace{
 	private int rssnr = 0;
 	private int timingadvance = 0;
 
-	protected CellularSignalStrengthEvent(Trace trace, CellSignalStrength signalStrength){
+	private Cell connectedTo;
+
+	protected CellularSignalStrengthEvent(Trace trace, Cell connectedTo, CellSignalStrength signalStrength){
 		Trace.copy(trace, this);
 		this.signalStrength = signalStrength;
 		if (signalStrength instanceof CellSignalStrengthLte)
@@ -55,11 +57,12 @@ public class CellularSignalStrengthEvent extends Trace{
 			this.rssnr = cellStrength.getRssnr();
 			this.timingadvance = cellStrength.getTimingAdvance();
 		}
+		this.connectedTo = connectedTo;
 		// Only LTE supported for now
 	}
 
-	public static CellularSignalStrengthEvent getNewCellularSignalStrengthEvent(Trace trace, CellSignalStrength signalStrength){
-		return new CellularSignalStrengthEvent(trace, signalStrength);
+	public static CellularSignalStrengthEvent getNewCellularSignalStrengthEvent(Trace trace, Cell connectedTo, CellSignalStrength signalStrength){
+		return new CellularSignalStrengthEvent(trace, connectedTo, signalStrength);
 	}
 
 	private static final String AP_SEPARATOR = "-";
@@ -71,6 +74,10 @@ public class CellularSignalStrengthEvent extends Trace{
 	@Override
 	public TraceType getStoringType() {
 		return TraceType.CELL_SIGNAL_EVENT;
+	}
+
+	public Cell getConnectedTo() {
+		return connectedTo;
 	}
 
 	public int getAsuLevel()
