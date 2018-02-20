@@ -48,10 +48,11 @@ import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthCdma;
 import android.telephony.CellSignalStrengthWcdma;
 
-
+import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.model.Logger;
 import telecom.wi2meCore.controller.configuration.TimeoutConstants;
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
+import telecom.wi2meCore.model.entities.Cell;
 import telecom.wi2meCore.model.entities.CellularSignalStrengthEvent;
 import telecom.wi2meCore.model.TraceManager;
 
@@ -425,7 +426,8 @@ public class CellService implements ICellService {
     	            	if(cellInfos.get(i) instanceof CellInfoLte){
 	                	    CellInfoLte cellInfoLte = (CellInfoLte) telephonyManager.getAllCellInfo().get(0);
             	        	CellSignalStrengthLte cellSignalStrengthLte = cellInfoLte.getCellSignalStrength();
-							Logger.getInstance().log(CellularSignalStrengthEvent.getNewCellularSignalStrengthEvent(TraceManager.getTrace(), (CellSignalStrength)cellSignalStrengthLte));
+							Cell currentCell = Cell.getNewCellFromCellInfo(ControllerServices.getInstance().getCell().getLastScannedCell());
+							Logger.getInstance().log(CellularSignalStrengthEvent.getNewCellularSignalStrengthEvent(TraceManager.getTrace(), currentCell , (CellSignalStrength)cellSignalStrengthLte));
                 		}
             		}
         		}
