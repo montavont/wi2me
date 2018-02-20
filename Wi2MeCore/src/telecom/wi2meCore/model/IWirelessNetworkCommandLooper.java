@@ -19,6 +19,7 @@
 
 package telecom.wi2meCore.model;
 
+import java.util.HashMap;
 import java.util.List;
 
 import telecom.wi2meCore.model.parameters.IParameterManager;
@@ -53,6 +54,11 @@ public interface IWirelessNetworkCommandLooper {
 	 * Stops looping the commands
 	 */
 	void breakLoop();
+
+	/**
+	 * Get a string describing the state of the looper
+	 */
+	HashMap<String, String> getStates();
 
 	/**
 	 * Loops the commands one after another until the passed Flag is deactivated.

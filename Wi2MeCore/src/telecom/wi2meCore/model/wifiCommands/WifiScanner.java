@@ -20,7 +20,7 @@
 package telecom.wi2meCore.model.wifiCommands;
 
 import java.util.ArrayList;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.List;
 
 import telecom.wi2meCore.controller.services.ControllerServices;
@@ -94,6 +94,7 @@ public class WifiScanner extends WirelessNetworkCommand{
 				List<ScanResult> results = this.scan();
 				if (results != null)
 				{
+					m_stateString = results.size() + " ssids";
 					WifiScanResult wifiScanResult = WifiScanResult.getNewWifiScanResult(TraceManager.getTrace(), getAPs(results));
 					parameters.setParameter(Parameter.WIFI_SCAN_RESULT, results);
 					Logger.getInstance().log(wifiScanResult);
@@ -101,10 +102,12 @@ public class WifiScanner extends WirelessNetworkCommand{
 			}
 			catch(TimeoutException e)
 			{
+				m_stateString = "Scanning timeout";
 				Log.e(getClass().getSimpleName(), "++ "+"Scanning Timeout", e);
 			}
 		} catch (InterruptedException e) {
 			// if we are interrupted, we leave
+			m_stateString = "Scanning interrupted";
 			Log.d(getClass().getSimpleName(), "++ "+"Scanning Interrupted", e);
 		}
 	}

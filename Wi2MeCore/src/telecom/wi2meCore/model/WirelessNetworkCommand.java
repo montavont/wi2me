@@ -33,6 +33,7 @@ public abstract class WirelessNetworkCommand {
 
 	protected HashMap<String, String> m_params;
 	protected String m_subclassName;
+	protected String m_stateString = "";
 
 	/**
 	 * Initialize the commands. Usually allows the command to store the parameters.
@@ -60,5 +61,10 @@ public abstract class WirelessNetworkCommand {
 	public String getSubclassName()
 	{
 		return m_subclassName;
+	}
+
+	public String getStateString()
+	{
+		return m_stateString;
 	}
 }
