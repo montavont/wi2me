@@ -27,4 +27,13 @@
 	<string name="DISABLEMENT_TIMEOUT">Timeout disabling wlan interface, try doing it from settings and restart</string>
 	<string name="ABOUT_WI2ME">About Wi2Me</string>
 	<string name="PERCENTAGE" formatted="false">%s %%</string>
+
+	<string name="mainscreen_localization_header">Localization</string>
+	<string name="mainscreen_localization_provider">Provider/Accuracy (m)</string>
+	<string name="mainscreen_localization_latitude">Latitude</string>
+	<string name="mainscreen_localization_longitude">Longitude</string>
+	<string name="mainscreen_localization_timestamp">Timestamp (ms)</string>
+	<string name="mainscreen_localization_speed">Speed (m/s)</string>
+	<string name="mainscreen_localization_battery">Battery Level</string>
+
 </resources>

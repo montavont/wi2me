@@ -97,8 +97,6 @@ public class ApplicationService extends Service {
 	int startId;
 	String configuration;
 	Context context;
-	boolean wasCellularConnected;
-
 	ServiceBinder binder;
 
 	private NotificationManager mNM;
@@ -148,19 +146,6 @@ public class ApplicationService extends Service {
 				binder.loadingError = true;
 				return;
 			}
-
-	        // We get if the 3G connection is available to enable it again when closing
-		int version = Build.VERSION.SDK_INT;
-		if (version <= 8)
-		{
-			//TKER TODO LOook into
-			//8 is FROYO (2.2), higher versions change the Telephony API so we should not use the cellular methods
-			wasCellularConnected = ControllerServices.getInstance().getCell().isDataNetworkConnected();
-		}
-		else
-		{
-			wasCellularConnected = false;
-		}
 	}
 
 	private class WirelessLooperThread extends Thread
@@ -255,12 +240,6 @@ public class ApplicationService extends Service {
     			}
 
 	    	}
-
-    		if (wasCellularConnected){
-    			//disable wifi if connected
-    			ControllerServices.getInstance().getWifi().disableAsync();
-    			ControllerServices.getInstance().getCell().connectAsync();
-    		}
 
     		ControllerServices.finalizeServices();
 
@@ -379,6 +358,16 @@ public class ApplicationService extends Service {
 
 		protected synchronized void setWifiData(Object data) {
 			this.wifiData = data;
+		}
+
+		public synchronized HashMap<String, HashMap<String,String>> getLooperData() {
+    		HashMap<String, HashMap<String, String>> looperData = new HashMap<String, HashMap<String, String>>();
+
+			for (String looperKey:WirelessLoopers.keySet())
+			{
+				looperData.put(looperKey, WirelessLoopers.get(looperKey).getStates());
+			}
+			return looperData;
 		}
 
 		public ServiceBinder(IParameterManager parameters){

@@ -74,6 +74,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.pm.ResolveInfo;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Color;
 import android.location.Location;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -96,6 +97,9 @@ import android.widget.RatingBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TableRow.LayoutParams;
 
 
 public class Wi2MeRecherche extends Activity
@@ -108,13 +112,6 @@ public class Wi2MeRecherche extends Activity
 	private static final int MENU_EXPORT_LOGCAT = 3;
 	private static final int MENU_ACCOUNT_MANAGEMENT = 4;
 	private static final int MENU_PREFERENCES = 5;
-
-
-
-	////TRIAL VARIABLES
-	private Boolean trial  = ConfigurationManager.TRIAL;
-	private Date trialExpire= new Date(112,8,11);
-
 
 	LogObserver logObserver;
 
@@ -178,7 +175,6 @@ public class Wi2MeRecherche extends Activity
         	logObserver = new LogObserver();
 
         	startService();
-	        clearInfo();
 
 		refreshTask = new Runnable()
 		{
@@ -232,18 +228,6 @@ public class Wi2MeRecherche extends Activity
 	}
 
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-
-		// TRIAL VERSION MANAGEMENT
-		Date dateFormat = new Date();
-		Log.d(getClass().getSimpleName(), "++ DATE LOCAL " + dateFormat);
-
-		if ((dateFormat.after(trialExpire))&&(trial)) //trial expired
-		{
-			Log.d(getClass().getSimpleName(), "++ TRIAL EXPIRED");
-			Toast.makeText(context, getResources().getString(R.string.TRIAL_EXPIRED), Toast.LENGTH_LONG).show();
-			stopAndQuit();
-		} else
-		{
 
 			switch(item.getItemId()){
 
@@ -323,7 +307,6 @@ public class Wi2MeRecherche extends Activity
 						startActivity(new Intent(this, Wi2MePreferenceActivity.class));
 						break;
 				}
-		}
 		return super.onMenuItemSelected(featureId, item);
 	}
 
@@ -339,7 +322,6 @@ public class Wi2MeRecherche extends Activity
 					public void run() {
 				       	if (stoppingProcessDialog.isShowing()) {
 				            stoppingProcessDialog.dismiss();
-							clearInfo();
 				         }
 					}
 
@@ -905,166 +887,78 @@ public class Wi2MeRecherche extends Activity
 
 	}
 
+
+	private void addTableRow(String key, String value)
+	{
+		addTableRow(key, value, Color.rgb(100, 100, 100));
+	}
+
+	private void addTableRow(String key, String value, int color)
+	{
+		TableLayout table_layout=(TableLayout)findViewById(R.id.mainscreen_tablelayout);
+		TableRow table_row = new TableRow(this);
+		TextView key_text_view = new TextView(this);
+		TextView value_text_view = new TextView(this);
+
+		value_text_view.setGravity(5);
+
+		table_row.setLayoutParams(new LayoutParams( LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT));
+		key_text_view.setText(key);
+		table_row.addView(key_text_view);
+		value_text_view.setText(value);
+		table_row.addView(value_text_view);
+		table_row.setBackgroundColor(color);
+		table_layout.addView(table_row, new TableLayout.LayoutParams(LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT));
+	}
+
 	private void updateInfo()
 	{
 
-		localizationView = (ListView) findViewById(R.id.gridViewLocalization);
-		RelativeLayout looperLogContainer = (RelativeLayout) findViewById(R.id.LooperLogContainer);
-		myListAdapter localizationAdapter = (myListAdapter) localizationView.getAdapter();
+		TableLayout table_layout=(TableLayout)findViewById(R.id.mainscreen_tablelayout);
+		//Reset table view
+		while (table_layout.getChildCount() > 0)
+		{
+             table_layout.removeView(table_layout.getChildAt(0));
+		}
+
+		addTableRow(getResources().getString(R.string.mainscreen_localization_header), "", Color.rgb(30, 30, 30));
 
 		if (logTrace != null)
 		{
 			Location location = ControllerServices.getInstance().getLocation().getLocation();
 			if (location != null)
 			{
-				localizationAdapter.setData("Provider/Accuracy (m)", location.getProvider()+"/"+String.valueOf(location.getAccuracy()));
-				localizationAdapter.setData("Latitude", String.valueOf(location.getLatitude()));
-				localizationAdapter.setData("Longitude", String.valueOf(location.getLongitude()));
-				//localizationAdapter.setData("Timestamp (ms)", String.valueOf(location.getTimestamp()));
-				localizationAdapter.setData("Speed (m/s)", String.valueOf(location.getSpeed()));
+				addTableRow(getResources().getString(R.string.mainscreen_localization_provider), location.getProvider()+"/"+String.valueOf(location.getAccuracy()));
+				addTableRow(getResources().getString(R.string.mainscreen_localization_latitude), String.valueOf(location.getLatitude()));
+				addTableRow(getResources().getString(R.string.mainscreen_localization_longitude), String.valueOf(location.getLongitude()));
+				addTableRow(getResources().getString(R.string.mainscreen_localization_speed), String.valueOf(location.getSpeed()));
 			}
-			localizationAdapter.setData("Battery Level", String.valueOf(logTrace.content.getBatteryLevel())+"%");
 
-			localizationAdapter.notifyDataSetChanged();
+			addTableRow(getResources().getString(R.string.mainscreen_localization_battery), String.valueOf(logTrace.content.getBatteryLevel())+"%");
 
-			traceView = (TextView) findViewById(R.id.trace);
-			traceView.setText(logTrace.content.toString());
-			TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
-			ListView dataView = (ListView) findViewById(R.id.gridViewConnection);
-			TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
-			if (refreshUI)
+
+		}
+
+		if (binder != null)
+		{
+			HashMap<String, HashMap<String, String>> looperData = binder.getLooperData();
+			for (String looperKey : looperData.keySet())
 			{
-      				refreshHandler.postDelayed(refreshTask, UI_REFRESH_PERIOD);
+				addTableRow(looperKey, "", Color.rgb(30, 30, 30));
+				HashMap<String, String> commandStates = looperData.get(looperKey);
+				for (String commandKey : commandStates.keySet())
+				{
+					addTableRow(commandKey, commandStates.get(commandKey));
+				}
 			}
+		}
 
+
+		if (refreshUI)
+		{
+      			refreshHandler.postDelayed(refreshTask, UI_REFRESH_PERIOD);
 		}
 	}
 
-	private void clearInfo()
-	{
-
-		localizationView = (ListView) findViewById(R.id.gridViewLocalization);
-
-		ArrayList<HashMap<String, String>> traceValueList = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> traceValueItem = new HashMap<String, String>();
-		traceValueItem.put("traceItem", "Provider/Accuracy (m)");
-		traceValueItem.put("traceValue","");
-		traceValueList.add(traceValueItem);
-		traceValueItem = new HashMap<String, String>();
-		traceValueItem.put("traceItem", "Latitude");
-		traceValueItem.put("traceValue","");
-		traceValueList.add(traceValueItem);
-		traceValueItem = new HashMap<String, String>();
-		traceValueItem.put("traceItem", "Longitude");
-		traceValueItem.put("traceValue","");
-		traceValueList.add(traceValueItem);
-		traceValueItem = new HashMap<String, String>();
-		traceValueItem.put("traceItem", "Timestamp (ms)");
-		traceValueItem.put("traceValue","");
-		traceValueList.add(traceValueItem);
-		traceValueItem = new HashMap<String, String>();
-		traceValueItem.put("traceItem", "Speed (m/s)");
-		traceValueItem.put("traceValue","");
-		traceValueList.add(traceValueItem);
-		traceValueItem = new HashMap<String, String>();
-		traceValueItem.put("traceItem", "Battery Level");
-		traceValueItem.put("traceValue","");
-		traceValueList.add(traceValueItem);
-
-		myListAdapter adapter = new myListAdapter(traceValueList,currentActivity);
-		localizationView.setAdapter(adapter);
-
-		traceView = (TextView) findViewById(R.id.trace);
-		traceView.setText("");
-
-
-		wifiView = (ListView) findViewById(R.id.gridViewWifi);
-		ArrayList<HashMap<String, String>> wifiTraceList = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> wifiTraceItem = new HashMap<String, String>();
-		wifiTraceItem.put("traceItem", "SSID");
-		wifiTraceItem.put("traceValue", "");
-		wifiTraceList.add(wifiTraceItem);
-		wifiTraceItem = new HashMap<String, String>();
-		wifiTraceItem.put("traceItem", "Signal strength (dBm)");
-		wifiTraceItem.put("traceValue", "");
-		wifiTraceList.add(wifiTraceItem);
-		wifiTraceItem = new HashMap<String, String>();
-		wifiTraceItem.put("traceItem", "Channel");
-		wifiTraceItem.put("traceValue", "");
-		wifiTraceList.add(wifiTraceItem);
-		wifiTraceItem = new HashMap<String, String>();
-		wifiTraceItem.put("traceItem", "BSSID");
-		wifiTraceItem.put("traceValue", "");
-		wifiTraceList.add(wifiTraceItem);
-		wifiTraceItem = new HashMap<String, String>();
-		wifiTraceItem.put("traceItem", "Rate (Mbps)");
-		wifiTraceItem.put("traceValue", "");
-		wifiTraceList.add(wifiTraceItem);
-
-		myListAdapter wifiAdapter = new myListAdapter(wifiTraceList,currentActivity);
-		wifiView.setAdapter(wifiAdapter);
-
-		TextView wifiStatus=(TextView) findViewById(R.id.wifiStatus);
-		wifiStatus.setText("");
-
-		cellView = (ListView) findViewById(R.id.gridViewCell);
-		ArrayList<HashMap<String, String>> cellTraceList = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> cellTraceItem = new HashMap<String, String>();
-		cellTraceItem.put("traceItem", "Operator Name");
-		cellTraceItem.put("traceValue", "");
-		cellTraceList.add(cellTraceItem);
-		cellTraceItem = new HashMap<String, String>();
-		cellTraceItem.put("traceItem", "Signal strength (dBm)");
-		cellTraceItem.put("traceValue", "");
-		cellTraceList.add(cellTraceItem);
-		cellTraceItem = new HashMap<String, String>();
-		cellTraceItem.put("traceItem", "Network type");
-		cellTraceItem.put("traceValue", "");
-		cellTraceList.add(cellTraceItem);
-		cellTraceItem = new HashMap<String, String>();
-		cellTraceItem.put("traceItem", "CID/LAC");
-		cellTraceItem.put("traceValue", "");
-		cellTraceList.add(cellTraceItem);
-
-		myListAdapter adapterCell = new myListAdapter(cellTraceList,currentActivity);
-		cellView.setAdapter(adapterCell);
-
-		TextView cellStatus=(TextView) findViewById(R.id.CellStatus);
-		cellStatus.setText("");
-
-		ListView wifiDataView = (ListView) findViewById(R.id.gridViewConnection);
-		ArrayList<HashMap<String, String>> connectionTraceList = new ArrayList<HashMap<String, String>>();
-		HashMap<String, String> connectionTraceItem = new HashMap<String, String>();
-		connectionTraceItem.put("traceItem", "IP address");
-		connectionTraceItem.put("traceValue", "");
-		connectionTraceList.add(connectionTraceItem);
-		connectionTraceItem = new HashMap<String, String>();
-		connectionTraceItem.put("traceItem", "Elapsed time (ms)");
-		connectionTraceItem.put("traceValue", "");
-		connectionTraceList.add(connectionTraceItem);
-		connectionTraceItem = new HashMap<String, String>();
-		connectionTraceItem.put("traceItem", "Retries");
-		connectionTraceItem.put("traceValue", "");
-		connectionTraceList.add(connectionTraceItem);
-		connectionTraceItem = new HashMap<String, String>();
-		connectionTraceItem.put("traceItem", "Tx/Rx packets");
-		connectionTraceItem.put("traceValue", "");
-		connectionTraceList.add(connectionTraceItem);
-		connectionTraceItem = new HashMap<String, String>();
-		connectionTraceItem.put("traceItem", "Throughput (KB/s)");
-		connectionTraceItem.put("traceValue", "");
-		connectionTraceList.add(connectionTraceItem);
-		connectionTraceItem = new HashMap<String, String>();
-		connectionTraceItem.put("traceItem", "Transfer progress");
-		connectionTraceItem.put("traceValue", "");
-		connectionTraceList.add(connectionTraceItem);
-
-
-		myListAdapter adapterConnection = new myListAdapter(connectionTraceList,currentActivity);
-		wifiDataView.setAdapter(adapterConnection);
-
-		TextView connectionStatus=(TextView) findViewById(R.id.connectionStatus);
-		connectionStatus.setText("");
-	}
 }
 

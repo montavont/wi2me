@@ -20,6 +20,7 @@
 package telecom.wi2meCore.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import telecom.wi2meCore.model.Flag;
 import telecom.wi2meCore.model.parameters.IParameterManager;
@@ -73,6 +74,28 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 	public void breakLoop()
 	{
 		this.running = false;
+	}
+
+	@Override
+	public HashMap<String, String> getStates()
+	{
+		HashMap<String, String> states = new HashMap<String, String>();
+
+		for (int i = 0; i < commands.size(); i++)
+		{
+			int cmdInd = 0;
+			String[] path = commands.get(i).getSubclassName().split("\\.");
+			String key = path[path.length -1];
+			String val = commands.get(i).getStateString();
+			while (states.containsKey(key))
+			{
+				cmdInd += 1;
+				key = commands.get(i).getSubclassName() + "_" + cmdInd;
+			}
+			states.put(key, val);
+		}
+
+		return states;
 	}
 
 	@Override
