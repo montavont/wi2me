@@ -232,13 +232,10 @@ public class Wi2MeRecherche extends Activity
 			switch(item.getItemId()){
 
 				case MENU_START:
-					if ((Boolean)binder.parameters.getParameter(Parameter.USE_GPS_POSITION))
+					if (!binder.getServices().getLocation().isGPSEnabled() || (!binder.getServices().getLocation().isNetworkLocationEnabled() && binder.getServices().getCell().isDataTransferringEnabled()))
 					{
-						if (!binder.getServices().getLocation().isGPSEnabled() || (!binder.getServices().getLocation().isNetworkLocationEnabled() && binder.getServices().getCell().isDataTransferringEnabled()))
-						{
-							openLocationSettings();
-							break;
-						}
+						openLocationSettings();
+						break;
 					}
 					if ((Boolean)binder.parameters.getParameter(Parameter.CONNECT_CELLULAR)){//If user chose to connect to cellular networks, this must be enabled
 						if (!binder.getServices().getCell().isDataTransferringEnabled())

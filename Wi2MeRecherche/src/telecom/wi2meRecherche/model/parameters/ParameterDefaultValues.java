@@ -62,7 +62,6 @@ public class ParameterDefaultValues {
 	public static final boolean NOTIFY_SERVICE_STATUS = true;
 	public static final boolean SENSOR_ONLY=false;
 	public static final int WIFI_THRESHOLD=-85;
-	public static final boolean USE_GPS_POSITION = true;
 	public static final boolean ALLOW_TRACE_CONNECTIONS = true;
 	public static final boolean ALLOW_UPLOAD_TRACES = true;
 	public static final int CONNECTIVITY_CHECK_FREQUENCY = 60000;//1 minute
@@ -136,8 +135,6 @@ public class ParameterDefaultValues {
 			return Boolean.valueOf(SENSOR_ONLY);
 		case WIFI_THRESHOLD:
 			return Integer.valueOf(WIFI_THRESHOLD);
-		case USE_GPS_POSITION:
-			return Boolean.valueOf(USE_GPS_POSITION);
 		case ALLOW_TRACE_CONNECTIONS:
 			return Boolean.valueOf(ALLOW_TRACE_CONNECTIONS);
 		case ALLOW_UPLOAD_TRACES:

@@ -71,12 +71,6 @@
             android:key="LOCK_NETWORK"
             android:title="LOCK_NETWORK (requiers root)">
         </CheckBoxPreference>
-        <CheckBoxPreference
-		    android:layout_width="fill_parent"
-		    android:layout_height="fill_parent"
-            android:key="USE_GPS"
-            android:title="USE_GPS">
-        </CheckBoxPreference>
         <ListPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
