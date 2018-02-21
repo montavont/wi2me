@@ -142,8 +142,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		commandFile = (Preference) findPreference("COMMAND_FILE");
 		commandLoopCategory = (PreferenceCategory) findPreference("COMMAND_LOOP_CATEGORY");
 		lockNetwork=(CheckBoxPreference) findPreference("LOCK_NETWORK");
-		useGPS=(CheckBoxPreference) findPreference("USE_GPS");
-
 		storageType =(ListPreference) findPreference("STORAGE_TYPE");
 
 		advanced =(Preference) findPreference("Advanced");
@@ -496,33 +494,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 			try {
 					changeParameter((Boolean)arg1, Parameter.LOCK_NETWORK);
 					lockNetwork.setChecked((Boolean)arg1);
-				} catch (IOException e) {
-					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				}
-				return true;
-			}
-
-		});
-
-
-		// Set parameter USE_GPS
-		try
-		{
-			useGPS.setChecked(Boolean.parseBoolean(readProperties("USE_GPS")));
-		}
-		catch (IOException e1)
-		{
-			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
-		}
-
-		useGPS.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
-		{
-			@Override
-			public boolean onPreferenceChange(Preference arg0, Object arg1)
-			{
-			try {
-					changeParameter((Boolean)arg1, Parameter.USE_GPS_POSITION);
-					useGPS.setChecked((Boolean)arg1);
 				} catch (IOException e) {
 					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 				}
