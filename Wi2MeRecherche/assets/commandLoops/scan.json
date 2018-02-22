@@ -1,10 +1,12 @@
 {
-	"wifi":{
-		"command":{
-			"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
+	"loopers":{
+		"wifi":{
+			"command":{
+				"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
+			}
 		}
 	}
 }

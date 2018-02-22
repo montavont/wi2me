@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
@@ -93,6 +94,10 @@ public class ConfigurationManager
 	public static final Boolean TRIAL = false;
 	public static final int MAX_TRACES = 60000;
 	public static final String ASSET_COMMAND_LOOPS = "commandLoops";
+
+	private static Boolean json_parsed = false;
+	private static HashMap<String, IWirelessNetworkCommandLooper> m_CommandLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
+	private static HashMap<String, String> m_EventButtons = new HashMap<String, String>();
 
 	private enum ObjectType{
 		Boolean,
@@ -353,11 +358,18 @@ public class ConfigurationManager
 				File outFile = new File(dir.getPath() + "/" + assetFile.getName());
 				if(!outFile.exists())
 				{
-    				HashMap<String, IWirelessNetworkCommandLooper> loopers = readCommandFile(ControllerServices.getInstance().getAssets().getStream(ASSET_COMMAND_LOOPS + "/" + path));
-					if (loopers.size() > 0)
+					try (InputStream in = new FileInputStream(assetFile))
 					{
-						saveCommandFile(loopers, outFile.getPath());
-					}
+				        try (OutputStream out = new FileOutputStream(outFile))
+						{
+            				byte[] buf = new byte[1024];
+				            int len;
+				            while ((len = in.read(buf)) > 0)
+							{
+                				out.write(buf, 0, len);
+				            }
+				        }
+				    }
 				}
 			}
 		}
@@ -367,97 +379,156 @@ public class ConfigurationManager
 		}
 	}
 
-
-    public static HashMap<String, IWirelessNetworkCommandLooper> readCommandFile(InputStream stream) throws IOException
+    public static HashMap<String, IWirelessNetworkCommandLooper> getWirelessLoopers()
 	{
-    	HashMap<String, IWirelessNetworkCommandLooper> retval = new HashMap<String, IWirelessNetworkCommandLooper>();
+		if (!json_parsed)
+		{
+			try
+			{
+				readCommandFile(new FileInputStream(COMMAND_FILE));
+				json_parsed = true;
+			}
+			catch (java.io.FileNotFoundException e )
+			{
+    				Log.e("ConfigurationManager", "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
+			}
+			catch (IOException e)
+			{
+   					Log.e("ConfigurationManager", "++ " + "FileNotFoundException parsing json configuration file: "+e.getMessage());
+			}
+		}
+		return m_CommandLoopers;
+	}
+
+    public static HashMap<String, String> getEventButtons()
+	{
+		if (!json_parsed)
+		{
+			try
+			{
+				readCommandFile(new FileInputStream(COMMAND_FILE));
+				json_parsed = true;
+			}
+			catch (java.io.FileNotFoundException e )
+			{
+    				Log.e("ConfigurationManager", "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
+			}
+			catch (IOException e)
+			{
+   					Log.e("ConfigurationManager", "++ " + "FileNotFoundException parsing json configuration file: "+e.getMessage());
+			}
+		}
+		return m_EventButtons;
+	}
+
+	private static void readCommandFile(InputStream stream) throws IOException
+	{
 		JsonReader reader = new JsonReader(new InputStreamReader(stream));
 		reader.beginObject();
 		while (reader.hasNext())
 		{
-			String LooperName = reader.nextName();
+			String CategoryName = reader.nextName();
 			reader.beginObject();
-			while (reader.hasNext())
+			if (CategoryName.equals("loopers"))
 			{
-				String looperContentKey = reader.nextName();
-				if (looperContentKey.equals("command"))
+				while (reader.hasNext())
 				{
-					String commandModule = "";
-					HashMap<String, String> commandParams = new HashMap<String, String>();
+					String LooperName = reader.nextName();
 					reader.beginObject();
 					while (reader.hasNext())
 					{
-						String key = reader.nextName();
-						if (key.equals("module"))
+						String looperContentKey = reader.nextName();
+						if (looperContentKey.equals("command"))
 						{
-         						commandModule = reader.nextString();
-						}
-       					else if (key.equals("params"))
-						{
+							String commandModule = "";
+							HashMap<String, String> commandParams = new HashMap<String, String>();
 							reader.beginObject();
 							while (reader.hasNext())
 							{
-								commandParams.put(reader.nextName(), reader.nextString());
+								String key = reader.nextName();
+								if (key.equals("module"))
+								{
+         								commandModule = reader.nextString();
+								}
+       							else if (key.equals("params"))
+								{
+									reader.beginObject();
+									while (reader.hasNext())
+									{
+										commandParams.put(reader.nextName(), reader.nextString());
+									}
+									reader.endObject();
+								}
+								else
+								{
+									reader.skipValue();
+								}
 							}
 							reader.endObject();
-						}
-						else
-						{
-							reader.skipValue();
+							try
+							{
+								if (commandModule.length() > 0 && LooperName.length() > 0)
+								{
+									Class<?> clazz = Class.forName(commandModule);
+									Constructor<?> ctor = clazz.getConstructor(HashMap.class);
+									if (!m_CommandLoopers.containsKey(LooperName))
+									{
+										m_CommandLoopers.put(LooperName, new WirelessNetworkCommandLooper());
+									}
+									m_CommandLoopers.get(LooperName).addCommand((WirelessNetworkCommand) ctor.newInstance(new Object[] {commandParams}));
+								}
+							}
+							catch (ClassNotFoundException e)
+							{
+    								Log.e("ConfigurationManager", "++ " + "ClassNotFoundException parsing json configuration file: "+e.getMessage());
+							}
+							catch (NoSuchMethodException e)
+							{
+    								Log.e("ConfigurationManager", "++ " + "NoSuchMethodException parsing json configuration file: "+e.getMessage());
+							}
+							catch (InstantiationException e)
+							{
+    								Log.e("ConfigurationManager", "++ " + "InstantiationException parsing json configuration file: "+e.getMessage());
+							}
+							catch (IllegalAccessException e)
+							{
+    								Log.e("ConfigurationManager", "++ " + "IllegalAccessException parsing json configuration file: "+e.getMessage());
+							}
+							catch (java.lang.reflect.InvocationTargetException e)
+							{
+    							Log.e("ConfigurationManager", "++ " + "InvocationTargetException parsing json configuration file: "+e.getMessage());
+								e.printStackTrace();
+							}
 						}
 					}
 					reader.endObject();
-					try
-					{
-						if (commandModule.length() > 0 && LooperName.length() > 0)
-						{
-							Class<?> clazz = Class.forName(commandModule);
-							Constructor<?> ctor = clazz.getConstructor(HashMap.class);
-							if (!retval.containsKey(LooperName))
-							{
-								retval.put(LooperName, new WirelessNetworkCommandLooper());
-							}
-							retval.get(LooperName).addCommand((WirelessNetworkCommand) ctor.newInstance(new Object[] {commandParams}));
-						}
-					}
-					catch (ClassNotFoundException e)
-					{
-    						Log.e("ConfigurationManager", "++ " + "ClassNotFoundException parsing json configuration file: "+e.getMessage());
-					}
-					catch (NoSuchMethodException e)
-					{
-    						Log.e("ConfigurationManager", "++ " + "NoSuchMethodException parsing json configuration file: "+e.getMessage());
-					}
-					catch (InstantiationException e)
-					{
-    						Log.e("ConfigurationManager", "++ " + "InstantiationException parsing json configuration file: "+e.getMessage());
-					}
-					catch (IllegalAccessException e)
-					{
-    						Log.e("ConfigurationManager", "++ " + "IllegalAccessException parsing json configuration file: "+e.getMessage());
-					}
-					catch (java.lang.reflect.InvocationTargetException e)
-					{
-    					Log.e("ConfigurationManager", "++ " + "InvocationTargetException parsing json configuration file: "+e.getMessage());
-						e.printStackTrace();
-					}
+				}
+			}
+			if (CategoryName.equals("buttons"))
+			{
+				while (reader.hasNext())
+				{
+					String buttonName = reader.nextName();
+         			String buttonText = reader.nextString();
+					m_EventButtons.put(buttonName, buttonText);
 				}
 			}
 			reader.endObject();
 		}
 		reader.endObject();
-
-		return retval;
-
 	}
 
-	public static void saveCommandFile(HashMap<String, IWirelessNetworkCommandLooper> loopers, String path) throws IOException
+	//TKE Disabling command file saving - Needs to take into accound custom event buttons
+	/*public static void saveCommandFile(HashMap<String, IWirelessNetworkCommandLooper> loopers, String path) throws IOException
 	{
 		try
 		{
 
 	    	JsonWriter writer = new JsonWriter(new OutputStreamWriter(new FileOutputStream(path), "UTF-8"));
 			writer.setIndent("  ");
+			writer.beginObject();
+
+			writer.name("loopers");
 			writer.beginObject();
 
 			for (String looperName : loopers.keySet())
@@ -488,11 +559,12 @@ public class ConfigurationManager
 				writer.endObject();
 			}
 			writer.endObject();
+			writer.endObject();
 			writer.close();
 		}
 		catch (IOException e )
 		{
 			Log.e("ConfigurationManager", "++ " + "IOException trying to access configuration file: " +e.getMessage());
 		}
-	}
+	}*/
 }

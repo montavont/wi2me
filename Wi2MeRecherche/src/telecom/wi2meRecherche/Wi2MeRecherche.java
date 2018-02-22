@@ -35,6 +35,7 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Arrays; //TODO delete
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -58,10 +59,13 @@ import telecom.wi2meCore.model.Logger.TraceString;
 import telecom.wi2meCore.model.entities.CellularConnectionData;
 import telecom.wi2meCore.model.entities.CellularConnectionEvent;
 import telecom.wi2meCore.model.entities.CellularScanResult;
+import telecom.wi2meCore.model.entities.CustomEvent;
 import telecom.wi2meCore.model.entities.WifiConnectionData;
 import telecom.wi2meCore.model.entities.WifiConnectionEvent;
 import telecom.wi2meCore.model.parameters.Parameter;
+import telecom.wi2meCore.model.TraceManager;
 import telecom.wi2meCore.controller.services.StatusService;
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -90,8 +94,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.RelativeLayout;
@@ -112,8 +120,6 @@ public class Wi2MeRecherche extends Activity
 	private static final int MENU_EXPORT_LOGCAT = 3;
 	private static final int MENU_ACCOUNT_MANAGEMENT = 4;
 	private static final int MENU_PREFERENCES = 5;
-
-	LogObserver logObserver;
 
 	ProgressDialog exportingProcessDialog;
 	ProgressDialog stoppingProcessDialog;
@@ -141,22 +147,19 @@ public class Wi2MeRecherche extends Activity
 	MenuItem menuItemStart;
 	MenuItem menuItemStop;
 
-   	public TraceString logTrace = null;
 	long cell_start_time = 0;
    	long wifi_start_time = 0;
 	boolean wifi_start=false;
    	boolean cell_start=false;
 	int lastBytesTransferred = 0;
 
-	public CellularConnectionEvent mCellConnectionEvent = null;
-	public CellularConnectionData mCellConnectionData = null;
-	public WifiConnectionEvent mWifiConnectionEvent = null;
-	public WifiConnectionData mWifiConnectionData = null;
-
 	private Handler refreshHandler = new Handler();
 	private Runnable refreshTask;
 	private static final long UI_REFRESH_PERIOD = 500;
 	private boolean refreshUI = true;
+
+	private boolean buttonLoaded = false;
+
 
 	/** Called when the activity is first created./ */
 	@Override
@@ -172,27 +175,23 @@ public class Wi2MeRecherche extends Activity
         	packageName = this.getPackageName();
 	        context = this;
 
-        	logObserver = new LogObserver();
-
         	startService();
 
-		refreshTask = new Runnable()
-		{
-			@Override
-			public void run()
+			refreshTask = new Runnable()
 			{
-				runOnUiThread(new Runnable()
+				@Override
+				public void run()
 				{
-					@Override
-					public void run()
+					runOnUiThread(new Runnable()
 					{
-						updateInfo();
-					}
-				});
-			}
-		};
-
-
+						@Override
+						public void run()
+						{
+							updateInfo();
+						}
+					});
+				}
+			};
 
 	}
 
@@ -247,9 +246,32 @@ public class Wi2MeRecherche extends Activity
 
 					binder.start();
 					refreshUI = true;
-      					refreshHandler.postDelayed(refreshTask, UI_REFRESH_PERIOD);
+      				refreshHandler.postDelayed(refreshTask, UI_REFRESH_PERIOD);
 					menuItemStart.setVisible(false);
 					menuItemStop.setVisible(true);
+
+			GridView button_grid=(GridView)findViewById(R.id.mainscreen_buttongrid);
+
+			HashMap<String, String> custom_buttons = ConfigurationManager.getEventButtons();
+		    final List<String> button_events = new ArrayList<String>(custom_buttons.keySet());
+		    List<String> button_labels = new ArrayList<String>(custom_buttons.values());
+
+    	    // Create a new ArrayAdapter
+        	final ArrayAdapter<String> gridViewArrayAdapter = new ArrayAdapter<String>
+            	    (this,android.R.layout.simple_list_item_1, button_labels);
+
+	        // Data bind GridView with ArrayAdapter (String Array elements)
+    	    button_grid.setAdapter(gridViewArrayAdapter);
+            gridViewArrayAdapter.notifyDataSetChanged();
+
+			button_grid.setOnItemClickListener(new OnItemClickListener() {
+		        @Override
+        		public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+				{
+					Log.i(getClass().getSimpleName(), "++ " + "Logging custom event " + position + "	" + button_events.get(position));
+					binder.getLogger().log(CustomEvent.getNewCustomEvent(TraceManager.getTrace(),button_events.get(position)));
+        		}
+    		});
 					break;
 				case MENU_STOP:
 					stop();
@@ -503,23 +525,7 @@ public class Wi2MeRecherche extends Activity
 				binder = (ServiceBinder) service;
 				if (binder.loadingError){
 					stopAndQuit();
-				}else{
-					binder.getLogger().addObserver(logObserver);
-					if (binder.isRunning()){
-						//if it was running the binder has something we can already show
-						Observable observable = binder.getObservable();
-						Object data = binder.getWifiData(); //first the wifi data
-						if (observable != null && data != null){
-							logObserver.update(observable, data);
-						}
-						data = binder.getCellData(); //now cell data
-						if (observable != null && data != null){
-							logObserver.update(observable, data);
-						}
-					}
 				}
-
-
 			}
 			public void onServiceDisconnected(ComponentName name) {
 			}
@@ -531,16 +537,9 @@ public class Wi2MeRecherche extends Activity
 
 	private void unbind(){
     	if (serviceConnection != null){
-    		removeObservers();
     		unbindService(serviceConnection);
     		serviceConnection = null;
     	}
-	}
-
-	private void removeObservers(){
-    		if (binder != null){
-    			binder.getLogger().deleteObserver(logObserver);
-    		}
 	}
 
 	private void startService(){
@@ -551,7 +550,6 @@ public class Wi2MeRecherche extends Activity
 
 	private void stopService(){
     		stopService(new Intent(this, ApplicationService.class));
-    		removeObservers();
 	}
 
     private void stopAndQuit() {
@@ -636,48 +634,6 @@ public class Wi2MeRecherche extends Activity
     	}
     }
 
-
-	private class LogObserver implements Observer
-	{
-
-		@Override
-		public void update(Observable observable, Object data)
-		{
-			logTrace = (TraceString) data;
-			switch(logTrace.type)
-			{
-				case CELL:
-
-					switch (logTrace.content.getStoringType())
-					{
-						case CELL_CONNECTION_EVENT:
-							mCellConnectionEvent = (CellularConnectionEvent) logTrace.content;
-							break;
-
-						case CELL_CONNECTION_DATA:
-							mCellConnectionData = (CellularConnectionData) logTrace.content;
-							break;
-					}
-					break;
-
-				case WIFI:
-					switch (logTrace.content.getStoringType())
-					{
-						case WIFI_CONNECTION_EVENT:
-
-							mWifiConnectionEvent = (WifiConnectionEvent) logTrace.content;
-							break;
-
-						case WIFI_CONNECTION_DATA:
-							mWifiConnectionData = (WifiConnectionData) logTrace.content;
-							break;
-
-					}
-					break;
-			}
-		}
-
-	}
 
 	private boolean compressFile(String pathFileInput, String pathFileOutput){
 		byte[] buffer = new byte[100000];
@@ -920,8 +876,9 @@ public class Wi2MeRecherche extends Activity
 
 		addTableRow(getResources().getString(R.string.mainscreen_localization_header), "", Color.rgb(30, 30, 30));
 
-		if (logTrace != null)
+		if (binder != null)
 		{
+
 			Location location = ControllerServices.getInstance().getLocation().getLocation();
 			if (location != null)
 			{
@@ -931,13 +888,8 @@ public class Wi2MeRecherche extends Activity
 				addTableRow(getResources().getString(R.string.mainscreen_localization_speed), String.valueOf(location.getSpeed()));
 			}
 
-			addTableRow(getResources().getString(R.string.mainscreen_localization_battery), String.valueOf(logTrace.content.getBatteryLevel())+"%");
+			//addTableRow(getResources().getString(R.string.mainscreen_localization_battery), String.valueOf(logTrace.content.getBatteryLevel())+"%");
 
-
-		}
-
-		if (binder != null)
-		{
 			HashMap<String, HashMap<String, String>> looperData = binder.getLooperData();
 			for (String looperKey : looperData.keySet())
 			{

@@ -47,6 +47,7 @@ public abstract class Trace {
 		LOCATION_EVENT,
 		BLE_WRITE_EVENT,
 		BLE_READ_EVENT,
+        CUSTOM_EVENT,
 	};
 
 	/**

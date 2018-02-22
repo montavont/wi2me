@@ -1,20 +1,22 @@
 {
-	"cell":{
-		"command":{
-			"module":"telecom.wi2meCore.model.cellCommands.CellCleanerCommand"
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.cellCommands.CellScanner"
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.cellCommands.CellConnector"
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.cellCommands.CellDownloader",
-			"params":{
+	"loopers":{
+		"cell":{
+			"command":{
+				"module":"telecom.wi2meCore.model.cellCommands.CellCleanerCommand"
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.cellCommands.CellScanner"
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.cellCommands.CellConnector"
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.cellCommands.CellDownloader",
+				"params":{
                   "server":"ipv4.download.thinkbroadband.com",
                   "path":"/100MB.zip",
                   "size":"102400000"
+				}
 			}
 		}
 	}

@@ -395,6 +395,11 @@ public class TextTraceHelper implements ITraceDatabase
 							+ bleREvent.getCharValue()
 						);
 						break;
+					case CUSTOM_EVENT:
+						CustomEvent customEvent = (CustomEvent)trace;
+						trace_strings.add(
+							customEvent.getEvent()
+						);
 				}
 
 				try

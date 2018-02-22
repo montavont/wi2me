@@ -120,8 +120,6 @@ public class ApplicationService extends Service {
 
 			TextTraceHelper.initialize(context);
 
-    		//binder also keeps the last info of the log
-    		Logger.getInstance().addObserver(binder);
     		try {
 
 		        ControllerServices.initializeServices(new TimeService(),
@@ -315,15 +313,12 @@ public class ApplicationService extends Service {
     }
 
 
-	public class ServiceBinder extends Binder implements Observer
+	public class ServiceBinder extends Binder
 	{
 	    	private boolean firstRun;
     		private boolean bound;
 	    	public boolean loadingError;
 		public Date startedDate;
-		private Observable observable;
-		private Object wifiData;
-		private Object cellData;
 		private boolean isRunning;
 		public boolean isBateryLow;
 		public IParameterManager parameters;
@@ -334,30 +329,6 @@ public class ApplicationService extends Service {
 
 		protected synchronized void setRunning(boolean isRunning) {
 			this.isRunning = isRunning;
-		}
-
-		public synchronized Object getCellData() {
-			return cellData;
-		}
-
-		protected synchronized void setCellData(Object cellData) {
-			this.cellData = cellData;
-		}
-
-		public synchronized Observable getObservable() {
-			return observable;
-		}
-
-		protected synchronized void setObservable(Observable observable) {
-			this.observable = observable;
-		}
-
-		public synchronized Object getWifiData() {
-			return wifiData;
-		}
-
-		protected synchronized void setWifiData(Object data) {
-			this.wifiData = data;
 		}
 
 		public synchronized HashMap<String, HashMap<String,String>> getLooperData() {
@@ -376,8 +347,6 @@ public class ApplicationService extends Service {
 			firstRun = true;
 			startedDate = new Date(Calendar.getInstance().getTimeInMillis());
 	    		loadingError = false;
-    			observable = null;
-    			wifiData = null;
 	    	}
 
 		public void start()
@@ -385,33 +354,7 @@ public class ApplicationService extends Service {
 		    wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
 	        cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
 
-			/*if (wifiWorkingFlag.isActive())
-			{
-				WirelessLoopers.put("wifiCommands", new WirelessNetworkCommandLooper());
-			}
-			if (cellWorkingFlag.isActive())
-			{
-				WirelessLoopers.put("cellCommands", new WirelessNetworkCommandLooper());
-			}
-			TODO remove *WorkingFlags, up until pref page
-			*/
-
-
-
-			try
-			{
-				WirelessLoopers = ConfigurationManager.readCommandFile(new FileInputStream((String)parameters.getParameter(Parameter.COMMAND_FILE)));
-			}
-			catch (java.io.FileNotFoundException e )
-			{
-    				Log.e(getClass().getSimpleName(), "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
-				return;
-			}
-			catch (IOException e )
-			{
-    				Log.e(getClass().getSimpleName(), "++ " + "IOException trying to access command file file: " +e.getMessage());
-				return;
-			}
+			WirelessLoopers = ConfigurationManager.getWirelessLoopers();
 
 			for (IWirelessNetworkCommandLooper looper:WirelessLoopers.values())
 			{
@@ -479,20 +422,6 @@ public class ApplicationService extends Service {
 		public synchronized boolean isBound()
 		{
 			return bound;
-		}
-
-		@Override
-		public void update(Observable observable, Object data) {
-			setObservable(observable);
-			TraceString logTrace = (TraceString) data;
-			switch(logTrace.type){
-			case CELL:
-				setCellData(data);
-				break;
-			case WIFI:
-				setWifiData(data);
-				break;
-			}
 		}
 
 	}
