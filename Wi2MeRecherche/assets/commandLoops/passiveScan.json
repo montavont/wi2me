@@ -1,7 +1,9 @@
 {
-	"wifi":{
-  		"command": {
-			"module":"telecom.wi2meCore.model.wifiCommands.WifiPassiveScanner"
-	  	}
+	"loopers":{
+		"wifi":{
+  			"command": {
+				"module":"telecom.wi2meCore.model.wifiCommands.WifiPassiveScanner"
+		  	}
+		}
 	}
 }

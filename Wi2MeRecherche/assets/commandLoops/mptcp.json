@@ -1,59 +1,61 @@
 {
-	"wifi":{
-		"command":{
-			"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
-		},
-		"command":{
-				"module":"telecom.wi2meRecherche.model.wifiCommands.WifiConnector",
+	"loopers":{
+		"wifi":{
+			"command":{
+				"module":"telecom.wi2meCore.model.wifiCommands.WifiCleanerCommand"
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.wifiCommands.WifiScanner"
+			},
+			"command":{
+					"module":"telecom.wi2meRecherche.model.wifiCommands.WifiConnector",
+					"params":{
+						"bssid_file":""
+					}
+			},
+			"command":{
+					"module":"telecom.wi2meCore.model.wifiCommands.CommunityNetworkConnector"
+			},
+			"command":{
+				"module":"telecom.wi2meCore.wifiCommands.ShellPoppingCommand",
 				"params":{
-					"bssid_file":""
-				}
-		},
-		"command":{
-				"module":"telecom.wi2meCore.model.wifiCommands.CommunityNetworkConnector"
-		},
-		"command":{
-			"module":"telecom.wi2meCore.wifiCommands.ShellPoppingCommand",
-			"params":{
-					"command":"sysctl -w net.mptcp.mptcp_enabled=0"
-				}
-		},
-		"command":{
-				"module":"telecom.wi2meCore.model.wifiCommands.WifiWebPageDownloader",
-				"params":{
-					"page":"http://192.108.119.130/Huff.html",
-					"threads":"5",
-					"tag":"WEB"
-				}
-		},
-		"command":{
+						"command":"sysctl -w net.mptcp.mptcp_enabled=0"
+					}
+			},
+			"command":{
+					"module":"telecom.wi2meCore.model.wifiCommands.WifiWebPageDownloader",
+					"params":{
+						"page":"http://192.108.119.130/Huff.html",
+						"threads":"5",
+						"tag":"WEB"
+					}
+			},
+			"command":{
+					"module":"telecom.wi2meCore.model.ShellPoppingCommand",
+					"params":{
+						"command":"sysctl -w net.mptcp.mptcp_enabled=1"
+					}
+			},
+			"command":{
+					"module":"telecom.wi2meCore.model.wifiCommands.WifiWebPageDownloader",
+					"params":{
+						"page":"http://192.108.119.130/Huff.html",
+						"threads":"5",
+							"tag":"NDIFFPORTS"
+						}
+			},
+			"command":{
 				"module":"telecom.wi2meCore.model.ShellPoppingCommand",
 				"params":{
-					"command":"sysctl -w net.mptcp.mptcp_enabled=1"
-				}
-		},
-		"command":{
-				"module":"telecom.wi2meCore.model.wifiCommands.WifiWebPageDownloader",
+						"command":"sysctl -w net.mptcp.mptcp_enabled=0"
+					}
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.wifiCommands.WifiSPDYDownloader",
 				"params":{
 					"page":"http://192.108.119.130/Huff.html",
-					"threads":"5",
-						"tag":"NDIFFPORTS"
-					}
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.ShellPoppingCommand",
-			"params":{
-					"command":"sysctl -w net.mptcp.mptcp_enabled=0"
+					"tag":"SPDY_VANILLA"
 				}
-		},
-		"command":{
-			"module":"telecom.wi2meCore.model.wifiCommands.WifiSPDYDownloader",
-			"params":{
-				"page":"http://192.108.119.130/Huff.html",
-				"tag":"SPDY_VANILLA"
 			}
 		}
 	}

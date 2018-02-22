@@ -120,7 +120,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 	ServiceBinder binder;
 	ServiceConnection serviceConnection;
 
-	//private List<LooperCommand> LooperCommands = new ArrayList<LooperCommand>();
 	private HashMap<String, IWirelessNetworkCommandLooper> loopers;
 
 	@Override
@@ -729,7 +728,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		try
 		{
 			String commandFilePath = readProperties("COMMAND_FILE");
-			loopers = ConfigurationManager.readCommandFile(new FileInputStream(commandFilePath));
+			loopers = ConfigurationManager.getWirelessLoopers();
 		}
 		catch (java.io.IOException e)
 		{
