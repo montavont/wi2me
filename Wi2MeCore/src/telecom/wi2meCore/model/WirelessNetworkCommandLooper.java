@@ -90,7 +90,7 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 			while (states.containsKey(key))
 			{
 				cmdInd += 1;
-				key = commands.get(i).getSubclassName() + "_" + cmdInd;
+				key = key + "_" + cmdInd;
 			}
 			states.put(key, val);
 		}
