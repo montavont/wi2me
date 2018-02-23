@@ -348,6 +348,7 @@ public class Wi2MeRecherche extends Activity
 
 			}
 		}).start();
+		binder = null;
 	}
 
 	private void exportLogcat()
@@ -539,6 +540,7 @@ public class Wi2MeRecherche extends Activity
     	if (serviceConnection != null){
     		unbindService(serviceConnection);
     		serviceConnection = null;
+			binder = null;
     	}
 	}
 
@@ -617,6 +619,7 @@ public class Wi2MeRecherche extends Activity
     public void onPause(){
     	super.onPause();
     	unbind();
+
     }
 
     public void onResume(){
@@ -629,7 +632,7 @@ public class Wi2MeRecherche extends Activity
 
     public void onDestroy(){
     	super.onDestroy();
-    	if (!binder.isRunning()){
+    	if (binder != null && !binder.isRunning()){
     		stopService();
     	}
     }

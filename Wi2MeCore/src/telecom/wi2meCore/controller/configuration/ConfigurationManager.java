@@ -339,9 +339,6 @@ public class ConfigurationManager
 			}
 		}
 
-
-
-
 		//If there is no config dir, create it and load the built in configs along.
 		File dir = new File(Environment.getExternalStorageDirectory() + WI2ME_DIRECTORY + JSON_COMMAND_DIRECTORY);
 		if (!dir.exists())
@@ -356,11 +353,14 @@ public class ConfigurationManager
 			{
 				File assetFile = new File(path);
 				File outFile = new File(dir.getPath() + "/" + assetFile.getName());
+				Log.e("ConfigurationManager", "++ " + "yiDDDA  SATAN ult configs /" + dir.getPath() + '/'  + assetFile.getName());
+				Log.e("ConfigurationManager", "++ " + "tryiDDDA  " + path );
 				if(!outFile.exists())
 				{
-					try (InputStream in = new FileInputStream(assetFile))
+					outFile.createNewFile();
+					try (InputStream in = ControllerServices.getInstance().getAssets().getStream(ASSET_COMMAND_LOOPS + "/" + path))
 					{
-				        try (OutputStream out = new FileOutputStream(outFile))
+				        try (OutputStream out = new FileOutputStream(outFile, false))
 						{
             				byte[] buf = new byte[1024];
 				            int len;
@@ -369,7 +369,15 @@ public class ConfigurationManager
                 				out.write(buf, 0, len);
 				            }
 				        }
+						catch (Exception e)
+						{
+   							Log.e("ConfigurationManager", "-- Error creating default config " + e.getMessage());
+						}
 				    }
+					catch (Exception e)
+					{
+   						Log.e("ConfigurationManager", "-- Error reading default config " + e.getMessage());
+					}
 				}
 			}
 		}
