@@ -266,7 +266,6 @@ public class Wi2MeRecherche extends Activity
 				        @Override
         				public void onItemClick(AdapterView<?> parent, View v, int position, long id)
 						{
-							Log.i(getClass().getSimpleName(), "++ " + "Logging custom event " + position + "	" + button_events.get(position));
 							binder.getLogger().log(CustomEvent.getNewCustomEvent(TraceManager.getTrace(),button_events.get(position)));
 		        		}
     				});
@@ -762,83 +761,6 @@ public class Wi2MeRecherche extends Activity
 			}
 		}
 	}
-	/*
-	private class LogcatPrintWriter extends PrintWriter{
-
-	}*/
-	/** Customer ListView to show the information in traces*/
-
-	private class myListAdapter extends BaseAdapter
-	{
-		private ArrayList<HashMap<String, String>> infoTraceList;
-		private LayoutInflater mInflater;
-		public myListAdapter(ArrayList<HashMap<String, String>> list, Context context){
-			infoTraceList = list;
-			mInflater = LayoutInflater.from(context);
-		}
-		@Override
-		public int getCount() {
-			return infoTraceList.size();
-		}
-		@Override
-		public Object getItem(int position) {
-			return infoTraceList.get(position);
-		}
-		@Override
-		public long getItemId(int position) {
-			return position;
-		}
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			ViewHolder holder;
-			if (convertView == null) {
-				convertView = mInflater.inflate(R.layout.griditem, null);
-				holder = new ViewHolder();
-				holder.traceItem = (TextView) convertView.findViewById(R.id.traceItem);
-				holder.traceValue = (TextView)convertView.findViewById(R.id.traceValue);
-
-				convertView.setTag(holder);
-			}
-			else {
-				holder = (ViewHolder) convertView.getTag();
-			}
-
-			holder.traceItem.setText((String) infoTraceList.get(position).get("traceItem"));
-			holder.traceValue.setText((String) infoTraceList.get(position).get("traceValue"));
-			return convertView;
-		}
-
-		public void setData(String key, String value)
-		{
-			boolean inserted = false;
-			HashMap<String, String> newVal;
-			for (HashMap<String, String> d : infoTraceList)
-			{
-				if (d.get("traceItem") == key)
-				{
-					d.put("traceValue", value);
-					inserted = true;
-				}
-			}
-
-			if (!inserted)
-			{
-				newVal = new HashMap<String, String>();
-				newVal.put("traceItem", key);
-				newVal.put("traceValue",value);
-				infoTraceList.add(newVal);
-			}
-		}
-
-		class ViewHolder {
-			TextView traceItem;
-			TextView traceValue;
-		}
-
-
-	}
-
 
 	private void addTableRow(String key, String value)
 	{

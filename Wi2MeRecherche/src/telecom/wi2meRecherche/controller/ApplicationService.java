@@ -112,6 +112,7 @@ public class ApplicationService extends Service {
     		parameters = ParameterFactory.getNewParameterManager();
     		binder = new ServiceBinder(parameters);
 
+
 	        ControllerServices.initializeServices(new TimeService(),
 							new CellService(context),
 							new MoveService(context, new TimeService()),
@@ -124,6 +125,17 @@ public class ApplicationService extends Service {
 							new CommunityNetworkService(context),
 							new BLEService(context)
 			);
+
+    		try {
+    			ConfigurationManager.loadParameters(context, parameters);
+    			configuration = ConfigurationManager.getConfiguration();
+			} catch (Exception e) {
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				//If we have problems loading the parameters file, we should tell and finish
+				Toast.makeText(context, "ERROR LOADING CONFIGURATION FILE: "+e.getMessage()+". Please, check ensure USB storage is off. Otherwise, replace configuration file and try again.", Toast.LENGTH_LONG).show();
+				binder.loadingError = true;
+				return;
+			}
 	}
 
 	private class WirelessLooperThread extends Thread
@@ -328,12 +340,8 @@ public class ApplicationService extends Service {
 
 		public void start()
 		{
-
-
 			TextTraceHelper.initialize(context);
-
     		try {
-
     			ConfigurationManager.loadParameters(context, parameters);
     			configuration = ConfigurationManager.getConfiguration();
 			} catch (Exception e) {

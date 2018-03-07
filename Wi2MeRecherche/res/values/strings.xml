@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Wi2MeRecherche</string>
     <string name="operator_name">Operator Name:</string>
 
 	<string name="STOPPING_SERVICE_MESSAGE">Stopping service &#8230;</string>
@@ -11,20 +10,12 @@
 	<string name="DATABASE_UPLOAD_SUCCESSFUL_MESSAGE">Database successfully sent!!</string>
 	<string name="ERROR_COMPRESSING_DATABASE">Error compressing the database. Check the device\'s storage is not mounted and that you have enough disk space, then relaunch.</string>
 	<string name="MAIL_TO_SEND_DATABASE">alejandro.lampropulos@telecom-bretagne.eu</string>
-	<string name="ERROR_RUNNING_DROIDWALL">ERROR: Drodiwall could not be launched. Is it installed on your device?</string>
-	<string name="TURN_OFF_WIFI_MESSAGE">Wifi interface must be turned off! Please relaunch application.</string>
 	<string name="STOP_SERVICE_TO_UPLOAD_RESULTS_MESSAGE">Service must be stopped first</string>
 	<string name="LOGCAT_EXPORT_SUCCESSFUL_MESSAGE">Logcat exported!!</string>
 	<string name="LOGCAT_EXPORT_ERROR_MESSAGE">ERROR. Could not export log. Make sure USB storage is turned off.</string>
-	<string name="LOGCAT_EXPORT_INTERRUPTED_MESSAGE">ERROR. Logcat export was interrupted! Please, try again.</string>
-	<string name="DISABLE_DROIDWALL_UPLOAD_MESSAGE">Droidwall must be disabled to send the results. Select the option to disable the Firewall, and press BACK to return and try to Upload Results again.</string>
-	<string name="ENABLE_DROIDWALL_START_MESSAGE">Droidwall must be enabled to start the service. Select the option to enable the Firewall, and press BACK to return and try to Start again.</string>
-	<string name="TRIAL_EXPIRED">Trial Version Expired</string>
 
 	<string name="EXPORT_POPUP_TITLE">Export results</string>
 	<string name="EXPORT_POPUP_LOCAL">Export to SD</string>
-	<string name="EXPORT_POPUP_SERVER">Upload to Server</string>
-	<string name="DISABLEMENT_TIMEOUT">Timeout disabling wlan interface, try doing it from settings and restart</string>
 	<string name="ABOUT_WI2ME">About Wi2Me</string>
 	<string name="PERCENTAGE" formatted="false">%s %%</string>
 
@@ -32,8 +23,30 @@
 	<string name="mainscreen_localization_provider">Provider/Accuracy (m)</string>
 	<string name="mainscreen_localization_latitude">Latitude</string>
 	<string name="mainscreen_localization_longitude">Longitude</string>
-	<string name="mainscreen_localization_timestamp">Timestamp (ms)</string>
 	<string name="mainscreen_localization_speed">Speed (m/s)</string>
-	<string name="mainscreen_localization_battery">Battery Level</string>
 
+	<string name="account_management_title">Account Management</string>
+	<string name="account_management_login">Login:</string>
+	<string name="account_management_show_password">Show the password</string>
+	<string name="account_management_save">Save</string>
+	<string name="account_management_cancel">Cancel</string>
+	<string name="account_management_password">Password</string>
+
+	<string name="advanced_configuration_title">Advanced Configuration</string>
+
+	<string name="community_networks_title">Community Networks</string>
+
+	<string name="preference_connectivity">Connectivity</string>
+	<string name="preference_connect_to_open_networks">CONNECT_TO_OPEN_NETWORKS</string>
+	<string name="preference_configuration">Configuration</string>
+	<string name="preference_min_battery_level">MIN_BATTERY_LEVEL</string>
+	<string name="preference_wifi_threshold">WIFI_THRESHOLD</string>
+	<string name="preference_wifi_scan_interval">WIFI_SCAN_INTERVAL</string>
+	<string name="preference_monitored_interfaces">MONITORED_INTERFACES</string>
+	<string name="preference_storage_type">STORAGE_TYPE</string>
+	<string name="preference_lock_network">LOCK_NETWORK (requiers root)</string>
+	<string name="preference_command_file">COMMAND_FILE</string>
+	<string name="preference_advanced">Advanced</string>
+	<string name="preference_about">About</string>
+	<string name="preference_commands">Commands</string>
 </resources>

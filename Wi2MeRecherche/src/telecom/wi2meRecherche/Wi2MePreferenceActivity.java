@@ -97,11 +97,8 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 
 	private static final int PICK_COMMAND_FILE = 0;
 
-	CheckBoxPreference runWIFI;
-	CheckBoxPreference runCellular;
 	CheckBoxPreference lockNetwork;
 	CheckBoxPreference useGPS;
-	CheckBoxPreference connectCellular;
 	CheckBoxPreference openNetwork;
 	Preference battery;
 	EditTextPreference threshold;
@@ -130,9 +127,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.layout.preference);
 
-		runWIFI = (CheckBoxPreference) findPreference("RUN_WIFI");
-		runCellular=(CheckBoxPreference) findPreference("RUN_CELLULAR");
-		connectCellular =(CheckBoxPreference) findPreference("CONNECT_CELLULAR");
 		openNetwork=(CheckBoxPreference) findPreference("CONNECT_TO_OPEN_NETWORKS");
 		battery=(Preference) findPreference("MIN_BATTERY_LEVEL");
 		threshold = (EditTextPreference) findPreference("WIFI_THRESHOLD");
@@ -187,71 +181,6 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 
 	public void loadConfig()
 	{
-		// Set parameter RUN_WIFI
-
-		try {
-			runWIFI.setChecked(Boolean.parseBoolean(readProperties("RUN_WIFI")));
-		} catch (IOException e1) {
-			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
-		}
-		runWIFI.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-			@Override
-			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-
-				try {
-					changeParameter((Boolean)arg1, Parameter.RUN_WIFI);
-					runWIFI.setChecked((Boolean)arg1);
-				} catch (IOException e) {
-					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				}
-				return true;
-			}
-
-		});
-
-		// Set parameter RUN_Cellular
-		try {
-			runCellular.setChecked(Boolean.parseBoolean(readProperties("RUN_CELLULAR")));
-		} catch (IOException e1) {
-			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
-		}
-		runCellular.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-			@Override
-			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-
-				try {
-					changeParameter((Boolean)arg1, Parameter.RUN_CELLULAR);
-					runCellular.setChecked((Boolean)arg1);
-				} catch (IOException e) {
-					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				}
-				return true;
-			}
-
-		});
-
-		// Set parameter Connect_Cellular
-
-		try {
-			connectCellular.setChecked(Boolean.parseBoolean(readProperties("CONNECT_CELLULAR")));
-		} catch (IOException e1) {
-			Log.e(getClass().getSimpleName(), "++ " + e1.getMessage(), e1);
-		}
-		connectCellular.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-			@Override
-			public boolean onPreferenceChange(Preference arg0, Object arg1) {
-
-				try {
-					changeParameter((Boolean)arg1, Parameter.CONNECT_CELLULAR);
-					connectCellular.setChecked((Boolean)arg1);
-				} catch (IOException e) {
-					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				}
-				return true;
-			}
-
-		});
-
 		// Set parameter ConnectionToOpenNetwork
 		try {
 			openNetwork.setChecked(Boolean.parseBoolean(readProperties("CONNECT_TO_OPEN_NETWORKS")));
@@ -337,7 +266,7 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 							boolean fromUser) {
 						if(fromUser){
 
-								batteryLevel.setText(Integer.toString(progress)+"%");
+								batteryLevel.setText(String.format("%d %%", progress));
 							batteryLevel.setText(String.format(getResources().getString(R.string.PERCENTAGE), Integer.toString(progress)));
 								batterylevelsetted = progress;
 
@@ -716,8 +645,8 @@ public class Wi2MePreferenceActivity extends PreferenceActivity
 
 			Entry<String, String> item = getItem(position);
 
-			((TextView) result.findViewById(R.id.cpam_text1)).setText(item.getKey());
-			((TextView) result.findViewById(R.id.cpam_text2)).setText(item.getValue());
+			((TextView) result.findViewById(R.id.parameter_name)).setText(item.getKey());
+			((TextView) result.findViewById(R.id.parameter_value)).setText(item.getValue());
 
 			return result;
 		}

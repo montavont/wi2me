@@ -3,7 +3,9 @@
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
 >
-   <PreferenceCategory android:title="CommunityNetworks" android:key="CommunityNetworks"
+   <PreferenceCategory
+   			android:title="@+string/community_networks_title"
+			android:key="CommunityNetworks"
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
    >

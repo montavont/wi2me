@@ -19,7 +19,7 @@
             android:layout_gravity="center_horizontal"
             android:paddingBottom="40sp"
             android:paddingTop="70sp"
-            android:text="Account Management"
+            android:text="@string/account_management_title"
             android:textColor="#00FF00"
             android:textSize="25sp" />
 
@@ -69,7 +69,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Login:"
+            android:text="@string/account_management_login"
+			android:labelFor="@+id/login"
             android:textSize="15sp" />
 
         <EditText
@@ -79,7 +80,6 @@
             android:layout_weight="1"
 			android:inputType="text"
             android:maxLines="1">
-
 
             <requestFocus />
         </EditText>
@@ -97,12 +97,13 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-			android:inputType="text"
-            android:text="Password:"
+            android:text="@string/account_management_password"
+			android:labelFor="@+id/password"
             android:textSize="15sp" />
 
         <EditText
             android:id="@+id/password"
+			android:inputType='textPassword'
             android:layout_width="0sp"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
@@ -121,7 +122,7 @@
         android:id="@+id/showPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Show the password"
+        android:text="@string/account_management_show_password"
         android:textSize="12sp"/>
     </TableRow>
 
@@ -131,23 +132,26 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
-        <Button
-			style="?android:attr/buttonBarButtonStyle"
-            android:id="@+id/save_AM"
-            android:layout_width="0sp"
-            android:layout_height="wrap_content"
-            android:layout_marginRight="10sp"
-            android:layout_weight="1"
-            android:text="Save" />
 
         <Button
 			style="?android:attr/buttonBarButtonStyle"
             android:id="@+id/cancel_AM"
             android:layout_width="0sp"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10sp"
+            android:layout_marginStart="10sp"
             android:layout_weight="1"
-            android:text="Cancel" />
+        	android:text="@string/account_management_cancel"
+			 />
+
+        <Button
+			style="?android:attr/buttonBarButtonStyle"
+            android:id="@+id/save_AM"
+            android:layout_width="0sp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="10sp"
+            android:layout_weight="1"
+        	android:text="@string/account_management_save"
+			/>
 
     </TableRow>
 </TableLayout>

@@ -20,6 +20,7 @@
 package telecom.wi2meCore.model.bluetoothCommands;
 
 import java.util.HashMap;
+import java.util.Locale;
 
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.model.Logger;
@@ -70,7 +71,7 @@ public class BLEWriteGPSToCharacteristicCommand extends WirelessNetworkCommand{
 		if (location != null)
 		{
 
-			String charValue = String.format("%f %f", location.getLatitude(), location.getLongitude());
+			String charValue = String.format(Locale.US, "%f %f", location.getLatitude(), location.getLongitude());
 
 			if (ControllerServices.getInstance().getBLE().writeCharacteristic(charValue, deviceAddress, serviceUUID, characteristicUUID))
 			{
