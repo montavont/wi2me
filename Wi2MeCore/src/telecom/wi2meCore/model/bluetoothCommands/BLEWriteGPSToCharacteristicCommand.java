@@ -75,6 +75,7 @@ public class BLEWriteGPSToCharacteristicCommand extends WirelessNetworkCommand{
 			if (ControllerServices.getInstance().getBLE().writeCharacteristic(charValue, deviceAddress, serviceUUID, characteristicUUID))
 			{
 				Logger.getInstance().log(BLEWriteEvent.getNewBLEWriteEvent(TraceManager.getTrace(), deviceAddress, serviceUUID, characteristicUUID, charValue));
+				m_stateString = charValue;
 			}
 		}
 	}
