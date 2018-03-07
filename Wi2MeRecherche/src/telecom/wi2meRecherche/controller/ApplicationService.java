@@ -92,8 +92,6 @@ public class ApplicationService extends Service {
     HashMap<String, Thread> WirelessThreads = new HashMap<String, Thread>();
 
 	IParameterManager parameters;
-	Flag wifiWorkingFlag;
-	Flag cellWorkingFlag;
 	int startId;
 	String configuration;
 	Context context;
@@ -109,41 +107,23 @@ public class ApplicationService extends Service {
 	public void onCreate()
 	{
     		super.onCreate();
-
     		context = this;
-
     		mNM = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-
     		parameters = ParameterFactory.getNewParameterManager();
-
     		binder = new ServiceBinder(parameters);
 
-			TextTraceHelper.initialize(context);
-
-    		try {
-
-		        ControllerServices.initializeServices(new TimeService(),
-								new CellService(this),
-								new MoveService(this, new TimeService()),
-								new WebService(this),
-								new WifiService(this),
-								new BatteryService(this),
-								new LocationService(this),
-								new AssetServices(this),
-								new NotificationServices(this),
-								new CommunityNetworkService(this),
-							new BLEService(this)
-								);
-
-    			ConfigurationManager.loadParameters(context, parameters);
-    			configuration = ConfigurationManager.getConfiguration();
-			} catch (Exception e) {
-				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-				//If we have problems loading the parameters file, we should tell and finish
-				Toast.makeText(this, "ERROR LOADING CONFIGURATION FILE: "+e.getMessage()+". Please, check ensure USB storage is off. Otherwise, replace configuration file and try again.", Toast.LENGTH_LONG).show();
-				binder.loadingError = true;
-				return;
-			}
+	        ControllerServices.initializeServices(new TimeService(),
+							new CellService(context),
+							new MoveService(context, new TimeService()),
+							new WebService(context),
+							new WifiService(context),
+							new BatteryService(context),
+							new LocationService(context),
+							new AssetServices(context),
+							new NotificationServices(context),
+							new CommunityNetworkService(context),
+							new BLEService(context)
+			);
 	}
 
 	private class WirelessLooperThread extends Thread
@@ -265,10 +245,7 @@ public class ApplicationService extends Service {
 			}
 		}
 
-		cellWorkingFlag.setActive(false);
-		wifiWorkingFlag.setActive(false);
-
-	    	Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), "STOPPING"));
+    	Logger.getInstance().log(ExternalEvent.getNewExternalEvent(TraceManager.getTrace(), "STOPPING"));
 
 	}
 
@@ -315,9 +292,9 @@ public class ApplicationService extends Service {
 
 	public class ServiceBinder extends Binder
 	{
-	    	private boolean firstRun;
-    		private boolean bound;
-	    	public boolean loadingError;
+    	private boolean firstRun;
+   		private boolean bound;
+    	public boolean loadingError;
 		public Date startedDate;
 		private boolean isRunning;
 		public boolean isBateryLow;
@@ -351,21 +328,31 @@ public class ApplicationService extends Service {
 
 		public void start()
 		{
-		    wifiWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_WIFI));
-	        cellWorkingFlag = new Flag((Boolean)parameters.getParameter(Parameter.RUN_CELLULAR));
+
+
+			TextTraceHelper.initialize(context);
+
+    		try {
+
+    			ConfigurationManager.loadParameters(context, parameters);
+    			configuration = ConfigurationManager.getConfiguration();
+			} catch (Exception e) {
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				//If we have problems loading the parameters file, we should tell and finish
+				Toast.makeText(context, "ERROR LOADING CONFIGURATION FILE: "+e.getMessage()+". Please, check ensure USB storage is off. Otherwise, replace configuration file and try again.", Toast.LENGTH_LONG).show();
+				binder.loadingError = true;
+				return;
+			}
 
 			WirelessLoopers = ConfigurationManager.getWirelessLoopers();
-
 			for (IWirelessNetworkCommandLooper looper:WirelessLoopers.values())
 			{
 				looper.initializeCommands(parameters);
 			}
 
-		        parameters.setParameter(Parameter.WIFI_WORKING_FLAG, wifiWorkingFlag);
-		        parameters.setParameter(Parameter.CELL_WORKING_FLAG, cellWorkingFlag);
 
-		        if ((Boolean)parameters.getParameter(Parameter.LOCK_NETWORK))
-		       	{
+		    if ((Boolean)parameters.getParameter(Parameter.LOCK_NETWORK))
+		    {
 				LockNetwork();
 			}
 

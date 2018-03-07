@@ -95,7 +95,6 @@ public class ConfigurationManager
 	public static final int MAX_TRACES = 60000;
 	public static final String ASSET_COMMAND_LOOPS = "commandLoops";
 
-	private static Boolean json_parsed = false;
 	private static HashMap<String, IWirelessNetworkCommandLooper> m_CommandLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
 	private static HashMap<String, String> m_EventButtons = new HashMap<String, String>();
 
@@ -353,8 +352,6 @@ public class ConfigurationManager
 			{
 				File assetFile = new File(path);
 				File outFile = new File(dir.getPath() + "/" + assetFile.getName());
-				Log.e("ConfigurationManager", "++ " + "yiDDDA  SATAN ult configs /" + dir.getPath() + '/'  + assetFile.getName());
-				Log.e("ConfigurationManager", "++ " + "tryiDDDA  " + path );
 				if(!outFile.exists())
 				{
 					outFile.createNewFile();
@@ -389,42 +386,34 @@ public class ConfigurationManager
 
     public static HashMap<String, IWirelessNetworkCommandLooper> getWirelessLoopers()
 	{
-		if (!json_parsed)
+		try
 		{
-			try
-			{
-				readCommandFile(new FileInputStream(COMMAND_FILE));
-				json_parsed = true;
-			}
-			catch (java.io.FileNotFoundException e )
-			{
-    				Log.e("ConfigurationManager", "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
-			}
-			catch (IOException e)
-			{
-   					Log.e("ConfigurationManager", "++ " + "FileNotFoundException parsing json configuration file: "+e.getMessage());
-			}
+			readCommandFile(new FileInputStream(COMMAND_FILE));
+		}
+		catch (java.io.FileNotFoundException e )
+		{
+    			Log.e("ConfigurationManager", "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
+		}
+		catch (IOException e)
+		{
+   				Log.e("ConfigurationManager", "++ " + "FileNotFoundException parsing json configuration file: "+e.getMessage());
 		}
 		return m_CommandLoopers;
 	}
 
     public static HashMap<String, String> getEventButtons()
 	{
-		if (!json_parsed)
+		try
 		{
-			try
-			{
-				readCommandFile(new FileInputStream(COMMAND_FILE));
-				json_parsed = true;
-			}
-			catch (java.io.FileNotFoundException e )
-			{
-    				Log.e("ConfigurationManager", "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
-			}
-			catch (IOException e)
-			{
-   					Log.e("ConfigurationManager", "++ " + "FileNotFoundException parsing json configuration file: "+e.getMessage());
-			}
+			readCommandFile(new FileInputStream(COMMAND_FILE));
+		}
+		catch (java.io.FileNotFoundException e )
+		{
+   				Log.e("ConfigurationManager", "++ " + "FileNotFoundException trying to access command file: " +e.getMessage());
+		}
+		catch (IOException e)
+		{
+   				Log.e("ConfigurationManager", "++ " + "FileNotFoundException parsing json configuration file: "+e.getMessage());
 		}
 		return m_EventButtons;
 	}
@@ -432,6 +421,11 @@ public class ConfigurationManager
 	private static void readCommandFile(InputStream stream) throws IOException
 	{
 		JsonReader reader = new JsonReader(new InputStreamReader(stream));
+
+		//Reset loopers and buttons
+		m_CommandLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
+		m_EventButtons = new HashMap<String, String>();
+
 		reader.beginObject();
 		while (reader.hasNext())
 		{
