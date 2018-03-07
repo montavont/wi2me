@@ -30,6 +30,7 @@ public class SleepCommand extends WirelessNetworkCommand{
 
 	private final String SLEEP_KEY = "sleep_ms";
 	private int ms = 0;
+	private final int ms_refresh = 50;
 
 	public SleepCommand(HashMap<String, String> params)
 	{
@@ -51,9 +52,24 @@ public class SleepCommand extends WirelessNetworkCommand{
 	@Override
 	public void run(IParameterManager parameters)
 	{
+
+		int slept = 0;
 		try
 		{
-			Thread.sleep(ms);
+			while (slept < ms)
+			{
+				if (slept + ms_refresh < ms)
+				{
+					Thread.sleep(ms_refresh);
+					slept += ms_refresh;
+				}
+				else
+				{
+					Thread.sleep(ms - slept);
+					slept = ms;
+				}
+				m_stateString = slept + "/" + ms;
+			}
 		}
 		catch (InterruptedException e)
 		{
