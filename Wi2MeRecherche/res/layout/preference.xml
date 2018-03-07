@@ -4,7 +4,8 @@
 		    android:layout_height="fill_parent"
 >
 
-    <PreferenceCategory android:title="Connectivity"
+    <PreferenceCategory
+			android:title="@+string/preference_connectivity"
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
 	>
@@ -12,32 +13,11 @@
         <CheckBoxPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
-            android:key="RUN_WIFI"
-            android:title="RUN_WIFI">
-        </CheckBoxPreference>
-
-        <CheckBoxPreference
-		    android:layout_width="fill_parent"
-		    android:layout_height="fill_parent"
-            android:key="RUN_CELLULAR"
-            android:title="RUN_CELLULAR">
-        </CheckBoxPreference>
-
-        <CheckBoxPreference
-		    android:layout_width="fill_parent"
-		    android:layout_height="fill_parent"
-            android:key="CONNECT_CELLULAR"
-            android:title="CONNECT_CELLULAR">
-        </CheckBoxPreference>
-
-        <CheckBoxPreference
-		    android:layout_width="fill_parent"
-		    android:layout_height="fill_parent"
             android:key="CONNECT_TO_OPEN_NETWORKS"
-            android:title="CONNECT_TO_OPEN_NETWORKS">
+            android:title="@+string/preference_connect_to_open_networks">
         </CheckBoxPreference>
       </PreferenceCategory>
-      <PreferenceCategory android:title="Configuration"
+      <PreferenceCategory android:title="@+string/preference_configuration"
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
 	  >
@@ -45,61 +25,61 @@
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="MIN_BATTERY_LEVEL"
-            android:title="MIN_BATTERY_LEVEL">
+            android:title="@+string/preference_min_battery_level">
         </Preference>
         <EditTextPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="WIFI_THRESHOLD"
-            android:title="WIFI_THRESHOLD">
+            android:title="@+string/preference_wifi_threshold">
         </EditTextPreference>
         <EditTextPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="WIFI_SCAN_INTERVAL"
-            android:title="WIFI_SCAN_INTERVAL">
+            android:title="@+string/preference_wifi_scan_interval">
         </EditTextPreference>
 	<MultiSelectListPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="MONITORED_INTERFACES"
-            android:title="MONITORED_INTERFACES">
+            android:title="@+string/preference_monitored_interfaces">
 	</MultiSelectListPreference>
         <CheckBoxPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="LOCK_NETWORK"
-            android:title="LOCK_NETWORK (requiers root)">
+            android:title="@+string/preference_lock_network">
         </CheckBoxPreference>
         <ListPreference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="STORAGE_TYPE"
-            android:title="STORAGE_TYPE">
+            android:title="@+string/preference_storage_type">
         </ListPreference>
 	<Preference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="COMMAND_FILE"
-            android:title="COMMAND_FILE">
+            android:title="@+string/preference_command_file">
 	</Preference>
         <Preference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="Advanced"
-            android:title="Advanced">
+            android:title="@+string/preference_advanced">
         </Preference>
         <Preference
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
             android:key="About"
-            android:title="About">
+            android:title="@+string/preference_about">
         </Preference>
     </PreferenceCategory>
     <PreferenceCategory
 		    android:layout_width="fill_parent"
 		    android:layout_height="fill_parent"
-	android:title="Commands"
+	android:title="@+string/preference_commands"
 	android:key="COMMAND_LOOP_CATEGORY" >
     </PreferenceCategory>
 </PreferenceScreen>

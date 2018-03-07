@@ -7,14 +7,15 @@
 		>
 
 		<TextView
-			android:id="@+id/cpam_text1"
+			android:id="@+id/parameter_name"
+			android:labelFor="@+id/parameter_value"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content"
 		/>
 
 		<EditText
-			android:id="@+id/cpam_text2"
-			android:inputType="textCapSentences|textAutoCorrect"
+			android:id="@+id/parameter_value"
+			android:inputType="text"
 			android:layout_width="wrap_content"
 			android:layout_height="wrap_content">
 			<requestFocus />
