@@ -35,7 +35,6 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Arrays; //TODO delete
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -229,7 +228,6 @@ public class Wi2MeRecherche extends Activity
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 
 			switch(item.getItemId()){
-
 				case MENU_START:
 					if (!binder.getServices().getLocation().isGPSEnabled() || (!binder.getServices().getLocation().isNetworkLocationEnabled() && binder.getServices().getCell().isDataTransferringEnabled()))
 					{
@@ -250,28 +248,28 @@ public class Wi2MeRecherche extends Activity
 					menuItemStart.setVisible(false);
 					menuItemStop.setVisible(true);
 
-			GridView button_grid=(GridView)findViewById(R.id.mainscreen_buttongrid);
+					GridView button_grid=(GridView)findViewById(R.id.mainscreen_buttongrid);
 
-			HashMap<String, String> custom_buttons = ConfigurationManager.getEventButtons();
-		    final List<String> button_events = new ArrayList<String>(custom_buttons.keySet());
-		    List<String> button_labels = new ArrayList<String>(custom_buttons.values());
+					HashMap<String, String> custom_buttons = ConfigurationManager.getEventButtons();
+				    final List<String> button_events = new ArrayList<String>(custom_buttons.keySet());
+				    List<String> button_labels = new ArrayList<String>(custom_buttons.values());
 
-    	    // Create a new ArrayAdapter
-        	final ArrayAdapter<String> gridViewArrayAdapter = new ArrayAdapter<String>
-            	    (this,android.R.layout.simple_list_item_1, button_labels);
+    			    // Create a new ArrayAdapter
+		        	final ArrayAdapter<String> gridViewArrayAdapter = new ArrayAdapter<String>
+        	    	    (this,android.R.layout.simple_list_item_1, button_labels);
 
-	        // Data bind GridView with ArrayAdapter (String Array elements)
-    	    button_grid.setAdapter(gridViewArrayAdapter);
-            gridViewArrayAdapter.notifyDataSetChanged();
+	        		// Data bind GridView with ArrayAdapter (String Array elements)
+		    	    button_grid.setAdapter(gridViewArrayAdapter);
+        		    gridViewArrayAdapter.notifyDataSetChanged();
 
-			button_grid.setOnItemClickListener(new OnItemClickListener() {
-		        @Override
-        		public void onItemClick(AdapterView<?> parent, View v, int position, long id)
-				{
-					Log.i(getClass().getSimpleName(), "++ " + "Logging custom event " + position + "	" + button_events.get(position));
-					binder.getLogger().log(CustomEvent.getNewCustomEvent(TraceManager.getTrace(),button_events.get(position)));
-        		}
-    		});
+					button_grid.setOnItemClickListener(new OnItemClickListener() {
+				        @Override
+        				public void onItemClick(AdapterView<?> parent, View v, int position, long id)
+						{
+							Log.i(getClass().getSimpleName(), "++ " + "Logging custom event " + position + "	" + button_events.get(position));
+							binder.getLogger().log(CustomEvent.getNewCustomEvent(TraceManager.getTrace(),button_events.get(position)));
+		        		}
+    				});
 					break;
 				case MENU_STOP:
 					stop();
@@ -301,7 +299,6 @@ public class Wi2MeRecherche extends Activity
 								}});
 							/*builder.setNegativeButton(getResources().getString(R.string.EXPORT_POPUP_SERVER),  new OnClickListener()
 							{
-
 								@Override
 								public void onClick(DialogInterface arg0, int arg1)
 								{
@@ -348,7 +345,6 @@ public class Wi2MeRecherche extends Activity
 
 			}
 		}).start();
-		binder = null;
 	}
 
 	private void exportLogcat()
@@ -625,8 +621,8 @@ public class Wi2MeRecherche extends Activity
     public void onResume(){
 
     	super.onResume();
-	bind();
-	updateInfo(); //TKE IHM empty bug ?
+		bind();
+		updateInfo(); //TKE IHM empty bug ?
 
     }
 
@@ -903,6 +899,10 @@ public class Wi2MeRecherche extends Activity
 					addTableRow(commandKey, commandStates.get(commandKey));
 				}
 			}
+		}
+		else
+		{
+			addTableRow("Service stopped", "", Color.rgb(30, 30, 30));
 		}
 
 
