@@ -1,0 +1,31 @@
+{
+	"loopers":{
+		"bleWrite":{
+			"command":{
+				"module":"telecom.wi2meCore.model.bluetoothCommands.BLEWriteCounterToCharacteristicCommand",
+				"params": {
+						"device_address": "24:0A:C4:00:CC:A0",
+						"service_uuid": "30323631-3331-3130-3237-303330353137",
+						"characteristic_uuid": "35353138-3738-3634-3235-333033353134"
+				}
+			},
+			"command":{
+				"module":"telecom.wi2meCore.model.SleepCommand",
+				"params": {
+					"sleep_ms":"30000"
+				}
+			}
+		},
+		"bleRead":{
+			"command":{
+				"module":"telecom.wi2meCore.model.bluetoothCommands.BLEReadCharacteristicCommand",
+				"params": {
+						"device_address": "24:0A:C4:00:CC:A0",
+						"service_uuid": "38303434-3533-3331-3631-323235363132",
+						"characteristic_uuid": "38353731-3338-3736-3936-323131343935",
+						"backoff_on_null":"4000"
+				}
+			}
+		}
+	}
+}
