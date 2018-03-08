@@ -53,6 +53,9 @@ public class BLEService implements IBLEService{
     private BluetoothManager mBluetoothManager;
     private BluetoothAdapter mBluetoothAdapter;
 
+	private int serviceLosses = 0;
+	private int maxServiceLosses = 10;
+
     // Various callback methods defined by the BLE API.
     private class localBLEGattCallback extends BluetoothGattCallback
 	{
@@ -79,6 +82,7 @@ public class BLEService implements IBLEService{
 			{
 	            if (status == BluetoothGatt.GATT_SUCCESS) {
 					discovered = true;
+					serviceLosses = 0;
             	}
 				else
 				{
@@ -96,6 +100,34 @@ public class BLEService implements IBLEService{
 	            }
     	    }
     }
+
+
+	// This function counts the BLE service losses, if there are too many of the in a row
+	// there might be an issue with the adapter, reset it.
+	private void notifyServiceLoss()
+	{
+		serviceLosses += 1;
+		if (serviceLosses >= maxServiceLosses)
+		{
+			serviceLosses = 0;
+			resetAdapter();
+		}
+	}
+
+	private void resetAdapter()
+	{
+        Log.i(TAG, "BLE adapter reset.");
+		try{
+			mBluetoothAdapter.disable();
+			Thread.sleep(1000);
+			mBluetoothAdapter.enable();
+		}
+		catch (InterruptedException e)
+		{
+            Log.w(TAG, "BLE adapter reset interrupted.");
+		}
+	}
+
 
 	@Override
 	public boolean writeCharacteristic(String charValue, String deviceAddr, String serviceUUID, String characteristicUUID)
@@ -133,7 +165,8 @@ public class BLEService implements IBLEService{
 
 	        BluetoothGattService service = gatt.getService(UUID.fromString(serviceUUID));
     	    if (service == null) {
-        	    Log.e(getClass().getSimpleName(), "service not found!");
+        	    Log.e(getClass().getSimpleName(), "service not found");
+				notifyServiceLoss();
 	        }
 			else
 			{
@@ -146,9 +179,9 @@ public class BLEService implements IBLEService{
 			        charac.setValue(charValue);
         			retval = gatt.writeCharacteristic(charac);
 				}
+				gatt.close();
 			}
 		}
-		gatt.close();
    		return retval;
 	}
 
@@ -205,6 +238,7 @@ public class BLEService implements IBLEService{
         BluetoothGattService service = gatt.getService(UUID.fromString(serviceUUID));
         if (service == null) {
             Log.e(getClass().getSimpleName(), "service not found!");
+			notifyServiceLoss();
         }
 		else
 		{
@@ -239,9 +273,9 @@ public class BLEService implements IBLEService{
 		        		retval = charac.getStringValue(0);
 					}
 				}
+				gatt.close();
 			}
 		}
-		gatt.close();
     	return retval;
 	}
 }
