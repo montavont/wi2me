@@ -39,8 +39,8 @@ public class TextTraceHelper implements ITraceDatabase
 
 	public static final String TRACEFILE_NAME = "trace";
 	private static final String CSV_SEP = "	";
-	private static String storageFile;
-	private static String packageName;
+	private static String storageFile = null;
+	private static String packageName = null;
 
 	private static TextTraceHelper tth = null;
 
@@ -68,14 +68,22 @@ public class TextTraceHelper implements ITraceDatabase
 
 	public static boolean dataAvailable()
 	{
-		File f = new File(storageFile);
-		return f.exists();
+		boolean retval = false;
+		if (storageFile != null)
+		{
+			File f = new File(storageFile);
+			retval = f.exists();
+		}
+		return retval;
 	}
 
 	public void resetTables()
 	{
-		File f = new File(storageFile);
-		f.delete();
+		if (storageFile != null)
+		{
+			File f = new File(storageFile);
+			f.delete();
+		}
 		return;
 	}
 	public void closeDatabase()
