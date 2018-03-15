@@ -101,7 +101,7 @@ public class ApplicationService extends Service {
 
 	// Unique Identification Number for the Notification.
 	// We use it on Notification start, and to cancel it.
-	private int NOTIFICATION = 0;
+	private int NOTIFICATION = 2;
 
 	@Override
 	public void onCreate()
@@ -125,6 +125,8 @@ public class ApplicationService extends Service {
 							new CommunityNetworkService(context),
 							new BLEService(context)
 			);
+
+			TextTraceHelper.initialize(context);
 
     		try {
     			ConfigurationManager.loadParameters(context, parameters);
@@ -281,24 +283,20 @@ public class ApplicationService extends Service {
 
     private void showNotification() {
 
-        // Set the icon, scrolling text and timestamp
-        Notification notification = new Notification(R.drawable.icon, "Wi2Me service running", System.currentTimeMillis());
-		notification.category = Notification.CATEGORY_SERVICE;
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context
+                .NOTIFICATION_SERVICE);
 
-        // The PendingIntent to launch our activity if the user selects this notification
-        PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, Wi2MeRecherche.class), 0);
-		notification.contentIntent = contentIntent;
+        Notification.Builder notificationBuilder = new Notification.Builder(this)
+                .setSmallIcon(R.drawable.icon)
+                .setContentTitle("Wi2Me Research")
+                .setContentText("The wi2me service is running");
 
-        // Set the info for the views that show in the notification panel.
-        //notification.setLatestEventInfo(this, "Wi2Me Xplorer", "Select to open application", contentIntent);
-
-        notification.flags = Notification.FLAG_NO_CLEAR;
+        Notification notification = notificationBuilder.build();
 
         // Send the notification.
- 	mNM.notify(NOTIFICATION, notification);
+ 		mNM.notify(NOTIFICATION, notification);
 
-	startForeground(NOTIFICATION, notification);
+		startForeground(NOTIFICATION, notification);
     }
 
 
@@ -340,7 +338,6 @@ public class ApplicationService extends Service {
 
 		public void start()
 		{
-			TextTraceHelper.initialize(context);
     		try {
     			ConfigurationManager.loadParameters(context, parameters);
     			configuration = ConfigurationManager.getConfiguration();
