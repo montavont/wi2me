@@ -77,20 +77,9 @@ public class CellDownloader extends WirelessNetworkCommand{
 	@Override
 	public void run(IParameterManager parameters)
 	{
-		boolean canDownload = false;
+		boolean canDownload = true;
 			IBytesTransferredReceiver downloadReceiver = null;
-			if (!(Boolean)parameters.getParameter(Parameter.WIFI_CONNECTION_ATTEMPT)){
-				Object connectedObj = parameters.getParameter(Parameter.CELL_CONNECTED);
-				if ((Boolean)connectedObj){
-					if ((Boolean)parameters.getParameter(Parameter.CELL_CONTINUE_TRANSFERRING)){
-						// we will try to transfer only if we should continue. If not it is because an error happened with another transfer, and we should not run and let the cleaner command work
-						if (ControllerServices.getInstance().getCell().isDataNetworkConnected()){
-							downloadReceiver = new CellBytesTransferedReceiver(true);
-							canDownload = true;
-						}
-					}
-				}
-			}
+			downloadReceiver = new CellBytesTransferedReceiver(true);
 			if (canDownload){
 				CellInfo cell = ControllerServices.getInstance().getCell().getLastScannedCell();
 				try {
