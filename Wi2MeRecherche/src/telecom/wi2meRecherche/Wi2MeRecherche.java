@@ -181,21 +181,15 @@ public class Wi2MeRecherche extends Activity
 	        context = this;
 
 
-	        /*CustomGauge gauge1 = findViewById(R.id.gauge1);
+	        CustomGauge gauge1 = findViewById(R.id.gauge1);
 			gauge1.setValue(-140);
 	        CustomGauge gauge2 = findViewById(R.id.gauge2);
-			gauge2.setValue(0);*/
+			gauge2.setValue(0);
 
-			int level = -115;
-			int thr = 800000;
-	        CustomGauge gauge1 = findViewById(R.id.gauge1);
-			gauge1.setValue(level);
 			TextView gauge1Value = findViewById(R.id.textView1);
-			gauge1Value.setText(level + " dBm");
-	        CustomGauge gauge2 = findViewById(R.id.gauge2);
-			gauge2.setValue((int)(thr / 1000));
+			gauge1Value.setText("-140 dBm");
 			TextView gauge2Value = findViewById(R.id.textView2);
-			gauge2Value.setText(thr / 1000000 + " MB/s");
+			gauge2Value.setText("0 Mbits/s");
 
 
         	startService();
@@ -827,7 +821,6 @@ public class Wi2MeRecherche extends Activity
 
 			int level = ControllerServices.getInstance().getCell().getLastRsrp();
 			float thr = ControllerServices.getInstance().getWeb().getAverageThroughput();
-			Log.e(getClass().getSimpleName(), "++ " + "Level SDztnazkna SATA? " + level + "	" + thr);
 	        CustomGauge gauge1 = findViewById(R.id.gauge1);
 			gauge1.setValue(level);
 			TextView gauge1Value = findViewById(R.id.textView1);
@@ -835,7 +828,7 @@ public class Wi2MeRecherche extends Activity
 	        CustomGauge gauge2 = findViewById(R.id.gauge2);
 			gauge2.setValue((int)(thr * 8 / 1000));
 			TextView gauge2Value = findViewById(R.id.textView2);
-			gauge2Value.setText(String.format("%.3f MBits/s", thr * 8 / 1000000));
+			gauge2Value.setText(String.format("%.3f Mbits/s", thr * 8 / 1000000));
 
 			Location location = ControllerServices.getInstance().getLocation().getLocation();
 			if (location != null)
