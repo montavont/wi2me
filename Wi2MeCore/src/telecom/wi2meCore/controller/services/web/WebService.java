@@ -108,7 +108,7 @@ public class WebService implements IWebService {
 
 	private String urlRef;
 	private long uploadFileSize;
-	private IBytesTransferredReceiver transferReceiver;
+	private IBytesTransferredReceiver transferReceiver = null;
 	private long totalBytesToTransfer;
 	private Random generator;
 	private Context context;
@@ -563,151 +563,150 @@ public class WebService implements IWebService {
 	/*The uploading is done this way (by hand) because if not we cannot put a timeout and the socket would stay blocked until it is able to send something*/
 	public boolean uploadFile(String ip, String uploadScript, IBytesTransferredReceiver receiver, byte[] bytes, int timeoutConnection, int timeoutSocket, int receiverCallTimer) throws UploadingInterruptedException, UploadingFailException, TimeoutException
 	{
-
 		SocketChannel socketChannel = null;
 		try
 		{
+			int sent = 0;
+		    urlRef = ip;
+		    uploadFileSize = bytes.length;
+		    transferReceiver = receiver;
 
-	        	int sent = 0;
-		        urlRef = ip;
-		        uploadFileSize = bytes.length;
-		        transferReceiver = receiver;
+		    long time = Calendar.getInstance().getTimeInMillis();
 
-		        long time = Calendar.getInstance().getTimeInMillis();
+		    Log.d(getClass().getSimpleName(), "++ "+ "SIZE " + uploadFileSize + "RECEIVER " + transferReceiver + urlRef);
 
-		        Log.d(getClass().getSimpleName(), "++ "+ "SIZE " + uploadFileSize + "RECEIVER " + transferReceiver + urlRef);
-
-		        //Compatibility with first server
-		        if (ip.contains("192.108.119.11"))
-		        {
-		        	uploadScript = "/cgi-bin/upload.cgi";
-		        }
-
-
-		        String postHeader = "POST "+ uploadScript +" HTTP/1.1\r\n" +
-		                            "Host: " + ip +"\r\n" +
-		                            "Content-Length: "+bytes.length+"\r\n" +
-		                            //"Connection: Keep-Alive\n" +
-		                            "Content-Type: "+time+"\r\n" +
-		                            "\r\n";
+		    //Compatibility with first server
+		    if (ip.contains("192.108.119.11"))
+		    {
+		    	uploadScript = "/cgi-bin/upload.cgi";
+		    }
 
 
+		    String postHeader = "POST "+ uploadScript +" HTTP/1.1\r\n" +
+		                        "Host: " + ip +"\r\n" +
+		                        "Content-Length: "+bytes.length+"\r\n" +
+		                        "Content-Type: "+time+"\r\n" +
+		                        "\r\n";
 
-		        Log.d(getClass().getSimpleName(), "++ POST HEADER "+ postHeader);
+		    Log.d(getClass().getSimpleName(), "++ POST HEADER "+ postHeader);
 
-		        byte[] headerBytes = postHeader.getBytes();
+		    byte[] headerBytes = postHeader.getBytes();
+		    totalBytesToTransfer = headerBytes.length + bytes.length;
+		    receiver.receiveTransferredBytes(0, totalBytesToTransfer, START+"-"+time);
 
+		    int sleepConnectionTime = 5;//ms
+		    socketChannel = SocketChannel.open();
+		    socketChannel.configureBlocking(false);
 
-		        totalBytesToTransfer = headerBytes.length + bytes.length;
-
-		        receiver.receiveTransferredBytes(0, totalBytesToTransfer, START+"-"+time);
-
-		        int sleepConnectionTime = 5;//ms
-		        socketChannel = SocketChannel.open();
-		        socketChannel.configureBlocking(false);
-		        //connect
-		        socketChannel.connect(new InetSocketAddress(ip, 80));
-		        int connectionDelay = 0;
-		        long lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
-		        while(! socketChannel.finishConnect())
+		    //connect
+		    socketChannel.connect(new InetSocketAddress(ip, 80));
+		    int connectionDelay = 0;
+		    long lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
+		    while(! socketChannel.finishConnect())
 			{
-			        //We sleep so we can be interrupted and finish
-			        try {
-			            Thread.sleep(sleepConnectionTime); //we leave some time for it to connect
-			        } catch (InterruptedException e) {
-			            // finish
-			            throw new UploadingInterruptedException("Size:"+ uploadFileSize +"-"+urlRef);
-			        }
-			        connectionDelay += sleepConnectionTime;
-			        if (Calendar.getInstance().getTimeInMillis() - lastUpdateTimestamp >= receiverCallTimer){
-			            receiver.receiveTransferredBytes(0, totalBytesToTransfer, UPDATE);
-			            lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
-			        }
-			        if (connectionDelay >= timeoutConnection){
-			            throw new ConnectTimeoutException();
-			        }
-		        }
+			    //We sleep so we can be interrupted and finish
+			    try
+				{
+			        Thread.sleep(sleepConnectionTime); //we leave some time for it to connect
+			    } catch (InterruptedException e) {
+			        // finish
+			        throw new UploadingInterruptedException("Size:"+ uploadFileSize +"-"+urlRef);
+			    }
+			    connectionDelay += sleepConnectionTime;
+			    if (Calendar.getInstance().getTimeInMillis() - lastUpdateTimestamp >= receiverCallTimer)
+				{
+			        receiver.receiveTransferredBytes(0, totalBytesToTransfer, UPDATE);
+			        lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
+			    }
+			    if (connectionDelay >= timeoutConnection){
+			        throw new ConnectTimeoutException();
+			    }
+		    }
 
-		        long lastSentTimestamp = Calendar.getInstance().getTimeInMillis();
+		    long lastSentTimestamp = Calendar.getInstance().getTimeInMillis();
 
-		        //send the payload
-		        sent = 0;
-		        Log.d(getClass().getSimpleName(), "++ "+ "About to start sending");
+		    //send the payload
+		    sent = 0;
+		    Log.d(getClass().getSimpleName(), "++ "+ "About to start sending");
+
+
 			while(receiver.getTransferredBytes() < totalBytesToTransfer)
 			{
 				ByteBuffer buf = ByteBuffer.allocate(PACKET_SIZE * 10);
 				sent = socketChannel.write(buf);
-			        if (sent < 0)
+			    if (sent < 0)
 				{
-		        		Log.e(getClass().getSimpleName(), "++ "+ "Connection Refused");
-			                throw new SocketTimeoutException();
+		       		Log.e(getClass().getSimpleName(), "++ "+ "Connection Refused");
+			            throw new SocketTimeoutException();
 				}
 
 				//if we did not send anything, check when was the last time we could send, if it is more than the timeoutSocket, throw exception
-			        if (sent == 0)
+			    if (sent == 0)
 				{
-			        	if (Calendar.getInstance().getTimeInMillis() - lastSentTimestamp >= timeoutSocket)
+			       	if (Calendar.getInstance().getTimeInMillis() - lastSentTimestamp >= timeoutSocket)
 					{
-			                	throw new SocketTimeoutException();
+	                	throw new SocketTimeoutException();
 					}
-			        }
+			    }
 				else
-				{ //if we sent something, call the receiver and change the lastSentTimestamp
-			            receiver.receiveTransferredBytes(sent, totalBytesToTransfer);
-			            lastSentTimestamp = Calendar.getInstance().getTimeInMillis();
-			        }
+				{
+					//if we sent something, call the receiver and change the lastSentTimestamp
+			        receiver.receiveTransferredBytes(sent, totalBytesToTransfer);
+			        lastSentTimestamp = Calendar.getInstance().getTimeInMillis();
+			    }
 
-			        //Either we sent it or not, we see if it is necessary to update the receiver data
-			        if (Calendar.getInstance().getTimeInMillis() - lastUpdateTimestamp >= receiverCallTimer){
-			            receiver.receiveTransferredBytes(0, totalBytesToTransfer, UPDATE);
-			            lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
-			        }
-			        //We sleep so we can be interrupted and finish
-			        try {
-			            Thread.sleep(0);
-			        } catch (InterruptedException e) {
-			            // finish
-			            throw new UploadingInterruptedException("Size:"+ uploadFileSize +"-"+urlRef);
-			        }
-		        }
+			    //Either we sent it or not, we see if it is necessary to update the receiver data
+			    if (Calendar.getInstance().getTimeInMillis() - lastUpdateTimestamp >= receiverCallTimer){
+			        receiver.receiveTransferredBytes(0, totalBytesToTransfer, UPDATE);
+			        lastUpdateTimestamp = Calendar.getInstance().getTimeInMillis();
+			    }
+			    //We sleep so we can be interrupted and finish
+			    try {
+			        Thread.sleep(0);
+			    } catch (InterruptedException e) {
+			        // finish
+			        throw new UploadingInterruptedException("Size:"+ uploadFileSize +"-"+urlRef);
+			    }
+		    }
 
-		        if (receiver.getTransferredBytes() >= totalBytesToTransfer){
-		            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_COMPLETE);
-		            return true;
-		        }else{
-		            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INCOMPLETE);
-		            return false;
-		        }
+		    if (receiver.getTransferredBytes() >= totalBytesToTransfer){
+		        receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_COMPLETE);
+		        return true;
+		    }else{
+		        receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INCOMPLETE);
+		        return false;
+		    }
 
-	        } catch(UploadingInterruptedException ex){
-	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INTERRUPTED);
-	            throw new UploadingInterruptedException(ex.getMessage());
-	        }catch(SocketTimeoutException e){
-	            String msg = SOCKET_TIMEOUT+"("+ timeoutSocket +"ms)";
-	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
-	            throw new TimeoutException(msg);
-	        }catch(ConnectTimeoutException e){
-	            String msg = CONNECT_TIMEOUT+"("+ timeoutConnection +"ms)";
-	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
-	            throw new TimeoutException(msg);
-	        }catch(Exception e){
-	            Log.w(getClass().getSimpleName(), "++ "+ e.getMessage(), e);
-	            receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+e.getMessage());
-	            throw new UploadingFailException(e.getMessage());
-	        } finally{
-	            if (socketChannel != null){
-	                try {
-	                    socketChannel.close();
-	                } catch (IOException e) {
-	                    Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
-	                }
+	    } catch(UploadingInterruptedException ex){
+	        receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_INTERRUPTED);
+	        throw new UploadingInterruptedException(ex.getMessage());
+	    }catch(SocketTimeoutException e){
+	        String msg = SOCKET_TIMEOUT+"("+ timeoutSocket +"ms)";
+	        receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
+	        throw new TimeoutException(msg);
+	    }catch(ConnectTimeoutException e){
+	        String msg = CONNECT_TIMEOUT+"("+ timeoutConnection +"ms)";
+	        receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+msg);
+	        throw new TimeoutException(msg);
+	    }catch(Exception e){
+	        Log.w(getClass().getSimpleName(), "++ "+ e.getMessage(), e);
+	        receiver.receiveTransferredBytes(0, totalBytesToTransfer, FINISH_ERROR+"-Description:"+e.getMessage());
+	        throw new UploadingFailException(e.getMessage());
+	    } finally{
+	        if (socketChannel != null){
+	            try {
+	                socketChannel.close();
+	            } catch (IOException e) {
+	                Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
 	            }
 	        }
+	    }
 	}
 
 	@Override
 	public boolean downloadFile(String host, String filePath, IBytesTransferredReceiver receiver, long length, int timeoutConnection, int timeoutSocket, int receiverCallTimer, String ap, String network) throws DownloadingInterruptedException, DownloadingFailException, TimeoutException
 	{
+		transferReceiver = receiver;
 		SocketChannel socketChannel = null;
 		try {
 			totalBytesToTransfer = length;
@@ -951,5 +950,16 @@ public class WebService implements IWebService {
 			httpClient.getConnectionManager().shutdown();
 		}
 	}
+
+	public float getAverageThroughput()
+	{
+		float retval = 0;
+		if (transferReceiver != null)
+		{
+			retval = transferReceiver.getAverageThroughput();
+		}
+		return retval;
+	}
+
 
 }

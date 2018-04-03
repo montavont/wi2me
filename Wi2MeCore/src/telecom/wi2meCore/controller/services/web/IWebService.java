@@ -58,4 +58,8 @@ public interface IWebService {
 	public boolean uploadFile(String host, String uploadScript, IBytesTransferredReceiver receiver, byte[] bytes, int timeoutConnection, int timeoutSocket, int receiverCallTimer) throws UploadingInterruptedException, UploadingFailException, TimeoutException;
 	
 	public boolean downloadFile(String host, String filePath, IBytesTransferredReceiver receiver, long length, int timeoutConnection, int timeoutSocket, int receiverCallTimer, String ap, String network) throws DownloadingInterruptedException, DownloadingFailException, TimeoutException;
+
+	public float getAverageThroughput();
+
+
 }

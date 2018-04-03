@@ -37,6 +37,7 @@ public interface ICellService {
 	CellInfo scan() throws InterruptedException;
 
 	CellInfo getLastScannedCell();
+	int getLastRsrp();
 	
 	/**
 	 * Retrieves the information about the current mobile data network 

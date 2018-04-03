@@ -71,6 +71,7 @@ import telecom.wi2meRecherche.model.parameters.ParameterFactory;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.NotificationChannel;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -286,7 +287,16 @@ public class ApplicationService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context
                 .NOTIFICATION_SERVICE);
 
+
+    	String CHANNEL_ID = "telecom.wi2meRecherche.channel";
+		NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "notif_test_temp",
+        	NotificationManager.IMPORTANCE_DEFAULT);
+        channel.setShowBadge(false);
+        channel.setSound(null, null);
+		notificationManager.createNotificationChannel(channel);
+
         Notification.Builder notificationBuilder = new Notification.Builder(this)
+	            .setChannelId(CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle("Wi2Me Research")
                 .setContentText("The wi2me service is running");

@@ -164,6 +164,28 @@ public class CellService implements ICellService {
 		return currentCell.getCopyOfCurrentCell();
 	}
 
+	@Override
+	public int getLastRsrp()
+	{
+		int retval = -140;
+
+		List<android.telephony.CellInfo> cellInfos = telephonyManager.getAllCellInfo();
+		if(cellInfos!=null){
+			for (int i = 0 ; i<cellInfos.size(); i++){
+   				if (cellInfos.get(i).isRegistered()){
+					//Only LTE supported for now
+                	if(cellInfos.get(i) instanceof CellInfoLte){
+	               	    CellInfoLte cellInfoLte = (CellInfoLte) cellInfos.get(i);
+        				CellSignalStrengthLte cellStrength = cellInfoLte.getCellSignalStrength();
+						retval =cellStrength.getRsrp();
+					}
+				}
+			}
+		}
+		return retval;
+	}
+
+
 	/* (non-Javadoc)
 	 * @see android.servicetest.ICellService#isDataNetworkConnected()
 	 */
@@ -424,7 +446,7 @@ public class CellService implements ICellService {
        				if (cellInfos.get(i).isRegistered()){
 						//Only LTE supported for now
     	            	if(cellInfos.get(i) instanceof CellInfoLte){
-	                	    CellInfoLte cellInfoLte = (CellInfoLte) telephonyManager.getAllCellInfo().get(0);
+	                	    CellInfoLte cellInfoLte = (CellInfoLte) cellInfos.get(i);
             	        	CellSignalStrengthLte cellSignalStrengthLte = cellInfoLte.getCellSignalStrength();
 							Cell currentCell = Cell.getNewCellFromCellInfo(ControllerServices.getInstance().getCell().getLastScannedCell());
 							Logger.getInstance().log(CellularSignalStrengthEvent.getNewCellularSignalStrengthEvent(TraceManager.getTrace(), currentCell , (CellSignalStrength)cellSignalStrengthLte));

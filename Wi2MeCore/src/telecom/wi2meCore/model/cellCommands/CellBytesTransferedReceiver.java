@@ -25,7 +25,12 @@ import java.io.RandomAccessFile;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.concurrent.Semaphore;
 
 import telecom.wi2meCore.controller.services.ControllerServices;
 import telecom.wi2meCore.controller.services.web.IBytesTransferredReceiver;
@@ -42,6 +47,9 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 	private static final String SEPARATOR = "-";
 	private String type;
 	private int byteCounter;
+	private HashMap<Long, Integer> mDatapoints = new HashMap<Long, Integer>();
+	private int mAverageWindowSize = 10000; // 10 seconds
+	private Semaphore mSema = new Semaphore(1, true);
 
 	public CellBytesTransferedReceiver(boolean download){
 		byteCounter = 0;
@@ -91,6 +99,9 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 		Cell currentCell = Cell.getNewCellFromCellInfo(ControllerServices.getInstance().getCell().getLastScannedCell());
 		CellularConnectionData connectionData = CellularConnectionData.getNewCellularConnectionData(TraceManager.getTrace(), currentCell, ConnectionData.getNewConnectionData(getLocalIpAddress(), byteCounter, (int) totalBytes, type+eventDescription, tx, rx, retries));
 		Logger.getInstance().log(connectionData);
+
+		addDatapoint(bytes);
+
 	}
 
 	@Override
@@ -118,6 +129,56 @@ public class CellBytesTransferedReceiver implements IBytesTransferredReceiver {
 				}
 			}
 		}
+	}
+
+	private void addDatapoint(int bytes)
+	{
+		long time = Calendar.getInstance().getTimeInMillis();
+		Collection<Long> indexesForRemoval = new ArrayList<Long>();
+
+		// Remove datapoints older than mAverageWindowSize
+		try
+		{
+			mSema.acquire();
+			for (Long ts : mDatapoints.keySet())
+			{
+				if (time - ts > mAverageWindowSize)
+				{
+					indexesForRemoval.add(ts);
+				}
+			}
+			for (long index : indexesForRemoval)
+			{
+				mDatapoints.remove(index);
+			}
+
+			// Add datapoint to current list
+			mDatapoints.put(time, bytes);
+			mSema.release();
+		}
+		catch(InterruptedException e)
+		{
+            Log.e(getClass().getSimpleName(), "++ "+ e.toString());
+		}
+	}
+
+	public float getAverageThroughput()
+	{
+		float totalBytes = 0;
+		//Average over current mDatapoints keys
+		try{
+			mSema.acquire();
+			for (int bytes : mDatapoints.values())
+			{
+				totalBytes+= bytes;
+			}
+			mSema.release();
+		}
+		catch(InterruptedException e)
+		{
+            Log.e(getClass().getSimpleName(), "++ "+ e.toString());
+		}
+		return totalBytes  * 1000 / mAverageWindowSize;
 	}
 
 }
