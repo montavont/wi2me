@@ -36,6 +36,8 @@ import telecom.wi2meCore.model.entities.LocationEvent;
 import telecom.wi2meCore.model.entities.Trace;
 import telecom.wi2meCore.controller.services.ControllerServices;
 
+import android.annotation.SuppressLint; //TKE TODO Remove and handle refiusal below
+
 
 public class LocationService implements ILocationService{
 
@@ -55,6 +57,7 @@ public class LocationService implements ILocationService{
 
 
 	@Override
+	@SuppressLint("MissingPermission") //TODO TKE Remove and handle refusale
 	public void monitorLocation()
 	{
 		Criteria criteria = new Criteria();

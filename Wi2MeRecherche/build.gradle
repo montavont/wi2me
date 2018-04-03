@@ -19,6 +19,18 @@ dependencies {
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
+    repositories {
+		maven {
+            url 'https://maven.google.com'
+        }
+    	maven {
+        	url 'https://www.jitpack.io'
+	    }
+    }
+	dependencies {
+		compile 'com.github.pkleczko:CustomGauge:master-SNAPSHOT'
+	}
+
     sourceSets {
         main {
             manifest.srcFile 'AndroidManifest.xml'

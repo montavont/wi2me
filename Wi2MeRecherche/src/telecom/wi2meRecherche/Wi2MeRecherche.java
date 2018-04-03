@@ -51,6 +51,7 @@ import telecom.wi2meRecherche.controller.ApplicationService;
 import telecom.wi2meRecherche.controller.ApplicationService.ServiceBinder;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.controller.services.ControllerServices;
+import telecom.wi2meCore.controller.services.cell.CellInfo;
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
 import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.web.WebService;
@@ -64,6 +65,11 @@ import telecom.wi2meCore.model.entities.WifiConnectionEvent;
 import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meCore.model.TraceManager;
 import telecom.wi2meCore.controller.services.StatusService;
+
+
+//import com.github.anastr.speedviewlib.TubeSpeedometer;
+
+import pl.pawelkleczkowski.customgauge.CustomGauge;
 
 
 import android.app.Activity;
@@ -120,6 +126,7 @@ public class Wi2MeRecherche extends Activity
 	private static final int MENU_ACCOUNT_MANAGEMENT = 4;
 	private static final int MENU_PREFERENCES = 5;
 
+
 	ProgressDialog exportingProcessDialog;
 	ProgressDialog stoppingProcessDialog;
 
@@ -173,6 +180,18 @@ public class Wi2MeRecherche extends Activity
 	        deviceId = ((TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE)).getDeviceId();
         	packageName = this.getPackageName();
 	        context = this;
+
+
+	        CustomGauge gauge1 = findViewById(R.id.gauge1);
+			gauge1.setValue(-140);
+	        CustomGauge gauge2 = findViewById(R.id.gauge2);
+			gauge2.setValue(0);
+
+			TextView gauge1Value = findViewById(R.id.textView1);
+			gauge1Value.setText("-140 dBm");
+			TextView gauge2Value = findViewById(R.id.textView2);
+			gauge2Value.setText("0 Mbits/s");
+
 
         	startService();
 
@@ -788,6 +807,7 @@ public class Wi2MeRecherche extends Activity
 	private void updateInfo()
 	{
 
+
 		TableLayout table_layout=(TableLayout)findViewById(R.id.mainscreen_tablelayout);
 		//Reset table view
 		while (table_layout.getChildCount() > 0)
@@ -799,6 +819,24 @@ public class Wi2MeRecherche extends Activity
 
 		if (binder != null)
 		{
+
+			int level = ControllerServices.getInstance().getCell().getLastRsrp();
+			float thr = ControllerServices.getInstance().getWeb().getAverageThroughput();
+	        CustomGauge gauge1 = findViewById(R.id.gauge1);
+			gauge1.setValue(level);
+			TextView gauge1Value = findViewById(R.id.textView1);
+			gauge1Value.setText(level + " dBm");
+	        CustomGauge gauge2 = findViewById(R.id.gauge2);
+			gauge2.setValue((int)(thr * 8 / 1000));
+			TextView gauge2Value = findViewById(R.id.textView2);
+			gauge2Value.setText(String.format("%.3f Mbits/s", thr * 8 / 1000000));
+
+			CellInfo cell = ControllerServices.getInstance().getCell().getLastScannedCell();
+			if (cell != null)
+			{
+				TextView cellTextValue = findViewById(R.id.textView3);
+				cellTextValue.setText(String.format("Current Cell : %x", cell.cid));
+			}
 
 			Location location = ControllerServices.getInstance().getLocation().getLocation();
 			if (location != null)

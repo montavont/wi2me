@@ -501,5 +501,11 @@ public class WifiBytesTransferedReceiver implements IBytesTransferredReceiver{
 	}
 
 
+	public float getAverageThroughput()
+	{
+		return 0;
+	}
+
+
 }
 

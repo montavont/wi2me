@@ -36,4 +36,6 @@ public interface IBytesTransferredReceiver {
 	*/	
 	public int getTransferredBytes();
 
+	public float getAverageThroughput();
+
 }

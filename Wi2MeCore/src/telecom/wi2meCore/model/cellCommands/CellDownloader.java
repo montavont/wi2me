@@ -20,7 +20,7 @@
 package telecom.wi2meCore.model.cellCommands;
 
 import java.util.ArrayList;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.List;
 
 import telecom.wi2meCore.controller.configuration.TimeoutConstants;
@@ -83,7 +83,6 @@ public class CellDownloader extends WirelessNetworkCommand{
 			if (canDownload){
 				CellInfo cell = ControllerServices.getInstance().getCell().getLastScannedCell();
 				try {
-					cell = ControllerServices.getInstance().getCell().getLastScannedCell();
 					parameters.setParameter(Parameter.CELL_TRANSFERRING, true);
 					if (download(downloadReceiver, String.valueOf(cell.cid), cell.operatorName)){
 						if (cell.equals(ControllerServices.getInstance().getCell().getLastScannedCell())){
