@@ -81,12 +81,23 @@
         android:textSize="30dp"
         android:textStyle="bold" />
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView2"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp"
+        android:text=""
+        android:textSize="30dp"
+        android:textStyle="bold" />
+
 
 <TableLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:stretchColumns="1"
-	android:layout_below="@id/textView2"
+	android:layout_below="@id/textView3"
 	android:id="@+id/mainscreen_tablelayout">
 </TableLayout>
 

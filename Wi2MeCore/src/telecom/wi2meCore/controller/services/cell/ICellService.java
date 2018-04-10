@@ -38,7 +38,7 @@ public interface ICellService {
 
 	CellInfo getLastScannedCell();
 	int getLastRsrp();
-	
+
 	/**
 	 * Retrieves the information about the current mobile data network 
 	 * @return The network info of the mobile data connection, or null if it is not connected
@@ -50,7 +50,7 @@ public interface ICellService {
 	boolean isPhoneNetworkConnected();
 
 	boolean isDataTransferringEnabled();
-	
+
 	/**
 	 * This method enables the cellular connection and returns immediately (does not wait to connection to take place)
 	 */
@@ -77,21 +77,21 @@ public interface ICellService {
 	 * @throws InterruptedException Throws this exception if the thread where it is running is interrupted.
 	 */
 	boolean disconnect() throws TimeoutException, InterruptedException;
-	
+
 	/**
 	 * Disconnects the data network connection to the current cell just like the disconnect() method.
 	 * If a timeout is reached, or it failed at disconnecting, throws a RuntimeException with a FATAL ERROR message.
 	 * If this is interrupted, simply logs the error and finishes execution.
 	 */
 	void disconnectOrDie();
-	
+
 	/**
 	 * Registers a receiver of the cellular disconnection event, to be called whenever this happens. Disconnection can be triggered by the user, or by the system when being unable to keep the connection.
 	 * It is not mandatory that you unregister the receiver when finished.
 	 * @param receiver The receiver of the disconnection events 
 	 */
 	void registerDisconnectionReceiver(ICellularConnectionEventReceiver receiver);
-	
+
 	/**
 	 * Unregisters a receiver of the cellular disconnection event, to be called whenever this happens. Disconnection can be triggered by the user, or by the system when being unable to keep the connection.
 	 * @param receiver The receiver of the disconnection events 

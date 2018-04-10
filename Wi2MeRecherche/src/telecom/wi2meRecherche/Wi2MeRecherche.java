@@ -51,6 +51,7 @@ import telecom.wi2meRecherche.controller.ApplicationService;
 import telecom.wi2meRecherche.controller.ApplicationService.ServiceBinder;
 import telecom.wi2meCore.controller.configuration.ConfigurationManager;
 import telecom.wi2meCore.controller.services.ControllerServices;
+import telecom.wi2meCore.controller.services.cell.CellInfo;
 import telecom.wi2meCore.controller.services.exceptions.TimeoutException;
 import telecom.wi2meCore.controller.services.persistance.TextTraceHelper;
 import telecom.wi2meCore.controller.services.web.WebService;
@@ -829,6 +830,13 @@ public class Wi2MeRecherche extends Activity
 			gauge2.setValue((int)(thr * 8 / 1000));
 			TextView gauge2Value = findViewById(R.id.textView2);
 			gauge2Value.setText(String.format("%.3f Mbits/s", thr * 8 / 1000000));
+
+			CellInfo cell = ControllerServices.getInstance().getCell().getLastScannedCell();
+			if (cell != null)
+			{
+				TextView cellTextValue = findViewById(R.id.textView3);
+				cellTextValue.setText(String.format("Current Cell : %x", cell.cid));
+			}
 
 			Location location = ControllerServices.getInstance().getLocation().getLocation();
 			if (location != null)
