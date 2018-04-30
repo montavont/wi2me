@@ -169,15 +169,44 @@ public class CellService implements ICellService {
 	{
 		int retval = -140;
 
-		List<android.telephony.CellInfo> cellInfos = telephonyManager.getAllCellInfo();
-		if(cellInfos!=null){
-			for (int i = 0 ; i<cellInfos.size(); i++){
-   				if (cellInfos.get(i).isRegistered()){
-					//Only LTE supported for now
-                	if(cellInfos.get(i) instanceof CellInfoLte){
-	               	    CellInfoLte cellInfoLte = (CellInfoLte) cellInfos.get(i);
-        				CellSignalStrengthLte cellStrength = cellInfoLte.getCellSignalStrength();
-						retval =cellStrength.getRsrp();
+		// Check wether we are using an SDK implementing getRsrp
+		// and invoke it by reflexion, to keep the code buildable under SDK 26
+		if (android.os.Build.VERSION.SDK_INT >= 26)
+		{
+			List<android.telephony.CellInfo> cellInfos = telephonyManager.getAllCellInfo();
+			if(cellInfos!=null){
+				for (int i = 0 ; i<cellInfos.size(); i++){
+   					if (cellInfos.get(i).isRegistered()){
+						//Only LTE supported for now
+                		if(cellInfos.get(i) instanceof CellInfoLte){
+	               	    	CellInfoLte cellInfoLte = (CellInfoLte) cellInfos.get(i);
+	        				CellSignalStrengthLte cellStrength = cellInfoLte.getCellSignalStrength();
+							try
+							{
+								Method rsrp_method = cellStrength.getClass().getMethod("getRsrp");
+								retval = (int)rsrp_method.invoke(cellStrength);
+							}
+							catch (IllegalArgumentException e)
+							{
+								Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+							}
+							catch (IllegalAccessException e)
+							{
+								Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+							}
+							catch (InvocationTargetException e)
+							{
+								Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+							}
+							catch (SecurityException e)
+							{
+								Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+							}
+							catch (NoSuchMethodException e)
+							{
+								Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+							}
+						}
 					}
 				}
 			}

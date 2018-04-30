@@ -25,6 +25,10 @@ import android.telephony.CellSignalStrength;
 import android.telephony.CellSignalStrengthLte;
 import android.telephony.CellSignalStrengthGsm;
 import android.telephony.CellSignalStrengthCdma;
+import android.util.Log;
+
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 
 public class CellularSignalStrengthEvent extends Trace{
 
@@ -49,13 +53,48 @@ public class CellularSignalStrengthEvent extends Trace{
 		{
 			CellSignalStrengthLte cellStrength = (CellSignalStrengthLte) signalStrength;
 			this.asulevel =  cellStrength.getAsuLevel();
-			this.cqi = cellStrength.getCqi();
 			this.dbm = cellStrength.getDbm();
 			this.level = cellStrength.getLevel();
-			this.rsrp = cellStrength.getRsrp();
-			this.rsrq = cellStrength.getRsrq();
-			this.rssnr = cellStrength.getRssnr();
 			this.timingadvance = cellStrength.getTimingAdvance();
+
+			// Check wether we are using an SDK implementing these functions,
+			// and invoke them by reflexion, to keep the code buildable under SDK 26
+			if (android.os.Build.VERSION.SDK_INT >= 26)
+			{
+				try
+				{
+					Method rsrp_method = cellStrength.getClass().getMethod("getRsrp");
+					Method rsrq_method = cellStrength.getClass().getMethod("getRsrq");
+					Method rssnr_method = cellStrength.getClass().getMethod("getRssnr");
+					Method cqi_method = cellStrength.getClass().getMethod("getCqi");
+					this.cqi = (int)cqi_method.invoke(cellStrength);
+					this.rsrp = (int)rsrp_method.invoke(cellStrength);
+					this.rsrq = (int)rsrq_method.invoke(cellStrength);
+					this.rssnr = (int)rssnr_method.invoke(cellStrength);
+				}
+				catch (IllegalArgumentException e)
+				{
+					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				}
+				catch (IllegalAccessException e)
+				{
+					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				}
+				catch (InvocationTargetException e)
+				{
+					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				}
+				catch (SecurityException e)
+				{
+					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				}
+				catch (NoSuchMethodException e)
+				{
+					Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+				}
+
+
+			}
 		}
 		this.connectedTo = connectedTo;
 		// Only LTE supported for now

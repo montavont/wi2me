@@ -6,93 +6,6 @@
     android:layout_height="match_parent"
     tools:context="${relativePackage}.${activityClass}" >
 
-  <pl.pawelkleczkowski.customgauge.CustomGauge
-        android:id="@+id/gauge1"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-80dp"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        app:gaugeEndValue="-80"
-        app:gaugePointEndColor="@color/md_green_500"
-        app:gaugePointStartColor="@color/md_red_500"
-        app:gaugeStartAngle="180"
-        app:gaugeStartValue="-140"
-        app:gaugeStrokeCap="BUTT"
-        app:gaugeStrokeColor="@color/md_grey_400"
-        app:gaugeStrokeWidth="20dp"
-        app:gaugeSweepAngle="180"
-        app:gaugeDividerSize="1"
-        app:gaugeDividerColor="@color/md_yellow_500"
-        app:gaugeDividerStep="10"
-        app:gaugeDividerDrawFirst="false"
-        app:gaugeDividerDrawLast="true"
-/>
-
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/gauge1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:text="dBm"
-        android:textSize="30dp"
-        android:textStyle="bold" />
-
-  <pl.pawelkleczkowski.customgauge.CustomGauge
-        android:id="@+id/gauge2"
-        android:layout_width="200dp"
-        android:layout_height="200dp"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="-80dp"
-		android:layout_below="@+id/textView1"
-        android:paddingBottom="10dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:paddingTop="10dp"
-        app:gaugeEndValue="10000"
-        app:gaugePointEndColor="@color/md_green_500"
-        app:gaugePointStartColor="@color/md_red_500"
-        app:gaugeStartAngle="180"
-        app:gaugeStartValue="0"
-        app:gaugeStrokeCap="BUTT"
-        app:gaugeStrokeColor="@color/md_grey_400"
-        app:gaugeStrokeWidth="20dp"
-        app:gaugeSweepAngle="180"
-        app:gaugeDividerSize="1"
-        app:gaugeDividerColor="@color/md_yellow_500"
-        app:gaugeDividerStep="10"
-        app:gaugeDividerDrawFirst="false"
-        app:gaugeDividerDrawLast="true"
-/>
-
-    <TextView
-        android:id="@+id/textView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/gauge2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:text="Bytes/s"
-        android:textSize="30dp"
-        android:textStyle="bold" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:text=""
-        android:textSize="30dp"
-        android:textStyle="bold" />
-
-
 <TableLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -100,7 +13,6 @@
 	android:layout_below="@id/textView3"
 	android:id="@+id/mainscreen_tablelayout">
 </TableLayout>
-
 
 <GridView
     android:id="@+id/mainscreen_buttongrid"

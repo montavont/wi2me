@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.lang.Class;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.InvocationTargetException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -71,7 +73,6 @@ import telecom.wi2meRecherche.model.parameters.ParameterFactory;
 
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.NotificationChannel;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -287,9 +288,55 @@ public class ApplicationService extends Service {
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context
                 .NOTIFICATION_SERVICE);
 
-
     	String CHANNEL_ID = "telecom.wi2meRecherche.channel";
-		NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "notif_test_temp",
+        Notification.Builder notificationBuilder = new Notification.Builder(this);
+
+		// SDK 26 introduced a dramatic change in the way notifications are handled,
+		// by introducing the NotificationChannel object. The code below implements these
+		// channel modifications, and does so by using reflection. This way, this can also be built for targets under 26
+		if (android.os.Build.VERSION.SDK_INT >= 26)
+		{
+			try
+			{
+				Class<?> clazz = Class.forName("android.app.NotificationChannel");
+				Constructor<?> ctor = clazz.getConstructor(String.class, String.class, String.class);
+				Object channel = ctor.newInstance(CHANNEL_ID, "notif_test_temp", NotificationManager.IMPORTANCE_DEFAULT);
+
+
+				Method set_channel_method = notificationBuilder.getClass().getMethod("setChannelId");
+				set_channel_method.invoke(notificationBuilder, CHANNEL_ID);
+			}
+			catch (ClassNotFoundException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+			catch (InstantiationException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+			catch (IllegalArgumentException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+			catch (IllegalAccessException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+			catch (InvocationTargetException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+			catch (SecurityException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+			catch (NoSuchMethodException e)
+			{
+				Log.e(getClass().getSimpleName(), "++ " + e.getMessage(), e);
+			}
+		}
+
+		/*NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "notif_test_temp",
         	NotificationManager.IMPORTANCE_DEFAULT);
         channel.setShowBadge(false);
         channel.setSound(null, null);
@@ -299,7 +346,11 @@ public class ApplicationService extends Service {
 	            .setChannelId(CHANNEL_ID)
                 .setSmallIcon(R.drawable.icon)
                 .setContentTitle("Wi2Me Research")
-                .setContentText("The wi2me service is running");
+                .setContentText("The wi2me service is running");*/
+
+                notificationBuilder.setSmallIcon(R.drawable.icon);
+                notificationBuilder.setContentTitle("Wi2Me Research");
+                notificationBuilder.setContentText("The wi2me service is running");
 
         Notification notification = notificationBuilder.build();
 
@@ -605,6 +656,4 @@ public class ApplicationService extends Service {
 		return retval;
 
 	}
-
-
 }
