@@ -12,13 +12,51 @@ buildscript {
 apply plugin: 'com.android.application'
 
 dependencies {
-	compile project(':Wi2MeCore')
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
+configurations {
+	minApi25
+	minApi26
+}
+
 android {
+	defaultConfig {
+    	versionCode 2
+	}
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
+	flavorDimensions "api"
+    productFlavors {
+
+		minApi26 {
+    	  dimension "api"
+	      minSdkVersion '26'
+
+	      // To ensure the target device receives the version of the app with
+    	  // the highest compatible API level, assign version codes in increasing
+    	  // value with API level. To learn more about assigning version codes to
+	      // support app updates and uploading to Google Play, read Multiple APK Support
+    	  versionCode 30000 + android.defaultConfig.versionCode
+	      versionNameSuffix "-minApi26"
+		  dependencies {
+			minApi26Compile project(path: ':Wi2MeCore', configuration: 'minApi26Debug')
+		  }
+    	}
+
+	    minApi25 {
+    	  dimension "api"
+	      minSdkVersion '25'
+		  buildToolsVersion "25.0.1"
+	      compileSdkVersion 25
+    	  versionCode 20000  + android.defaultConfig.versionCode
+	      versionNameSuffix "-minApi25"
+		  dependencies {
+			minApi25Compile project(path: ':Wi2MeCore', configuration: 'minApi25Debug')
+		  }
+    	}
+	}
+
     repositories {
 		maven {
             url 'https://maven.google.com'
@@ -27,9 +65,9 @@ android {
         	url 'https://www.jitpack.io'
 	    }
     }
-	dependencies {
-		compile 'com.github.pkleczko:CustomGauge:master-SNAPSHOT'
-	}
+	//dependencies {
+	//	compile 'com.github.pkleczko:CustomGauge:master-SNAPSHOT'
+	//}
 
     sourceSets {
         main {

@@ -66,11 +66,7 @@ import telecom.wi2meCore.model.parameters.Parameter;
 import telecom.wi2meCore.model.TraceManager;
 import telecom.wi2meCore.controller.services.StatusService;
 
-
-//import com.github.anastr.speedviewlib.TubeSpeedometer;
-
-import pl.pawelkleczkowski.customgauge.CustomGauge;
-
+//import pl.pawelkleczkowski.customgauge.CustomGauge;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -182,7 +178,7 @@ public class Wi2MeRecherche extends Activity
 	        context = this;
 
 
-	        CustomGauge gauge1 = findViewById(R.id.gauge1);
+	        /*CustomGauge gauge1 = findViewById(R.id.gauge1);
 			gauge1.setValue(-140);
 	        CustomGauge gauge2 = findViewById(R.id.gauge2);
 			gauge2.setValue(0);
@@ -190,7 +186,7 @@ public class Wi2MeRecherche extends Activity
 			TextView gauge1Value = findViewById(R.id.textView1);
 			gauge1Value.setText("-140 dBm");
 			TextView gauge2Value = findViewById(R.id.textView2);
-			gauge2Value.setText("0 Mbits/s");
+			gauge2Value.setText("0 Mbits/s");*/
 
 
         	startService();
@@ -248,11 +244,12 @@ public class Wi2MeRecherche extends Activity
 
 			switch(item.getItemId()){
 				case MENU_START:
-					if (!binder.getServices().getLocation().isGPSEnabled() || (!binder.getServices().getLocation().isNetworkLocationEnabled() && binder.getServices().getCell().isDataTransferringEnabled()))
+					/*if (!binder.getServices().getLocation().isGPSEnabled() || (!binder.getServices().getLocation().isNetworkLocationEnabled() && binder.getServices().getCell().isDataTransferringEnabled()))
 					{
+						Log.e(getClass().getSimpleName(), "++ " + "LOCATION SATAN " + binder.getServices().getLocation().isGPSEnabled() + " " +  binder.getServices().getLocation().isNetworkLocationEnabled()  + " " + binder.getServices().getCell().isDataTransferringEnabled());
 						openLocationSettings();
 						break;
-					}
+					}*/
 					if ((Boolean)binder.parameters.getParameter(Parameter.CONNECT_CELLULAR)){//If user chose to connect to cellular networks, this must be enabled
 						if (!binder.getServices().getCell().isDataTransferringEnabled())
 						{
@@ -822,7 +819,7 @@ public class Wi2MeRecherche extends Activity
 
 			int level = ControllerServices.getInstance().getCell().getLastRsrp();
 			float thr = ControllerServices.getInstance().getWeb().getAverageThroughput();
-	        CustomGauge gauge1 = findViewById(R.id.gauge1);
+	        /*CustomGauge gauge1 = findViewById(R.id.gauge1);
 			gauge1.setValue(level);
 			TextView gauge1Value = findViewById(R.id.textView1);
 			gauge1Value.setText(level + " dBm");
@@ -836,7 +833,7 @@ public class Wi2MeRecherche extends Activity
 			{
 				TextView cellTextValue = findViewById(R.id.textView3);
 				cellTextValue.setText(String.format("Current Cell : %x", cell.cid));
-			}
+			}*/
 
 			Location location = ControllerServices.getInstance().getLocation().getLocation();
 			if (location != null)

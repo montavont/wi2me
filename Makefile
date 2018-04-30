@@ -6,7 +6,7 @@ clean:
 buildgradle:
 	./gradlew build
 
-upload.debug:
-	adb install -r  ./Wi2MeRecherche/build/outputs/apk/Wi2MeRecherche-debug.apk
+upload.debug.25:
+	adb install -r Wi2MeRecherche/build/outputs/apk/Wi2MeRecherche-minApi25-debug.apk
 
-dbg: buildgradle upload.debug
+dbg: buildgradle upload.debug.25
