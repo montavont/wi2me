@@ -73,6 +73,7 @@ public class WifiScanner extends WirelessNetworkCommand{
 	public void run(IParameterManager parameters) {
 		//To change the status of the application in Wi2MeUser
 		StatusService.getInstance().changeStatus("Scanning...");
+		m_stateString = "Scanning...";
 
 		int scanInterval = (Integer) parameters.getParameter(Parameter.WIFI_SCAN_INTERVAL);
 		int maxTimeSteady = (Integer) parameters.getParameter(Parameter.NOT_MOVING_TIME);

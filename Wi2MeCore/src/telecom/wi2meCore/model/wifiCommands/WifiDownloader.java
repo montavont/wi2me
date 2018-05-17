@@ -94,7 +94,9 @@ public class WifiDownloader extends WirelessNetworkCommand{
 			if (canDownload){
 				try {
 					WifiInfo current = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
+					m_stateString = "Downloading";
 					if (download(downloadReceiver, current.getBSSID(), current.getSSID())){
+						m_stateString = "Download complete";
 						//if download was complete and successful
 						current = ControllerServices.getInstance().getWifi().getWifiConnectionInfo();
 						if (current != null){
@@ -104,6 +106,7 @@ public class WifiDownloader extends WirelessNetworkCommand{
 							}
 						}
 					}else{
+						m_stateString = "Download incomplete";
 						//if download was not complete, it was unsuccessful, so an error ocurred (normally, we downloaded something we did not wan to, as an Authentication page of a Captive Portal)
 						// We will simulate disconnection of community network, so that the following pings, uploads and downloads won't take place, and the cleaner will disconnect the network properly
 						parameters.setParameter(Parameter.COMMUNITY_NETWORK_CONNECTED, false);
@@ -112,16 +115,19 @@ public class WifiDownloader extends WirelessNetworkCommand{
 				} catch (DownloadingInterruptedException e) {
 					// If we are interrupted, just finish execution
 					Log.d(getClass().getSimpleName()+"-INTERRUPTED", "++ "+e.getMessage(), e);
+					m_stateString = "Interrupted";
 				} catch (DownloadingFailException e) {
 					// If other failure happens, log it (probably connection was lost, but that is normal). Then, make sure you are disconnected
 					Log.w(getClass().getSimpleName(), "++ "+e.getMessage(), e);
 					// We will simulate disconnection of community network, so that the following pings, uploads and downloads won't take place, and the cleaner will disconnect the network properly
 					parameters.setParameter(Parameter.COMMUNITY_NETWORK_CONNECTED, false);
+					m_stateString = "Download Failure";
 				} catch (TimeoutException e) {
 					// If timeout was obtained, log and finish connection
 					Log.w(getClass().getSimpleName(), "++ "+e.getMessage(), e);
 					// We will simulate disconnection of community network, so that the following pings, uploads and downloads won't take place, and the cleaner will disconnect the network properly
 					parameters.setParameter(Parameter.COMMUNITY_NETWORK_CONNECTED, false);
+					m_stateString = "Download Timeout";
 				}
 			}
 		}
