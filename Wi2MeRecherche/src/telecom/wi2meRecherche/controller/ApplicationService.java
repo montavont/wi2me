@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Observable;
 import java.util.Observer;
 import java.util.zip.ZipEntry;
@@ -90,7 +91,7 @@ import android.widget.Toast;
 public class ApplicationService extends Service {
 
 	private static String ASSETS_FILES_DIRECTORY = "files/";
-    HashMap<String, IWirelessNetworkCommandLooper> WirelessLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
+    LinkedHashMap<String, IWirelessNetworkCommandLooper> WirelessLoopers = new LinkedHashMap<String, IWirelessNetworkCommandLooper>();
     HashMap<String, Thread> WirelessThreads = new HashMap<String, Thread>();
 
 	IParameterManager parameters;
@@ -379,8 +380,9 @@ public class ApplicationService extends Service {
 			this.isRunning = isRunning;
 		}
 
-		public synchronized HashMap<String, HashMap<String,String>> getLooperData() {
-    		HashMap<String, HashMap<String, String>> looperData = new HashMap<String, HashMap<String, String>>();
+		public synchronized LinkedHashMap<String, LinkedHashMap<String,String>> getLooperData()
+		{
+    		LinkedHashMap<String, LinkedHashMap<String, String>> looperData = new LinkedHashMap<String, LinkedHashMap<String, String>>();
 
 			for (String looperKey:WirelessLoopers.keySet())
 			{

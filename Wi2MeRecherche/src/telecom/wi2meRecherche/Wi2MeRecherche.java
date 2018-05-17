@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -846,7 +847,7 @@ public class Wi2MeRecherche extends Activity
 
 			//addTableRow(getResources().getString(R.string.mainscreen_localization_battery), String.valueOf(logTrace.content.getBatteryLevel())+"%");
 
-			HashMap<String, HashMap<String, String>> looperData = binder.getLooperData();
+			LinkedHashMap<String, LinkedHashMap<String, String>> looperData = binder.getLooperData();
 			for (String looperKey : looperData.keySet())
 			{
 				addTableRow(looperKey, "", Color.rgb(30, 30, 30));
