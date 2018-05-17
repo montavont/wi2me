@@ -19,6 +19,7 @@
 
 package telecom.wi2meCore.model;
 
+import java.util.LinkedHashMap;
 import java.util.HashMap;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public interface IWirelessNetworkCommandLooper {
 	/**
 	 * Get a string describing the state of the looper
 	 */
-	HashMap<String, String> getStates();
+	LinkedHashMap<String, String> getStates();
 
 	/**
 	 * Loops the commands one after another until the passed Flag is deactivated.

@@ -36,6 +36,7 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Properties;
@@ -95,7 +96,7 @@ public class ConfigurationManager
 	public static final int MAX_TRACES = 60000;
 	public static final String ASSET_COMMAND_LOOPS = "commandLoops";
 
-	private static HashMap<String, IWirelessNetworkCommandLooper> m_CommandLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
+	private static LinkedHashMap<String, IWirelessNetworkCommandLooper> m_CommandLoopers = new LinkedHashMap<String, IWirelessNetworkCommandLooper>();
 	private static HashMap<String, String> m_EventButtons = new HashMap<String, String>();
 
 	private enum ObjectType{
@@ -384,7 +385,7 @@ public class ConfigurationManager
 		}
 	}
 
-    public static HashMap<String, IWirelessNetworkCommandLooper> getWirelessLoopers()
+    public static LinkedHashMap<String, IWirelessNetworkCommandLooper> getWirelessLoopers()
 	{
 		try
 		{
@@ -423,7 +424,7 @@ public class ConfigurationManager
 		JsonReader reader = new JsonReader(new InputStreamReader(stream));
 
 		//Reset loopers and buttons
-		m_CommandLoopers = new HashMap<String, IWirelessNetworkCommandLooper>();
+		m_CommandLoopers = new LinkedHashMap<String, IWirelessNetworkCommandLooper>();
 		m_EventButtons = new HashMap<String, String>();
 
 		reader.beginObject();

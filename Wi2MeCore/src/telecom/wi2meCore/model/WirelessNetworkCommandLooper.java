@@ -21,6 +21,7 @@ package telecom.wi2meCore.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import telecom.wi2meCore.model.Flag;
 import telecom.wi2meCore.model.parameters.IParameterManager;
@@ -77,9 +78,9 @@ public class WirelessNetworkCommandLooper implements IWirelessNetworkCommandLoop
 	}
 
 	@Override
-	public HashMap<String, String> getStates()
+	public LinkedHashMap<String, String> getStates()
 	{
-		HashMap<String, String> states = new HashMap<String, String>();
+		LinkedHashMap<String, String> states = new LinkedHashMap<String, String>();
 
 		for (int i = 0; i < commands.size(); i++)
 		{
