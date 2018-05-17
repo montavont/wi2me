@@ -57,8 +57,6 @@ public class Free implements ICommunityNetwork {
 
 	private String name = "FreeWifi";
 	private String regExp = "FreeWifi";
-	private String pluginFilename = "plugins/freewifi.js";
-	private String loadedPlugin = "";
 	private String nameInApplication = "FreeWifi";
 	private String userParameter = "FREEWIFI_USER";
 	private String passwordParameter = "FREEWIFI_PASSWORD";
@@ -101,7 +99,7 @@ public class Free implements ICommunityNetwork {
 		Runnable routine = new Runnable()
 		{
 			String freeWifiServer =  "https://wifi.free.fr/Auth";
-			String wi2meServer = "http://216.34.181.45";
+			String wi2meServer = "https://slashdot.org";
 
 			String wi2meServerPage = "News for nerds, stuff that matters";
 
