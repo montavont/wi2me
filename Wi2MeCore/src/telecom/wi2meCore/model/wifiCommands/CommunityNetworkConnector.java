@@ -86,6 +86,7 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 		{
 			if (ControllerServices.getInstance().getWifi().isConnectedToAP()){ //We check we are actually connected
 				//To change the status of the application in Wi2MeUser
+				m_stateString = "Hotspot Authentication...";
 				StatusService.getInstance().changeStatus("Hotspot Authentication...");
 
 				Object connectedToObj = parameters.getParameter(Parameter.WIFI_CONNECTED_TO_AP);
@@ -107,10 +108,12 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 									for (User user : users){
 										if (connectedTo.SSID.matches(communityService.getRegExp(user.getCommunityNetwork()))){
 											connected = connectToCommunityNetwork(user, connectedTo, receiver);
+											m_stateString = "Connected : " + connected;
 										}
 									}
 								} catch (TimeoutException e) {
 									Log.d(getClass().getSimpleName(), "++ "+"Connecting to Community Network Timeout", e);
+									m_stateString = "Timeout";
 									//in this case we want the connection not to take place later
 									communityService.stopCommunityNetworkConnection();
 
@@ -118,6 +121,7 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 									connected = false;
 
 								} catch (InterruptedException e) {
+									m_stateString = "Interrupted";
 									Log.d(getClass().getSimpleName(), "++ "+"Connecting to Community Network Interrupted", e);
 									//in this case we want the connection not to take place later
 									communityService.stopCommunityNetworkConnection();
@@ -129,6 +133,7 @@ public class CommunityNetworkConnector extends WirelessNetworkCommand{
 							}
 						}else{
 							//if it is not a community network, simulate we are connected!
+							m_stateString = "N/A";
 							connected = true;
 						}
 					}

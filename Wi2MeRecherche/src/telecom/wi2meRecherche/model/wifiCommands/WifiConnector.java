@@ -160,12 +160,14 @@ public class WifiConnector extends WirelessNetworkCommand{
 
 							//We inform that we will attempt to connect
 							parameters.setParameter(Parameter.WIFI_CONNECTION_ATTEMPT, true);
+							m_stateString = "Connecting to " + r.SSID + "\n Rssi : " + r.level;
 
 							if (restrictedBssids.size() == 0 || restrictedBssids.contains(r.BSSID))
 							{
 								connected = connectTo(r);
 								if (connected)
 								{
+									m_stateString = "Connected to " + r.SSID;
 									//We keep a reference of the AP we are connected to
 									parameters.setParameter(Parameter.WIFI_CONNECTED_TO_AP, connectionTo);
 									if ((Boolean)parameters.getParameter(Parameter.NOTIFY_WHEN_WIFI_CONNECTED))
@@ -180,6 +182,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 
 						if (connected)
 						{
+							m_stateString = "Connected to " + r.SSID;
 							break;
 						}
 					}
@@ -189,6 +192,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 			catch(TimeoutException e)
 			{
 				Log.d(getClass().getSimpleName(), "++ "+"Connecting Timeout", e);
+				m_stateString = "Connection Timeout ";
 				//We must forget the network not to connect later
 				ControllerServices.getInstance().getWifi().cleanNetworks();
 				//Log the timeout event
@@ -201,6 +205,7 @@ public class WifiConnector extends WirelessNetworkCommand{
 			}
 			catch (InterruptedException e)
 			{
+				m_stateString = "Connectininterrupted ";
 				Log.d(getClass().getSimpleName(), "++ "+"Connection Interrupted ", e);
 				//We must forget the network not to connect later
 				ControllerServices.getInstance().getWifi().cleanNetworks();
