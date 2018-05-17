@@ -101,7 +101,7 @@ public class SALSA implements ICommunityNetwork {
 
 		Runnable routine = new Runnable()
 		{
-			String wi2meServer = "http://216.34.181.45";
+			String wi2meServer = "https://slashdot.org";
 			String wi2meServerPage = "News for nerds, stuff that matters";
 
 			String salsaUrl = "https://webauth.telecom-bretagne.eu/login.html";
