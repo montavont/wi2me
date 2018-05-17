@@ -61,7 +61,7 @@ public class CryptoUtils {
 		    }
 
 		   SecretKeySpec sks = getSecretKeySpec(keyFile);
-		   Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+		   Cipher cipher = Cipher.getInstance("AES");///CBC/PKCS5PADDING");
 		   cipher.init(Cipher.ENCRYPT_MODE, sks, cipher.getParameters());
 		   byte[] encrypted = cipher.doFinal(value.getBytes());
 		   return byteArrayToHexString(encrypted);
@@ -74,7 +74,7 @@ public class CryptoUtils {
 	   */
 	  public static String decrypt(String message, File keyFile)throws GeneralSecurityException, IOException {
 		   SecretKeySpec sks = getSecretKeySpec(keyFile);
-		   Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+		   Cipher cipher = Cipher.getInstance("AES");///CBC/PKCS5PADDING");
 		   cipher.init(Cipher.DECRYPT_MODE, sks);
 		   byte[] decrypted = cipher.doFinal(hexStringToByteArray(message));
 		   return new String(decrypted);
