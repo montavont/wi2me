@@ -22,7 +22,6 @@ import os
 from osmxapi.xapiquery import XapiQuery
 from osmxapi import OsmXapi
 from osmxapi import bbox
-import mapnik2 as mapnik
 import cairo 
 from settings import TEMP_DIR
 import numpy as np

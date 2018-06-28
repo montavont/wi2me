@@ -24,15 +24,15 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-CSV_SEP = " "
+CSV_SEP = "\t"
 
 class wi2meEvent:
     EXTERNAL = 0
-    SCAN_RESULT = 1
+    SCAN_RESULT = "WIFI_SCAN_RESULT"
     CONNECTION_EVENT = 2
     CONNECTION_DATA = 3
     WIFI_DISCONNECTED = 4
-    NEW_LOCATION = 5
+    NEW_LOCATION = "LOCATION_EVENT"
     NEW_BATTERY_LEVEL = 6
     WIFI_ON = 7
     STARTING_CONF = 8
@@ -64,25 +64,36 @@ class dbParser:
         data = c.execute('select * from ExternalEvent where TraceId = ' + str(eventId)).fetchone()
         _, _, eventType = data
 
-        if eventType == EventDescs[wi2meEvent.WIFI_DISCONNECTED]:
-            retval += str(wi2meEvent.WIFI_DISCONNECTED)
-        elif eventType == EventDescs[wi2meEvent.NEW_LOCATION]:
+        #if eventType == EventDescs[wi2meEvent.WIFI_DISCONNECTED]:
+        #    retval += str(wi2meEvent.WIFI_DISCONNECTED)
+        if eventType == EventDescs[wi2meEvent.NEW_LOCATION]:
             retval += str(wi2meEvent.NEW_LOCATION)
-            #_, _, altitude , longitude, latitude, accuracy, bearing, speed, provider, _, _ = pLine
-            for val in pLine[2:9]:
-                retval += CSV_SEP
-                retval += str(val)
-        elif eventType == EventDescs[wi2meEvent.NEW_BATTERY_LEVEL]:
-            retval += str(wi2meEvent.NEW_BATTERY_LEVEL)
+            _, _, altitude , longitude, latitude, accuracy, bearing, speed, provider, _, _ = pLine
             retval += CSV_SEP
-            batteryLevel = pLine[9]
-            retval += str(batteryLevel)
-        elif eventType.startswith(EventDescs[wi2meEvent.WIFI_ON]):
-            retval += str(wi2meEvent.WIFI_ON)
-        elif eventType.startswith(EventDescs[wi2meEvent.STARTING_CONF]):
-            retval += str(wi2meEvent.STARTING_CONF)
+            retval += str(provider)
             retval += CSV_SEP
-            retval += eventType
+            retval += str(altitude)
+            retval += CSV_SEP
+            retval += str(latitude)
+            retval += CSV_SEP
+            retval += str(longitude)
+            retval += CSV_SEP
+            retval += str(speed)
+            retval += CSV_SEP
+            retval += str(accuracy)
+            retval += CSV_SEP
+            retval += str(bearing)
+        #elif eventType == EventDescs[wi2meEvent.NEW_BATTERY_LEVEL]:
+        #    retval += str(wi2meEvent.NEW_BATTERY_LEVEL)
+        #    retval += CSV_SEP
+        #    batteryLevel = pLine[9]
+        #    retval += str(batteryLevel)
+        #elif eventType.startswith(EventDescs[wi2meEvent.WIFI_ON]):
+        #    retval += str(wi2meEvent.WIFI_ON)
+        #elif eventType.startswith(EventDescs[wi2meEvent.STARTING_CONF]):
+        #    retval += str(wi2meEvent.STARTING_CONF)
+        #    retval += CSV_SEP
+        #    retval += eventType
         #else: TODO : CONNECTION MONITOR PARSING
 
         return retval
@@ -100,7 +111,7 @@ class dbParser:
                 payload += CSV_SEP
             payload = payload.rstrip(CSV_SEP)
             retval.append(payload)
-        
+
         return retval
 
     def parseEvent(self, eventId, ts, eventType, pLine):
@@ -111,12 +122,16 @@ class dbParser:
             line = ""
             line += str(ts)
             line += CSV_SEP
+            line += "100" #Battery....to remove
+            line += CSV_SEP
             line += self.parseExternalEvent(eventId, pLine)
             retval.append(line)
         if eventType == EventDescs[wi2meEvent.SCAN_RESULT]:
             for resultPayload in self.parseScanResult(eventId):
                 line = ""
                 line += str(ts)
+                line += CSV_SEP
+                line += "100" #Battery....to remove
                 line += CSV_SEP
                 line += str(wi2meEvent.SCAN_RESULT)
                 line += CSV_SEP
